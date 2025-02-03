@@ -109,7 +109,7 @@ Note:- This is a Sample Project for learning purpose, we have not much considere
 
 #### Some Screenshots for the project:
 - Home Page
-![image](https://github.com/bjmanish/MyShop/assets/homePage.png)
+![image]([https://github.com/bjmanish/MyShop/assets/homePage.png])
 - Login Page
 ![image](https://github.com/bjmanish/MyShop/assets/34605595/c5451416-a669-4d76-ad84-9b8ea26bf6b4)
 - Register Page
