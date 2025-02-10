@@ -1,4 +1,4 @@
-# Online Shopping Cart (E-Commerce Website)
+# MyShop (E-Commerce Website)
 
 ### About
 
