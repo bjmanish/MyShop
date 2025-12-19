@@ -1,87 +1,94 @@
-<%@ page language="java" contentType="text/html; charset=ISO-8859-1"
-	pageEncoding="ISO-8859-1"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8"%>
 <!DOCTYPE html>
 <html>
-    <head>
-        <title>Login</title>
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
-        <link rel="stylesheet" href="./css/main.css">
-        <script	src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-        <script	src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
-    </head>
-    <body style="background-color: #E6F9E6;">
+<head>
+    <meta charset="UTF-8">
+    <title>Login</title>
 
-        <jsp:include page="header.jsp"></jsp:include>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
 
-	<%
-	String message = request.getParameter("message");
-        String email = (String)session.getAttribute("Email");
-	%>
-	<div class="container">
-            <div class="row" style="margin: 10px 10px;">
-		<form action="./LoginSrv" method="post" class="col-md-4 col-md-offset-4 col-sm-8 col-sm-offset-2"
-                    style="border: 2px solid black; border-radius: 10px; background-color: #FFE5CC; padding: 10px;" >
-                    <div style="font-weight: bold;" class="text-center">
-			<h2 style="color: green;">Login Form</h2>
-			<%
-                            if (message != null) {
-			%>
-                        <p style="color: red;" id="errorMessage"><%=message%></p>
-			<%  } %>
-                    </div>
-                    
-                    <div></div>
-                    
-                    <div class="row">			
-                        <div class="col-md-12 form-group">
-                            <label for="username">Username</label>   
-                            <%if(email != null){%>
-                            <input type="email" placeholder="Enter valid email" name="username" class="form-control" id="email" value="<%=email%>" required>
-                            <%}else{%>
-                            <input type="email" placeholder="Enter valid email" name="username" class="form-control" id="email" required>
-                            <%}%>
+<body class="bg-light">
+
+<jsp:include page="header.jsp" />
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-5">
+            <div class="card shadow">
+                <div class="card-body">
+
+                    <h3 class="text-center text-success mb-3">Login Form</h3>
+
+                    <%-- ERROR MESSAGE --%>
+                    <%
+                        String error = (String) session.getAttribute("error");
+                        if (error != null) {
+                    %>
+                        <div id="errorBox" class="alert alert-danger text-center">
+                            <%= error %>
                         </div>
-                    </div>
-                    
-                    <div class="row">			
-                        <div class="col-md-12 form-group">
-                            <label for="last_name">Password</label> 
-                            <input type="password" placeholder="Enter Password" name="password" class="form-control" id="password" required>
-			</div>
-                    </div>
-                    
-                    <div class="row">
-			<div class="col-md-12 form-group">
-                            <label for="userrole">Login As</label> 
-                            <select name="usertype" id="userrole" class="form-control" required>
-				<option value="customer" selected>CUSTOMER</option>
+                    <%
+                          // session.removeAttribute("error"); // clear flash message
+                        }
+                    %>
+
+                    <form action="LoginSrv" method="post">
+
+                        <!-- Email -->
+                        <div class="mb-3">
+                            <label>Email</label>
+                            <input type="email" name="username" class="form-control" required>
+                        </div>
+
+                        <!-- Password -->
+                        <div class="mb-3">
+                            <label>Password</label>
+                            <input type="password" name="password" class="form-control" required>
+                        </div>
+
+                        <!-- User Role -->
+                        <div class="mb-3">
+                            <label class="form-label">Login As</label>
+                            <select class="form-select" name="usertype" required>
+                                <option value="customer">CUSTOMER</option>
                                 <option value="admin">ADMIN</option>
                                 <option value="staff">DELIVERY STAFF</option>
                             </select>
                         </div>
-                    </div>
-                    
-                    <div class="row">
-			<div class="col-md-12 text-center">
-                            <button type="submit" id="loginButton" class="btn btn-success">Login</button>
-                        </div>
-                    </div>                        
-                    
-                    <!-- Register Link -->
-                    <div class="row" style="margin-top: 10px;">
-			<div class="col-md-12 text-center">
-                            <a href="register.jsp">I do not have an Account? Create Account</a>
-                        </div>
-                    </div>
-                    
-                                
-		</form>
-                        
-            </div>
-                                
-	</div>
 
-        <jsp:include page="footer.html"></jsp:include>
-        <script src="./js/allJsCode.js"></script>
-    </body>
+                        <!-- Remember Me -->
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" name="rememberMe">
+                            <label class="form-check-label">Remember Me</label>
+                        </div>
+
+                        <!-- Submit -->
+                        <div class="d-grid mb-3">
+                            <button type="submit" class="btn btn-success">Login</button>
+                        </div>
+
+                        <div class="text-center">
+                            <a href="register.jsp">Create New Account</a>
+                        </div>
+
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<jsp:include page="footer.html" />
+
+<script>
+    // Auto-hide error
+    setTimeout(() => {
+        const box = document.getElementById("errorBox");
+        if (box) box.style.display = "none";
+    }, 5000);
+</script>
+
+</body>
 </html>

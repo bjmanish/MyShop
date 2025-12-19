@@ -51,7 +51,7 @@
                         <div class="row">
                             <div class="col-md-12 form-group">
                                 <label for="cardnumber">Card Number</label>
-                                <input type="number" class="form-control" id="cardnumber" name="cardnumber" placeholder="1111-2222-3333-4444" required>
+                                <input type="text" minlength="19" maxlength="19" class="form-control" id="cardnumber" name="cardnumber" value="6578-9843-7854-8976" placeholder="1111-2222-3333-4444" required>
                             </div>
                         </div>
                         

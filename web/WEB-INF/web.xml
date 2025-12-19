@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--<web-app version="3.1" xmlns="http://xmlns.jcp.org/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd">-->
+<web-app version="3.0" xmlns="http://java.sun.com/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee          http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd">
+    <servlet>
+        <servlet-name>ViewStaffSev</servlet-name>
+        <servlet-class>com.myshop.srv.ViewStaffSrv</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>StaffImage</servlet-name>
+        <servlet-class>com.myshop.srv.StaffImage</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>VerifyOtp</servlet-name>
+        <servlet-class>com.myshop.srv.VerifyOtp</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>FetchProductSrv</servlet-name>
+        <servlet-class>com.myshop.srv.FetchProductSrv</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>OtpServlet</servlet-name>
+        <servlet-class>com.myshop.srv.OtpServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>Verify</servlet-name>
+        <servlet-class>com.myshop.srv.Verify</servlet-class>
+    </servlet>
+    
+    <servlet>
+        <servlet-name>SendOTPSrv</servlet-name>
+        <servlet-class>com.myshop.srv.SendOTPSrv</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>SendOTPSrv</servlet-name>
+        <url-pattern>/SendOTPSrv</url-pattern>
+    </servlet-mapping>
+    
+    <servlet>
+        <servlet-name>VerifyOTPServlet</servlet-name>
+        <servlet-class>com.myshop.srv.VerifyOTPServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>VerifyOTPServlet</servlet-name>
+        <url-pattern>/VerifyOTPServlet</url-pattern>
+    </servlet-mapping>
+    
+    <servlet-mapping>
+        <servlet-name>ViewStaffSev</servlet-name>
+        <url-pattern>/ViewStaffSev</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>StaffImage</servlet-name>
+        <url-pattern>/StaffImage</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>VerifyOtp</servlet-name>
+        <url-pattern>/VerifyOtp</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>FetchProductSrv</servlet-name>
+        <url-pattern>/FetchProductSrv</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>OtpServlet</servlet-name>
+        <url-pattern>/OtpServlet</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>Verify</servlet-name>
+        <url-pattern>/Verify</url-pattern>
+    </servlet-mapping>
+    <session-config>
+        <session-timeout>
+            30
+        </session-timeout>
+    </session-config>
+</web-app>

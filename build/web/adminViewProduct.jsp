@@ -2,14 +2,14 @@
 <%@page import="com.myshop.beans.ProductBean"%>
 <%@page import="java.util.List"%>
 <%@page import="com.myshop.service.impl.ProductServiceImpl"%>
-<%@ page language="java" contentType="text/html; charset=ISO-8859-1"
+<%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="ISO-8859-1"%>
 
 <!DOCTYPE html>
 <html>
     <head>
         <title>View Products</title>
-        <meta charset="utf-8">
+<!--        <meta charset="utf-8">-->
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
         <link rel="stylesheet" href="css/main.css">
@@ -23,37 +23,33 @@
 	String userName = (String) session.getAttribute("username");
 	String password = (String) session.getAttribute("password");
 	String userType = (String) session.getAttribute("usertype");
+//        System.out.println("view product admin details; "+userName+" userrole "+userType+" pass: "+password);
+        System.out.println(session.getId());
+	if(userType == null || !userType.equals("admin")) {
+            response.sendRedirect("login.jsp?message=Access Denied, Login as admin!!");
+	}else if (userName == null || password == null) {
+            response.sendRedirect("login.jsp?message=Session Expired, Login Again!!");
+	}else{
+            ProductServiceImpl prodDao = new ProductServiceImpl();
+            List<ProductBean> products = new ArrayList<>();
 
-	if (userType == null || !userType.equals("admin")) {
-
-		response.sendRedirect("login.jsp?message=Access Denied, Login as admin!!");
-
-	}
-
-	else if (userName == null || password == null) {
-
-		response.sendRedirect("login.jsp?message=Session Expired, Login Again!!");
-
-	}
-	ProductServiceImpl prodDao = new ProductServiceImpl();
-	List<ProductBean> products = new ArrayList<>();
-
-	String search = request.getParameter("search");
-	String type = request.getParameter("type");
-	String message = "All Products";
-	if (search != null) {
+            String search = request.getParameter("search");
+            String type = request.getParameter("type");
+            String message = "All Products";
+            if (search != null) {
 		products = prodDao.searchAllProducts(search);
 		message = "Showing Results for '" + search + "'";
-	} else if (type != null) {
+            } else if (type != null) {
 		products = prodDao.getAllProductsByType(type);
 		message = "Showing Results for '" + type + "'";
-	} else {
+            } else {
 		products = prodDao.getAllProducts();
-	}
-	if (products.isEmpty()) {
-		message = "No items found for the search '" + (search != null ? search : type) + "'";
+            }
+            if (products.isEmpty()) {
+            	message = "No items found for the search '" + (search != null ? search : type) + "'";
 		products = prodDao.getAllProducts();
-	}
+            }
+        
 	%>
 
 
@@ -97,6 +93,7 @@
 
             </div>
 	</div>
+        <%}%>
 	<!-- ENd of Product Items List -->
 
 	<%@ include file="footer.html"%>

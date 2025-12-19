@@ -1,5 +1,6 @@
 package com.myshop.utility;
 
+import com.myshop.beans.StaffBean;
 import javax.mail.MessagingException;
 
 public class MailMessage {
@@ -21,6 +22,25 @@ public class MailMessage {
         
        JavaMailUtil.sendMail(recipient, subject, htmlTextMessage); 
     }
+    
+    public static void staffRegistrationSuccess(StaffBean staff, String name) throws MessagingException {
+	String recipient = staff.getStaffId();
+	String subject = "Staff Registration Successfully";
+	String htmlTextMessage = "" + "<html>" + "<body>"
+		+ "<h2 style='color:green;'>Welcome to THE MYSHOP</h2>" + "" + "Hii " + name + ","
+		+ "<br><br>Thanks for joining with THE MYSHOP.<br>"             
+                + "Email ID: " + staff.getStaffId() + "\n"
+                + "Staff password: " + PasswordEncryption.getDecryptedPassword(staff.getPassword()) + "\n"
+                + "\n"
+                + "These details are crucial for internal record-keeping and ensuring efficient communication within the organization.\n"
+                + "<br>\n"
+                + "Best regards,\n"
+                + "<strong>The MYSHOP Store</strong>\n"
+                + "</body>" + "</html>";
+    
+       JavaMailUtil.sendMail(recipient, subject, htmlTextMessage); 
+    }
+    
     
     
     public static void productAvailableNow(String recipientEmail, String userName, String prodName, String prodId) throws MessagingException {
@@ -87,6 +107,48 @@ public class MailMessage {
             e.printStackTrace();
         }
     }
+    
+    public static void orderOutForDelivery(String recipientEmail, String name, String orderId, String deliveryDate, String prodId, String otp) {
+    String subject = "📦 Your Order is Out for Delivery - THE MYSHOP STORE";
+
+    String htmlTextMessage = "<!DOCTYPE html>" +
+        "<html>" +
+        "<head>" +
+        "<meta charset='UTF-8'>" +
+        "<style>" +
+        "  body { font-family: Arial, sans-serif; background-color: #f7f7f7; margin: 0; padding: 0; }" +
+        "  .container { background-color: #ffffff; max-width: 600px; margin: 30px auto; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }" +
+        "  .header { background-color: #4CAF50; color: white; padding: 10px 20px; border-top-left-radius: 8px; border-top-right-radius: 8px; }" +
+        "  .content { padding: 20px; color: #333; }" +
+        "  .btn { display: inline-block; padding: 10px 20px; margin-top: 20px; background-color: #4CAF50; color: white; text-decoration: none; border-radius: 5px; }" +
+        "  .footer { font-size: 12px; color: #777; text-align: center; margin-top: 20px; }" +
+        "</style>" +
+        "</head>" +
+        "<body>" +
+        "<div class='container'>" +
+        "  <div class='header'><h2>Delivery Status Update</h2></div>" +
+        "  <div class='content'>" +
+        "    <p>Hi <strong>" + name + "</strong>,</p>" +
+        "    <p>We're excited to let you know that your order <strong>" + orderId + "</strong> is now <strong style='color:#4CAF50;'>Out for Delivery</strong>.</p>" +
+        "    <p>Estimated delivery date: <strong>" + deliveryDate + "</strong></p>" +
+        "    <p class='btn' href='" + prodId + "'>Prod ID</p>" +
+        "    <p class='btn' href='" + otp + "'>Delivery OTP</p>" +
+            
+        "    <p>If you have any questions, feel free to contact our support team.</p>" +
+        "    <br/><p style='font-size:11px;color:#999;'>Note: This is a demo project email. No real transaction has been made.</p>" +
+        "  </div>" +
+        "  <div class='footer'>&copy; 2025 THE MYSHOP STORE. All rights reserved.</div>" +
+        "</div>" +
+        "</body>" +
+        "</html>";
+
+    try {
+        JavaMailUtil.sendMail(recipientEmail, subject, htmlTextMessage);
+    } catch (MessagingException e) {
+        e.printStackTrace();
+    }
+}
+
     
     public static String sendMessage(String toEmailId, String subject, String htmlTextMessage) {
         try {

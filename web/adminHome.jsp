@@ -1,102 +1,185 @@
-<%@ page language="java" contentType="text/html; charset=ISO-8859-1" pageEncoding="ISO-8859-1"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
-<html>  
+<html lang="en">
 <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>The MYSHOP - Admin Dashboard</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    
+    <meta charset="UTF-8">
+    <title>MYSHOP - Admin Dashboard</title>
+
     <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
 
     <style>
-        
-        .admin-container {
-            margin-top: 80px;
+        body {
+            background-color: #f0f4f8;
+            overflow-x: hidden;
         }
-        .admin-card {
-            margin-bottom: 20px;
-            text-align: center;
-            border-radius: 10px;
-            padding: 20px;
-            transition: 0.3s;
-            box-shadow: 2px 4px 10px rgba(0, 0, 0, 0.1);
+
+        /* Sidebar */
+        .sidebar {
+            height: calc(100vh - 70px);
+            width: 220px;
+            position: fixed;
+            top: 70px;
+            left: 0;
+            background-color: #343a40;
+            padding-top: 20px;
+            transition: all 0.3s ease;
+            z-index: 1000;
         }
-        .admin-card:hover {
+
+        .sidebar a {
+            color: #adb5bd;
+            display: block;
+            padding: 12px 20px;
+            text-decoration: none;
+        }
+
+        .sidebar a:hover,
+        .sidebar .active {
+            background-color: #0d6efd;
+            color: #fff;
+        }
+
+        /* Sidebar collapsed */
+        .sidebar-collapsed {
+            width: 0;
+            overflow: hidden;
+        }
+
+        /* Content */
+        .content {
+            margin-left: 220px;
+            padding: 30px;
+            transition: all 0.3s ease;
+        }
+
+        .content-collapsed {
+            margin-left: 0;
+        }
+
+        /* Cards */
+        .card-hover:hover {
             transform: scale(1.05);
+            transition: 0.3s;
         }
-        .admin-card i {
-            font-size: 40px;
-            margin-bottom: 10px;
+
+        /* Toggle button */
+        .sidebar-toggle-btn {
+            position: fixed;
+            top: 15px;
+            left: 15px;
+            z-index: 1100;
+            background-color: #0d6efd;
+            border: none;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 5px;
+        }
+
+        @media (min-width: 992px) {
+            .sidebar-toggle-btn {
+                display: none;
+            }
+        }
+
+        .footer {
+            margin-top: 50px;
         }
     </style>
 </head>
+<body>
 
-<body style="background-color: #E6F9E6;">
+<%
+    String userName = (String) session.getAttribute("username");
+    String userType = (String) session.getAttribute("usertype");
+    String userid = session.getId();
 
-    <%-- Admin Session Validation --%>
-    <%
-        String userName = (String) session.getAttribute("username");
-        String password = (String) session.getAttribute("password");
-        String userType = (String) session.getAttribute("usertype");
+    if (userName == null || userType == null || !userType.equalsIgnoreCase("admin") || userid==null) {
+        response.sendRedirect("login.jsp?error=access_denied");
+        return;
+    }
+%>
 
-        if (userType == null || !userType.equals("admin")) {
-            response.sendRedirect("login.jsp?error=access_denied");
-            return;
-        }
-        if (userName == null || password == null) {
-            response.sendRedirect("login.jsp?error=session_expired");
-            return;
-        }
-    %>
+<%@ include file="header.jsp" %>
 
-    <%@ include file="header.jsp" %>
+<button class="sidebar-toggle-btn" id="sidebarToggle">
+    <i class="bi bi-list"></i>
+</button>
 
-    <div class="container admin-container">
-        <div class="text-center">
-            <h1>Admin Dashboard</h1>
-            <p class="lead">Welcome, <%= userName %>! Manage your shop efficiently.</p>
+<!-- Sidebar -->
+<div class="sidebar" id="sidebar">
+    <h5 class="text-light text-center mb-3">MYSHOP Admin</h5>
+    <a href="#" class="active"><i class="bi bi-speedometer2 me-2"></i>Dashboard</a>
+    <a href="adminViewProduct.jsp?id=<%=userid%>"><i class="bi bi-box-seam me-2"></i>View Products</a>
+    <a href="FetchProductSrv"><i class="bi bi-plus-circle me-2"></i>Add Product</a>
+    <a href="addStaff.jsp<%=userid%>"><i class="bi bi-person-plus me-2"></i>Add Staff</a>
+    <a href="viewStaff.jsp<%=userid%>"><i class="bi bi-people me-2"></i>View Staff</a>
+    <a href="LogoutSrv"><i class="bi bi-box-arrow-right me-2"></i>Logout</a>
+</div>
+
+<!-- Content -->
+<div class="content" id="mainContent">
+
+    <h2 class="mb-2">Welcome, <%= userName %> 👋</h2>
+    <p class="text-muted">Manage your shop efficiently</p>
+
+    <div class="row g-4 mt-3">
+        <div class="col-md-3 col-sm-6">
+            <a href="adminViewProduct.jsp<%=id%>" class="text-decoration-none">
+                <div class="card card-hover text-center shadow p-3">
+                    <i class="bi bi-box-seam display-5 text-primary"></i>
+                    <h6 class="mt-2">View Products</h6>
+                </div>
+            </a>
         </div>
 
-        <div class="row">
-            <div class="col-md-3">
-                <div class="panel panel-info admin-card">
-                    <i class="glyphicon glyphicon-eye-open text-info"></i>
-                    <h4>View Products</h4>
-                    <a href="adminViewProduct.jsp" class="btn btn-info btn-block">Go</a>
+        <div class="col-md-3 col-sm-6">
+            <a href="FetchProductSrv" class="text-decoration-none">
+                <div class="card card-hover text-center shadow p-3">
+                    <i class="bi bi-plus-circle display-5 text-success"></i>
+                    <h6 class="mt-2">Add Product</h6>
                 </div>
-            </div>
+            </a>
+        </div>
 
-            <div class="col-md-3">
-                <div class="panel panel-success admin-card">
-                    <i class="glyphicon glyphicon-plus-sign text-success"></i>
-                    <h4>Add Product</h4>
-                    <a href="addProduct.jsp" class="btn btn-success btn-block">Go</a>
+        <div class="col-md-3 col-sm-6">
+            <a href="addStaff.jsp<%=id%>" class="text-decoration-none">
+                <div class="card card-hover text-center shadow p-3">
+                    <i class="bi bi-person-plus display-5 text-warning"></i>
+                    <h6 class="mt-2">Add Staff</h6>
                 </div>
-            </div>
+            </a>
+        </div>
 
-            <div class="col-md-3">
-                <div class="panel panel-primary admin-card">
-                    <i class="glyphicon glyphicon-user text-primary"></i>
-                    <h4>Add Delivery Staff</h4>
-                    <a href="addStaff.jsp" class="btn btn-primary btn-block">Go</a>
+        <div class="col-md-3 col-sm-6">
+            <a href="viewStaff.jsp<%=id%>" class="text-decoration-none">
+                <div class="card card-hover text-center shadow p-3">
+                    <i class="bi bi-people display-5 text-danger"></i>
+                    <h6 class="mt-2">View Staff</h6>
                 </div>
-            </div>
-
-            <div class="col-md-3">
-                <div class="panel panel-primary admin-card">
-                    <i class="glyphicon glyphicon-eye-open text-warning"></i>
-                    <h4>View Delivery Staff</h4>
-                    <a href="viewStaff.jsp" class="btn btn-warning btn-block">Go</a>
-                </div>
-            </div>
+            </a>
         </div>
     </div>
 
-    <%@ include file="footer.html" %>
+    <div class="footer">
+        <%@ include file="footer.html" %>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    const sidebar = document.getElementById("sidebar");
+    const content = document.getElementById("mainContent");
+
+    document.getElementById("sidebarToggle").onclick = () => {
+        sidebar.classList.toggle("sidebar-collapsed");
+        content.classList.toggle("content-collapsed");
+    };
+</script>
 
 </body>
 </html>

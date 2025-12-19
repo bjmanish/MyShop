@@ -1,9 +1,13 @@
+<%@page import="java.sql.Date"%>
+<%@page import="com.myshop.utility.DeliveryDate"%>
+<%@page import="java.time.ZoneId"%>
+<%@page import="java.time.LocalDate"%>
 <%@page import="java.sql.Timestamp"%>
 <%@page import="java.text.SimpleDateFormat"%>
 <%@page import="com.myshop.beans.OrderDetails"%>
 <%@page import="com.myshop.service.OrderService"%>
 <%@page import="com.myshop.beans.OrderBean"%>
-<%@page import="java.util.List"%>
+<%@page import="java.util.*"%>
 <%@page import="com.myshop.service.impl.OrderServiceImpl"%>
 <!DOCTYPE html "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html lang="en">
@@ -44,7 +48,7 @@
         <div class="container-fluid">
             <div class="table-responsive">
                 <table class="table table-hover table-sm table-bordered ">
-                    <thead class="thead-dark" style=" background-color: rgba(4, 80, 80); font-size: 18px; color:white;">
+                    <thead class="thead-dark" style=" background-color: rgba(4, 80, 80,0.9); font-size: 18px; color:white;">
                         <tr>
                             <th>Product Image</th>
                             <th>Order Id</th>
@@ -52,7 +56,8 @@
 <!--                            <th>Customer Details</th>-->
                             <th>Quantity</th>
                             <th>Amount</th>
-                            <th>Time</th>
+                            <th>Order Date</th>
+                            <th>Delivery Date</th>
                             <th>Status</th>
                         </tr>
                     </thead>
@@ -60,27 +65,27 @@
                     <tbody style="background-color: white;">
                         <!-- get the product details with transactions ID -->
                         <%
-                            OrderServiceImpl orderDAO = new OrderServiceImpl();            
-                            //System.out.println("userName: "+userName+" "+orderDAO.getAllOrderDetails(userName));
+                            OrderServiceImpl orderDAO = new OrderServiceImpl();          
                             List<OrderDetails> orders = orderDAO.getAllOrderDetails(userName);
-                            SimpleDateFormat sdf = new SimpleDateFormat("DD:MM:YYYY HH:mm:ss");
+                            SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
                             
-                            for(OrderDetails order : orders){
+                            for(OrderDetails order : orders) {
+//                                order.getDeliveryDate().getClass().getName();
+//                                java.util.Date deliveryDate = new java.util.Date(order.getDeliveryDate()); // convert sql.Date to util.Date
+                                String status = order.getStatus();
+                                String statusClass = order.getShipped() == 0 ? "bg-warning" : "bg-success";
                         %>
-                        <tr>
-                            <td><img src="./ShowImage?pid=<%=order.getProdId()%>"style="width: 50px; height: 50px;"></td>
-                            <td><%=order.getOrderId()%></td>
-                            <td><%=order.getProdName() %></td>
-<%--                            <td><%=order.get%></td>--%>
-                            <td><%=order.getQnty()%></td>
-                            <td>Rs. <%=order.getAmount() %></td>
-                           <td><%=sdf.format(order.getDatetime()) %></td>
-                            <%-- <td><%=order.getDatetime() %></td>--%>
-                            <td><span class="badge badge-success"><%=order.getShipped() == 0 ? "ORDER_PLACED" : "ORDER_SHIPPED" %></span></td>
-                        </tr>
-                        
-                        <%}%>
-                        
+                                <tr>
+                                    <td><img src="./ShowImage?pid=<%=order.getProdId()%>" style="width: 50px; height: 50px;"></td>
+                                    <td><%=order.getOrderId()%></td>
+                                    <td><%=order.getProdName()%></td>
+                                    <td><%=order.getQnty()%></td>
+                                    <td>Rs. <%=order.getAmount()%></td>
+                                    <td><%= sdf.format(order.getDatetime()) %></td>
+                                    <td><%= sdf.format(order.getDeliveryDate()) %></td>
+                                    <td><span class="badge <%=statusClass%>"><%=status%></span></td>
+                                </tr>
+                        <%  } %>                        
                     </tbody>
 
                 </table>

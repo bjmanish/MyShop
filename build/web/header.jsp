@@ -1,132 +1,148 @@
-<%@ page import="com.myshop.service.impl.CartServiceImpl" %>
-<%@ page language="java" contentType="text/html; charset=ISO-8859-1" pageEncoding="ISO-8859-1" %>
-
+<%@ page language="java" %>
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Header</title>
-    <meta charset="utf-8">
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
+
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+
+    <!-- Custom CSS -->
+   <link rel="stylesheet" href="css/main.css">
 </head>
 <body>
 
-    <!-- Header Section -->
-    <div class="container-fluid text-center" style="margin-top: 45px; background-color: #33cc33; color: white; padding: 5px;">
-        <h2>THE MYSHOP</h2>
-        <h6>We are ready for fast and secure services</h6>
-        <form class="form-inline" action="index.jsp" method="get">
-            <div class="input-group">
-                <input type="text" class="form-control" size="50" name="search" placeholder="Search Items" required>
-                <div class="input-group-btn">
-                    <button type="submit" class="btn btn-danger">Search</button>
-                </div>
-            </div>
-        </form>
-    </div>
+<%
+    String userrole = (String) session.getAttribute("usertype");
+    String username = (String) session.getAttribute("username");
+    String id = session.getId();
 
-    <%
-        String userrole = (String) session.getAttribute("usertype");
-        String username = (String) session.getAttribute("username");
-        int cartCount = 0;
-        String homePage = "index.jsp"; // Default for guests
+    int cartCount = 0;
+    Object cartObj = session.getAttribute("cartCount");
+    if (cartObj != null) {
+        try { cartCount = Integer.parseInt(cartObj.toString()); }
+        catch (Exception e) { cartCount = 0; }
+    }
 
-        if (userrole != null) {
-            if ("customer".equalsIgnoreCase(userrole)) {
-                homePage = "userHome.jsp";
-                if (username != null) {
-                    cartCount = new CartServiceImpl().getCartCount(username);
-                }
-            } else if ("admin".equalsIgnoreCase(userrole)) {
-                homePage = "adminHome.jsp";
-            } else if ("staff".equalsIgnoreCase(userrole)) {
-                homePage = "staffHome.jsp";
-            }
-        }
-    %>
+    String homePage = "index.jsp";
+    if ("customer".equalsIgnoreCase(userrole)) homePage = "userHome.jsp";
+    else if ("admin".equalsIgnoreCase(userrole)) homePage = "adminHome.jsp";
+    else if ("staff".equalsIgnoreCase(userrole)) homePage = "staffHome.jsp";
+%>
 
-    <!-- Navigation Bar -->
-    <nav class="navbar navbar-default navbar-fixed-top">
-        <div class="container">
-            <!-- Navbar Header -->
-            <div class="navbar-header">
-                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbarMenu">
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                </button>
-                <a class="navbar-brand" href="<%= homePage %>">
-                    <span class="glyphicon glyphicon-home"></span> MYSHOP
-                </a>
-            </div>
+<!-- NAVBAR -->
+<nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top shadow-sm">
+    <div class="container">
 
-            <!-- Navbar Links -->
-            <div class="collapse navbar-collapse" id="navbarMenu">
-                <ul class="nav navbar-nav navbar-right">
-                    <li><a href="adminViewProduct.jsp">Products</a></li>
+        <!-- LOGO -->
+        <a class="navbar-brand d-flex align-items-center" href="<%= homePage %>">
+            <img src="images/Myshop-logo.png" alt="MyShop" style="height:40px;width:80px;border-radius:50%;">
+        </a>
 
-                    <!-- Categories Dropdown -->
-                    <li class="dropdown">
-                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">Category <span class="caret"></span></a>
+        <!-- TOGGLER -->
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMenu">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <!-- MENU -->
+        <div class="collapse navbar-collapse" id="navbarMenu">
+            <ul class="navbar-nav ms-auto">
+
+                <li class="nav-item">
+                    <a class="nav-link" href="adminViewProduct.jsp?id=<%=id%>">Products</a>
+                </li>
+
+                <!-- CATEGORY DROPDOWN -->
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                        Category
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="<%= homePage %>?type=mobile">Mobiles</a></li>
+                        <li><a class="dropdown-item" href="<%= homePage %>?type=tv">TVs</a></li>
+                        <li><a class="dropdown-item" href="<%= homePage %>?type=laptop">Laptops</a></li>
+                        <li><a class="dropdown-item" href="<%= homePage %>?type=camera">Cameras</a></li>
+                        <li><a class="dropdown-item" href="<%= homePage %>?type=speaker">Speakers</a></li>
+                        <li><a class="dropdown-item" href="<%= homePage %>?type=tablet">Tablets</a></li>
+                    </ul>
+                </li>
+
+                <% if (userrole == null) { %>
+
+                    <li class="nav-item"><a class="nav-link" href="login.jsp">Login</a></li>
+                    <li class="nav-item"><a class="nav-link" href="register.jsp">Register</a></li>
+
+                <% } else if ("customer".equalsIgnoreCase(userrole)) { %>
+
+                    <li class="nav-item">
+                        <a class="nav-link position-relative" href="cartDetails.jsp?id=<%=id%>">
+                            <i class="bi bi-cart-fill"></i> Cart
+                            <% if (cartCount > 0) { %>
+                                <span class="badge bg-danger position-absolute top-0 start-100 translate-middle">
+                                    <%= cartCount %>
+                                </span>
+                            <% } %>
+                        </a>
+                    </li>
+
+                    <li class="nav-item"><a class="nav-link" href="orderDetails.jsp?id=<%=id%>">Orders</a></li>
+                    <li class="nav-item"><a class="nav-link" href="userProfile.jsp?id=<%=id%>"><i class="bi bi-person-fill"></i> Profile</a></li>
+                    <li class="nav-item"><a class="nav-link" href="./LogoutSrv"><i class="bi bi-box-arrow-right"></i> Logout</a></li>
+
+                <% } else if ("staff".equalsIgnoreCase(userrole)) { %>
+
+                    <li class="nav-item"><a class="nav-link" href="assignedDeliveries.jsp?id=<%=id%>">Assigned Deliveries</a></li>
+                    <li class="nav-item"><a class="nav-link" href="updateDeliveryStatus.jsp?id=<%=id%>">Update Status</a></li>
+                    <li class="nav-item"><a class="nav-link" href="staffProfile.jsp?id=<%=id%>">Profile</a></li>
+                    <li class="nav-item"><a class="nav-link" href="./LogoutSrv">Logout</a></li>
+
+                <% } else { %>
+
+                    <!-- ADMIN -->
+                    <li class="nav-item"><a class="nav-link" href="adminStock.jsp?id=<%=id%>">Stock</a></li>
+                    <li class="nav-item"><a class="nav-link" href="shippedItems.jsp?id=<%=id%>">Shipped</a></li>
+                    <li class="nav-item"><a class="nav-link" href="unShippedItems.jsp?id=<%=id%>">Orders</a></li>
+
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button"
+                            data-bs-toggle="dropdown" aria-expanded="false">
+                                Manage Items
+                        </a>
                         <ul class="dropdown-menu">
-                            <li><a href="<%= homePage %>?type=mobile">Mobiles</a></li>
-                            <li><a href="<%= homePage %>?type=tv">TVs</a></li>
-                            <li><a href="<%= homePage %>?type=laptop">Laptops</a></li>
-                            <li><a href="<%= homePage %>?type=camera">Cameras</a></li>
-                            <li><a href="<%= homePage %>?type=speaker">Speakers</a></li>
-                            <li><a href="<%= homePage %>?type=tablet">Tablets</a></li>
+                            <li><a class="dropdown-item" href="addProduct.jsp?id=<%=id%>">Add Product</a></li>
+                            <li><a class="dropdown-item" href="removeProduct.jsp?id=<%=id%>">Remove Product</a></li>
+                            <li><a class="dropdown-item" href="updateProductById.jsp?id=<%=id%>">Update Product</a></li>
                         </ul>
                     </li>
 
-                    <!-- User-Specific Links -->
-                    <% if (userrole == null) { %>
-                        <!-- Guest Links -->
-                        <li><a href="login.jsp">Login</a></li>
-                        <li><a href="register.jsp">Register</a></li>
-                    <% } else if ("customer".equalsIgnoreCase(userrole)) { %>
-                        <!-- Customer Links -->
-                        <li>
-                            <a href="cartDetails.jsp">
-                                <span class="glyphicon glyphicon-shopping-cart"></span> Cart 
-                                <% if (cartCount > 0) { %>
-                                    <span class="badge" style="background-color: red; margin-left: 5px;"><%= cartCount %></span>
-                                <% } %>
-                            </a>
-                        </li>
-                        <li><a href="orderDetails.jsp">Orders</a></li>
-                        <li>
-                            <a href="userProfile.jsp">
-                                <span class="glyphicon glyphicon-user"></span> Profile
-                            </a>
-                        </li>
-                        <li><a href="./LogoutSrv">Logout</a></li>
-                    <% } else if ("staff".equalsIgnoreCase(userrole)) { %>
-                        <!-- Delivery Staff Links -->
-                        <li><a href="assignedDeliveries.jsp"><span class="glyphicon glyphicon-list-alt"></span> Assigned Deliveries</a></li>
-                        <li><a href="updateDeliveryStatus.jsp"><span class="glyphicon glyphicon-ok"></span> Update Delivery Status</a></li>
-                        <li><a href="staffProfile.jsp"><span class="glyphicon glyphicon-user"></span> Profile</a></li>
-                        <li><a href="./LogoutSrv"><span class="glyphicon glyphicon-log-out"></span> Logout</a></li>
-                    <% } else { %>
-                        <!-- Admin Links -->
-                        <li><a href="adminStock.jsp">Stock</a></li>
-                        <li><a href="shippedItems.jsp">Shipped</a></li>
-                        <li><a href="unShippedItems.jsp">Orders</a></li>
-                        <li class="dropdown">
-                            <a class="dropdown-toggle" data-toggle="dropdown" href="#">Manage Items <span class="caret"></span></a>
-                            <ul class="dropdown-menu">
-                                <li><a href="addProduct.jsp">Add Product</a></li>
-                                <li><a href="removeProduct.jsp">Remove Product</a></li>
-                                <li><a href="updateProductById.jsp">Update Product</a></li>
-                            </ul>
-                        </li>
-                        <li><a href="./LogoutSrv"><span class="glyphicon glyphicon-log-out"></span> Logout</a></li>
-                    <% } %>
-                </ul>
-            </div>
+                    <li class="nav-item"><a class="nav-link" href="./LogoutSrv">Logout</a></li>
+
+                <% } %>
+            </ul>
         </div>
-    </nav>
+    </div>
+</nav>
+
+<!-- SPACER -->
+<div style="margin-top:90px;"></div>
+
+<!-- HEADER SEARCH -->
+<div class="text-center p-3 bg-success text-white">
+    <h2 class="fw-bold">THE MYSHOP</h2>
+    <h6>We are ready for fast and secure services</h6>
+
+    <form class="d-flex justify-content-center mt-2" action="index.jsp" method="get">
+        <input class="form-control w-50 me-2" type="search" name="search" placeholder="Search Items" required>
+        <button class="btn btn-danger">Search</button>
+    </form>
+</div>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
 </body>
 </html>

@@ -25,8 +25,8 @@ public class PasswordEncryption {
         return decryptedPwd;
     }
    
-//    public static void main(String[] args) {
-//        System.out.println("Decrypted password :"+getDecryptedPassword("TWFuaXNoMTIz"));
-//        System.out.println("Encrypted Password :"+getEncryptedPassword("Manish123"));
-//    }
+    public static void main(String[] args) {
+        System.out.println("Decrypted password :"+getDecryptedPassword("TWFuaXNoMTIzNA=="));
+        System.out.println("Encrypted Password :"+getEncryptedPassword("Manish123"));
+    }
 }

@@ -1,5 +1,6 @@
 package com.myshop.service;
 
+import com.myshop.beans.AssignOrder;
 import com.myshop.beans.OrderBean;
 import com.myshop.beans.OrderDetails;
 import com.myshop.beans.TransactionBean;
@@ -23,4 +24,13 @@ public interface OrderService {
     
     public List <OrderDetails> getAllOrderDetails(String userEmailId);
     
+    public String outForDelivery(String userId, String orderId, String prodId);
+    
+    public boolean assignOrder(AssignOrder order);
+    
+    public int assignId();
+    
+    List<AssignOrder> getAssignedOrdersByStaff(String staffEmail);
+    
+    public String markOrderAsDelivered(int assignId, String staffId);
 }

@@ -25,4 +25,6 @@ public interface UserService {
     public String getUserAddr(String userId);
     
     public byte[] getProfileImg(String userId);
+    
+    public void verifyMobile(String mobile, String email);
 }

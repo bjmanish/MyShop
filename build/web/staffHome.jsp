@@ -43,8 +43,9 @@
     <%
         String userType = (String) session.getAttribute("usertype");
         String userName = (String) session.getAttribute("username");
-
-        if (userType == null || !userType.equals("staff")) {
+        String userId = session.getId();
+//        System.out.println("userType: "+userType+" userName: "+ userName+" id: "+userId+"password: "+(String)session.getAttribute("password"));
+        if (userType == null || !userType.equalsIgnoreCase("staff") || userId.isEmpty()) {
             response.sendRedirect("login.jsp?error=access_denied");
             return;
         }
@@ -64,7 +65,7 @@
                 <div class="card">
                     <i class="glyphicon glyphicon-hourglass text-warning"></i>
                     <h4>Pending Deliveries</h4>
-                    <a href="pendingDeliveries.jsp" class="btn btn-warning btn-block">View</a>
+                    <a href="pendingDeliveries.jsp?id+<%=userId%>" class="btn btn-warning btn-block">View</a>
                 </div>
             </div>
 

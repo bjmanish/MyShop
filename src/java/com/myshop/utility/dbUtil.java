@@ -27,6 +27,7 @@ public class dbUtil {
                         cnf.printStackTrace();
                 }
                 conn = DriverManager.getConnection(connString, userName, password);
+                System.out.println("Connection Opened Sucessfully.");
             }
         } catch (SQLException ex) {
                 ex.printStackTrace();

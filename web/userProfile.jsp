@@ -48,8 +48,9 @@
                     <div class="card mb-4">
                         
                         <div class="card-header">
-                            <i class="fa fa-user" style="margin-right: -20px; "></i>
-                            <span style="margin-left: -5px; justify-content: center; align-items: center; font-size:larger; font-weight: bold;">User Profile</span>
+                            <i class="fa fa-user" style="margin-right: 10px; "></i>
+                            <!--<bold>User Profile</bold>-->
+                            <span style="margin-left: -5px; justify-content: center; align-items: center; font-size:larger; font-weight: bold;">User Profile</span>                          
                         </div>
                         
                         <div class="card-body text-center">
@@ -96,7 +97,17 @@
                                     <p class="mb-0">Email</p>
                                 </div>
                                 <div class="col-sm-9">
-                                    <p class="mb-0"><%= user.getEmail()%></p>
+                                    <p class="mb-0">
+                                        <%= user.getEmail()%>
+                                        <% if(user.getEmailVerified() == 1) { %>
+                                            <span style="color:green; font-weight:bold;">(Verified)</span>
+                                        <% } else { 
+                                                session.setAttribute("email", user.getEmail());
+                                                System.out.println("email from userProfile: "+ user.getEmail());
+                                        %>                                            
+                                            <span style="color:red; font-weight:bold;">(Not Verified)</span>
+                                        <% } %>
+                                    </p>
                                 </div>
                             </div>
                             <hr>
@@ -106,8 +117,36 @@
                                     <p class="mb-0">Phone</p>
                                 </div>
                                 <div class="col-sm-9">
-                                    <p class="mb-0"><%= user.getMobile() %></p>
+                                    <p class="mb-0">
+                                    <%= user.getMobile() %>
+                                    <% if(user.getMobileVerified() == 1) { %>
+                                        <span style="color:green; font-weight:bold;">(Verified)</span>
+                                    <% } else {
+                                            session.setAttribute("mobile", user.getMobile());
+                                            session.setAttribute("email", user.getEmail());
+                                                System.out.println("email from userProfile: "+ user.getEmail());
+                                            
+                                    %>
+                                        <a href="#" style="text-decoration: none;" onclick="joinAndSendOtp()">
+                                            <span style="color:red; font-weight:bold;">(Not Verified)</span>
+                                        </a>
+                                        
+                                        <script>
+                                            function joinAndSendOtp() {
+                                                // 1?? Open WhatsApp sandbox join link
+                                                window.open("https://wa.me/+14155238886?text=join%20difficult-glass", "_blank");
+
+                                                // 2?? After 5 seconds, redirect to your OTP servlet
+                                                setTimeout(function() {
+                                                    window.location.href = "SendOTPSrv";
+                                                }, 5000);
+                                            }
+                                        </script>
+                                        
+                                    <% } %>
+                                    </p>
                                 </div>
+
                             </div>
                             <hr>
                             

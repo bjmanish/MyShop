@@ -40,8 +40,10 @@ public class UserServiceImpl implements UserService{
         }
         
         try{
-            String query = "INSERT INTO "+IUserConstants.TABLE_USER+" VALUES(?,?,?,?,?,?,?)";
-            ps = conn.prepareStatement(query);;
+//            String query = "INSERT INTO "+IUserConstants.TABLE_USER+" VALUES(?, ?, ?, ?, ?, ?, ?)";
+            String sql = "INSERT INTO USER(image, email, name, mobile, address, pincode, password, email_verified, mobile_verified) "
+                   + "VALUES(?, ?, ?, ?, ?, ?, ?, ?, ? )";
+            ps = conn.prepareStatement(sql);;
             
             //set image as binary Stream  
             ps.setBinaryStream(1, imageInputStream);
@@ -51,7 +53,8 @@ public class UserServiceImpl implements UserService{
             ps.setString(5, user.getAddress());
             ps.setInt(6, user.getPincode());
             ps.setString(7, user.getPassword());
-            
+            ps.setInt(8, user.getEmailVerified());
+            ps.setInt(9, user.getMobileVerified());
             int k = ps.executeUpdate();
             //System.out.println("status: "+k);
             //System.out.println("userdata: "+ps.toString());
@@ -156,6 +159,8 @@ public class UserServiceImpl implements UserService{
                user.setAddress(rs.getString("address"));
                user.setPincode(rs.getInt("pincode"));
                user.setPassword(rs.getString("password"));
+               user.setEmailVerified(rs.getInt("email_verified"));
+               user.setMobileVerified(rs.getInt("mobile_verified"));
             }  
         }catch(SQLException ex){
             System.out.println("Error in db"+ex.getMessage());
@@ -243,5 +248,22 @@ public class UserServiceImpl implements UserService{
        
        return image;
     }
+
+    @Override
+    public void verifyMobile(String mobile, String email) {
+        String sql = "UPDATE USER SET mobile_verified = 1 WHERE mobile = ? AND email = ?";
+        try(Connection con = dbUtil.provideConnection();
+            PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setString(1, mobile);
+            ps.setString(2, email);
+            ps.executeUpdate();
+
+        } catch(SQLException e){
+            e.printStackTrace();
+        }
+    }
    
+    
+    
 }

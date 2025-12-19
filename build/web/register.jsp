@@ -9,14 +9,14 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
     <style>
         .register-container {
-            background: 0 4px rgba(0, 0, 0, 0.6);
+            background: 1px 4px rgba(0, 0, 0, 0.6);
             padding:  10px;
             border-radius: 8px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             width: 100%;
-            max-width: 600px;
-            margin: 0px auto;
-            margin-bottom: -150px ;
+            max-width: 650px;
+            margin: 30px auto;
+            margin-bottom: 150px ;
         }
 
         .register-container h2 {
@@ -31,24 +31,30 @@
             font-weight: bold;
         }
 
-        .register-container .input-group-text {
+        .register-container .input-group-addon {
             background-color: #f8f9fa;
             border: 1px solid #ddd;
+            margin-left: 0px;
+            width: 10%;
         }
 
-        .register-container .input-group-text i {
+        .register-container .input-group-addon i {
             color: #007bff;
+            margin-right: 10px;
+            width: 20px;
+            /*margin-right: 20px;*/
         }
 
         .register-container .form-control {
             border-radius: 4px;
+            width: 100%;
         }
 
         .register-container .btn-primary {
             width: 100%;
             background-color: #007bff;
             border-color: #007bff;
-            padding: 10px;
+            padding: 20px;
             font-size: 16px;
         }
 
@@ -99,17 +105,19 @@
         }
         
         .input-group i{
-            width: 15px;
+            width: 20px;
             height: 20.5px;
+            margin-right: -20px;
         }
-/*        .glyphicon-lock{
-            width: 10px;
-            height: 1px;
+/*        .glyphicon{
+            width: -10px;
+            height: 10px;
+            margin-right: 20px;
         }*/
         #togglePassword i, #toggleConfPassword i, #toggleIcon {
             color: #007bff;
-            width: 20px;
-            height: 20.5px;
+            width: 10%;
+            /*height: 20.5px;*/
             justify-content: center;
             align-content: center;
             display: flex;

@@ -15,13 +15,15 @@ public class OrderDetails implements Serializable {
     private double amount;
     private int shipped;
     private Timestamp datetime;
+    private Timestamp deliveryDate;
     private InputStream prodImage;
+    private String status;
 
     public OrderDetails() {
         super();
     }
 
-    public OrderDetails(String orderId, String prodId, String prodName, int qnty, double amount, int shipped, Timestamp datetime, InputStream prodImage) {
+    public OrderDetails(String orderId, String prodId, String prodName, int qnty, double amount, int shipped, Timestamp datetime, Timestamp deliveryDate, InputStream prodImage, String status) {
         super();
         this.orderId = orderId;
         this.prodId = prodId;
@@ -30,7 +32,9 @@ public class OrderDetails implements Serializable {
         this.amount = amount;
         this.shipped = shipped;
         this.datetime = datetime;
+        this.deliveryDate = deliveryDate;
         this.prodImage = prodImage;
+        this.status = status;
     }
 
     public String getOrderId() {
@@ -89,6 +93,14 @@ public class OrderDetails implements Serializable {
         this.datetime = datetime;
     }
 
+    public Timestamp getDeliveryDate() {
+        return deliveryDate;
+    }
+
+    public void setDeliveryDate(Timestamp deliveryDate) {
+        this.deliveryDate = deliveryDate;
+    } 
+
     public InputStream getProdImage() {
         return prodImage;
     }
@@ -97,9 +109,19 @@ public class OrderDetails implements Serializable {
         this.prodImage = prodImage;
     }
 
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    
+    
     @Override
     public String toString() {
-        return "OrderDetails{" + "orderId=" + orderId + ", prodId=" + prodId + ", prodName=" + prodName + ", qnty=" + qnty + ", amount=" + amount + ", shipped=" + shipped + ", datetime=" + datetime + ", prodImage=" + prodImage + '}';
+        return "OrderDetails{" + "orderId=" + orderId + ", prodId=" + prodId + ", prodName=" + prodName + ", qnty=" + qnty + ", amount=" + amount + ", shipped=" + shipped + ", datetime=" + datetime + ", prodImage=" + prodImage + ", status=" + status + '}';
     }   
     
 }

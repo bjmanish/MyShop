@@ -1,6 +1,8 @@
 package com.myshop.beans;
 
 import java.io.Serializable;
+import java.sql.Date;
+import java.sql.Timestamp;
 
 
 @SuppressWarnings("serial")
@@ -8,22 +10,39 @@ public class OrderBean implements Serializable{
 
     private String transId;
     private String prodId;
+    private String status;
     private int quantity;
     private double amount;
     private int shipped;
+    private Timestamp orderDate;
+    private Timestamp deliveryDate;
 
     public OrderBean() {
         super();
     }
 
-    public OrderBean(String transId, String prodId, int quantity, double amount, int shipped) {
+    public OrderBean(String transId, String prodId, int quantity, double amount, int shipped, String status) {
         super();
         this.transId= transId;
         this.prodId = prodId;
         this.quantity = quantity;
         this.amount = amount;
         this.shipped = shipped;
+        this.status = status;
     }
+    
+    public OrderBean(String transId, String prodId, int quantity, double amount, int shipped, String status, Timestamp deliveryDate, Timestamp orderDate) {
+        super();
+        this.transId= transId;
+        this.prodId = prodId;
+        this.quantity = quantity;
+        this.amount = amount;
+        this.shipped = shipped;
+        this.status = status;
+        this.deliveryDate = deliveryDate;
+        this.orderDate = orderDate;
+    }
+
 
     public String getTransId() {
         return transId;
@@ -57,6 +76,16 @@ public class OrderBean implements Serializable{
         this.amount = amount;
     }
 
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+    
+    
+    
     public int getShipped() {
         return shipped;
     }
@@ -65,10 +94,30 @@ public class OrderBean implements Serializable{
         this.shipped = shipped;
     }
 
+    public Timestamp getOrderDate() {
+        return orderDate;
+    }
+
+    public void setOrderDate(Timestamp orderDate) {
+        this.orderDate = orderDate;
+    }
+
+    public Timestamp getDeliveryDate() {
+        return deliveryDate;
+    }
+
+    public void setDeliveryDate(Timestamp deliveryDate) {
+        this.deliveryDate = deliveryDate;
+    }
+
+    
+
     @Override
     public String toString() {
-        return "OrderBean{" + "transId=" + transId + ", prodId=" + prodId + ", quantity=" + quantity + ", amount=" + amount + ", shipped=" + shipped + '}';
+        return "OrderBean{" + "transId=" + transId + ", prodId=" + prodId + ", quantity=" + quantity + ", amount=" + amount + ", shipped=" + shipped + ", orderDate=" + orderDate + ", deliveryDate=" + deliveryDate + '}';
     }
+
+    
     
     
     

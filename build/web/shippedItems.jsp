@@ -49,6 +49,7 @@
                             <th>Quantity</th>
                             <th>Amount</th>
                             <th>Status</th>
+                            <th>ACTION</th>
                         </tr>
                     </thead>
 
@@ -60,6 +61,7 @@
                             for(OrderBean order : orders){
                                 String transId = order.getTransId();
                                 String prodId = order.getProdId();
+                                String status = order.getStatus();
                                 int shipped  =  order.getShipped();
                                 double amount = order.getAmount();
                                 int qty = order.getQuantity();
@@ -69,13 +71,23 @@
                                     count ++;                                
                         %>
                         <tr>
-                            <td><%=transId %></td>
+                            <td><%=order.getTransId() %></td>
                             <td><a href="./updateProduct.jsp?prodid=<%=prodId%>"><%=prodId%></a></td>
                             <td><%=userId%></td>
                             <td><%=userAdd%></td>
                             <td><%=qty%></td>
                             <td>Rs.<%=order.getAmount()%></td>
-                            <td><span class="badge badge-success">SHIPPED</span></td>
+                            <td><span class="badge badge-success"><%=order.getStatus() %></span></td>
+                            <td>
+                                <% if(!"READY FOR DELIVERED".equalsIgnoreCase(order.getStatus()) && !"DELIVERED".equalsIgnoreCase(order.getStatus())){    %>
+                                    <a href="OutForDeliverySrv?orderid=<%= order.getTransId()%>&userid=<%= userId %>&prodid=<%= order.getProdId() %>&status=READY_FOR_DELIVERED"
+                                        onclick="return confirm('Mark this order as Ready for Delivery?');">
+                                            <span class="badge bg-dark">READY FOR DELIVERED</span>
+                                    </a>
+                                <%}else{%>
+                                    <p style="text-align: center;">-<p>  
+                                <%}%>
+                            </td>
                         </tr>
                         <%
                                 }

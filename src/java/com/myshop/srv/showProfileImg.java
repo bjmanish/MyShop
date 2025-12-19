@@ -35,7 +35,7 @@ public class showProfileImg extends HttpServlet {
             UserServiceImpl dao = new UserServiceImpl();
             image = dao.getProfileImg(userId);
             
-            //System.out.println("userID: "+userId+" dao:"+dao.toString()+" Image: "+image);
+//            System.out.println("userID: "+userId+" dao:"+dao.toString()+" Image: "+image);
             
             if(image == null){
             File fnew = new File(request.getServletContext().getRealPath("images/noimage.jpg") );
