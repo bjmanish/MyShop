@@ -190,7 +190,7 @@ public class UserServiceImpl implements UserService{
             rs = ps.executeQuery();
             if(rs.next())
                 fname = rs.getString(1);
-            fname = fname.split("")[0];
+//            fname = fname.split("")[0];
             
         }catch(SQLException ex){
             ex.printStackTrace();

@@ -20,7 +20,7 @@
     String userrole = (String) session.getAttribute("usertype");
     String username = (String) session.getAttribute("username");
     String id = session.getId();
-
+//    System.out.println("role: "+userrole);
     int cartCount = 0;
     Object cartObj = session.getAttribute("cartCount");
     if (cartObj != null) {
@@ -52,7 +52,8 @@
         <div class="collapse navbar-collapse" id="navbarMenu">
             <ul class="navbar-nav ms-auto">
 
-                <li class="nav-item">
+                <% if (userrole == null) { %>
+                    <li class="nav-item">
                     <a class="nav-link" href="adminViewProduct.jsp?id=<%=id%>">Products</a>
                 </li>
 
@@ -71,13 +72,29 @@
                     </ul>
                 </li>
 
-                <% if (userrole == null) { %>
-
                     <li class="nav-item"><a class="nav-link" href="login.jsp">Login</a></li>
                     <li class="nav-item"><a class="nav-link" href="register.jsp">Register</a></li>
 
                 <% } else if ("customer".equalsIgnoreCase(userrole)) { %>
+                    
+                    <li class="nav-item">
+                    <a class="nav-link" href="adminViewProduct.jsp?id=<%=id%>">Products</a>
+                </li>
 
+                <!-- CATEGORY DROPDOWN -->
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                        Category
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="<%= homePage %>?type=mobile">Mobiles</a></li>
+                        <li><a class="dropdown-item" href="<%= homePage %>?type=tv">TVs</a></li>
+                        <li><a class="dropdown-item" href="<%= homePage %>?type=laptop">Laptops</a></li>
+                        <li><a class="dropdown-item" href="<%= homePage %>?type=camera">Cameras</a></li>
+                        <li><a class="dropdown-item" href="<%= homePage %>?type=speaker">Speakers</a></li>
+                        <li><a class="dropdown-item" href="<%= homePage %>?type=tablet">Tablets</a></li>
+                    </ul>
+                </li>
                     <li class="nav-item">
                         <a class="nav-link position-relative" href="cartDetails.jsp?id=<%=id%>">
                             <i class="bi bi-cart-fill"></i> Cart
@@ -95,16 +112,34 @@
 
                 <% } else if ("staff".equalsIgnoreCase(userrole)) { %>
 
-                    <li class="nav-item"><a class="nav-link" href="assignedDeliveries.jsp?id=<%=id%>">Assigned Deliveries</a></li>
-                    <li class="nav-item"><a class="nav-link" href="updateDeliveryStatus.jsp?id=<%=id%>">Update Status</a></li>
-                    <li class="nav-item"><a class="nav-link" href="staffProfile.jsp?id=<%=id%>">Profile</a></li>
-                    <li class="nav-item"><a class="nav-link" href="./LogoutSrv">Logout</a></li>
+                    <li class="nav-item"><a class="nav-link  active" href="assignedDeliveries.jsp?id=<%=id%>">Assigned Deliveries</a></li>
+                    <li class="nav-item"><a class="nav-link " href="updateDeliveryStatus.jsp?id=<%=id%>">Update Status</a></li>
+                    <li class="nav-item"><a class="nav-link " href="staffProfile.jsp?id=<%=id%>">Profile</a></li>
+                    <li class="nav-item"><a class="nav-link " href="./LogoutSrv">Logout</a></li>
 
                 <% } else { %>
+                    
+                    <li class="nav-item">
+                    <a class="nav-link" href="adminViewProduct.jsp?id=<%=id%>">Products</a>
+                </li>
 
+                <!-- CATEGORY DROPDOWN -->
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                        Category
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="<%= homePage %>?type=mobile">Mobiles</a></li>
+                        <li><a class="dropdown-item" href="<%= homePage %>?type=tv">TVs</a></li>
+                        <li><a class="dropdown-item" href="<%= homePage %>?type=laptop">Laptops</a></li>
+                        <li><a class="dropdown-item" href="<%= homePage %>?type=camera">Cameras</a></li>
+                        <li><a class="dropdown-item" href="<%= homePage %>?type=speaker">Speakers</a></li>
+                        <li><a class="dropdown-item" href="<%= homePage %>?type=tablet">Tablets</a></li>
+                    </ul>
+                </li>
                     <!-- ADMIN -->
-                    <li class="nav-item"><a class="nav-link" href="adminStock.jsp?id=<%=id%>">Stock</a></li>
-                    <li class="nav-item"><a class="nav-link" href="shippedItems.jsp?id=<%=id%>">Shipped</a></li>
+                    <li class="nav-item"><a class="nav-link " href="adminStock.jsp?id=<%=id%>">Stock</a></li>
+                    <li class="nav-item"><a class="nav-link " href="shippedItems.jsp?id=<%=id%>">Shipped</a></li>
                     <li class="nav-item"><a class="nav-link" href="unShippedItems.jsp?id=<%=id%>">Orders</a></li>
 
                     <li class="nav-item dropdown">

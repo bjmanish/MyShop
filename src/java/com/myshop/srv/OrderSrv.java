@@ -26,6 +26,7 @@ public class OrderSrv extends HttpServlet {
         HttpSession session = request.getSession();
 	String userName = (String) session.getAttribute("username");
 	String password = (String) session.getAttribute("password");
+        String prodId = (String) request.getAttribute("prodId");
         if (userName == null || password == null) {
             response.sendRedirect("login.jsp?message=Session Expired, Login Again!!");
 	}
@@ -33,7 +34,7 @@ public class OrderSrv extends HttpServlet {
         double paidAmount = Double.parseDouble(request.getParameter("amount"));
         //System.out.println(new OrderServiceImpl().paymentSuccess(userName, paidAmount));
         String status = new OrderServiceImpl().paymentSuccess(userName, paidAmount);
-        
+        session.setAttribute("prodId", prodId);
         response.sendRedirect("orderDetails.jsp?message="+status);
         
     }

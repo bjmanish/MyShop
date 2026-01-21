@@ -79,8 +79,8 @@
                             <td>Rs.<%=order.getAmount()%></td>
                             <td><span class="badge badge-success"><%=order.getStatus() %></span></td>
                             <td>
-                                <% if(!"READY FOR DELIVERED".equalsIgnoreCase(order.getStatus()) && !"DELIVERED".equalsIgnoreCase(order.getStatus())){    %>
-                                    <a href="OutForDeliverySrv?orderid=<%= order.getTransId()%>&userid=<%= userId %>&prodid=<%= order.getProdId() %>&status=READY_FOR_DELIVERED"
+                                <% if(! ("OUT_FOR_DELIVERY".equalsIgnoreCase(order.getStatus()) || "DELIVERED".equalsIgnoreCase(order.getStatus()) )){    %>
+                                    <a href="OutForDeliverySrv?orderid=<%= order.getTransId()%>&userid=<%= userId %>&prodid=<%= order.getProdId() %>&status=OUT_FOR_DELIVERY"
                                         onclick="return confirm('Mark this order as Ready for Delivery?');">
                                             <span class="badge bg-dark">READY FOR DELIVERED</span>
                                     </a>

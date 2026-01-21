@@ -56,19 +56,20 @@ public class OutForDeliverySrv extends HttpServlet {
         // Step 3: Assign a random staff member
         StaffServiceImpl staffService = new StaffServiceImpl();
         List<StaffBean> staffList = staffService.getAllStaffs();
-        String staffId = "";
-        if (!staffList.isEmpty()) {
-            StaffBean assignedStaff = staffList.get(new Random().nextInt(staffList.size()));
-            staffId = assignedStaff.getStaffId();
-        }
+        String staffId = "ma8423884@gmail.com";
+//        if (!staffList.isEmpty()) {
+//            StaffBean assignedStaff = staffList.get(new Random().nextInt(staffList.size()));
+//            staffId = assignedStaff.getStaffId();
+//        }
         
         Timestamp deliveryDate = new OrderServiceImpl().getDeliveryDateByOrderId(orderId);
         
         AssignOrder assignOrd = new AssignOrder(orderId, staffId, deliveryDate, status, otp, otpTime);
-        boolean success = new OrderServiceImpl().assignOrder(assignOrd);
-
+//        boolean success = new OrderServiceImpl().assignOrder(assignOrd);
+        boolean success = new OrderServiceImpl().outForDelivery(userId, orderId, prodId, assignOrd);
         // Step 6: Redirect with message
         if (success || "SUCCESS".equalsIgnoreCase(status)) {
+//            new OrderServiceImpl().outForDelivery(userId, orderId, prodId);
             response.sendRedirect("shippedItems.jsp?message=" + 
                 URLEncoder.encode("Order moved to 'Out For Delivery'. OTP: " + otp, "UTF-8"));
         } else {

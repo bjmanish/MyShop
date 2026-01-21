@@ -3,29 +3,44 @@ package com.myshop.utility;
 import javax.mail.MessagingException;
 
 public class TestMail {
-	public static void main(String[] args) {
+	public static void main(String[] args) throws Exception {
 		try {
 			String recipient = "bjmanish45@gmail.com";
-			String subject = "Mail Configuration Successfull";
-			String htmlTextMessage = "" + "<html>"
-					+ "<head><title>Java Mail Configuration Test</title><style>.greenText{color:green;} p{font-size:14;}</style></head><body>"
-					+ "<h2 style='color:red;'>Welcome to THE MYSHOP</h2>" + "<p>Hey,<br>"
-					+ "Thanks for singing up with THE MYSHOP.<br>"
-					+ "We are glad that you choose <bold>us. We invite you to check out our latest collection of new electonics appliances."
-					+ "<br>We are providing upto 60% OFF on most of all the type of products. So please visit our site and explore the collections. <br>"
-					+ " <br>Our Online MYSHOP is growing in a larger amount these days and we are in high demand so we thanks all of you for "
-					+ "making us up to that level. We Deliver Product to your house with no extra delivery charges and we also have collection of most of the"
-					+ "branded items. As a Welcome gift for our New Customers we are providing additional 10% OFF Upto 500 Rs for the first product purchase. To avail this offer you only have "
-					+ "to enter the promo code given below.<br><br> PROMO CODE: "
-					+ "<span class='greenText'>THEMYSHOP500</span><br><br>" + "Have a good day!<br>" + "</p>" + "</body>"
-					+ "</html>";
-			JavaMailUtil.sendMail(recipient, subject, htmlTextMessage);
-			System.out.println("Mail Sent Successfully!");
+//			String subject = "Mail Configuration Successfull";
+                        String name = "Manish";
+                        String orderId = "T20260107095058";
+			String subject = "📦 Your Order is Out for Delivery - THE MYSHOP STORE";
+                        String textMessage = "Hello " + name +
+                            ",\n\nYour order is out for delivery.\nPlease check the attached PDF.";
+                        
+                        byte[] paypdfBytes = PaymentSlipPdfUtil.generatePaymentSlipPdf(
+                                "Rahul Sharma",
+                                "ORD123456",
+                                "PAY987654",
+                                "UPI",
+                                2499.00,
+                                "SUCCESS"
+                            );
+                        
+//                        JavaMailUtil.sendMailWithAttach(recipient,subject,textMessage,paypdfBytes,orderId+".pdf");
 
-		} catch (MessagingException e) {
+
+                        byte[] pdfBytes = OrderPdfUtil.generateOutForDeliveryPdf(name, orderId, "2026-01-14", "P20250921112523", "897868");
+
+//                        JavaMailUtil.sendMailWithAttach(recipient,subject,textMessage,pdfBytes,orderId+".pdf");
+                        System.out.println("Send Delivered ail ");
+                        MailMessage.markAsDelivered(recipient);
+                    } catch (MessagingException e) {
 			System.out.println("Mail Sending Failed With Error: " + e.getMessage());
 			e.printStackTrace();
 		}
+                
+//                MailMessage mail = new MailMessage();
+
+                    
+                
+                
+                
 	}
 
 }

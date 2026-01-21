@@ -1,6 +1,7 @@
 package com.myshop.utility;
 
 import com.myshop.beans.StaffBean;
+import java.sql.Timestamp;
 import javax.mail.MessagingException;
 
 public class MailMessage {
@@ -41,8 +42,6 @@ public class MailMessage {
        JavaMailUtil.sendMail(recipient, subject, htmlTextMessage); 
     }
     
-    
-    
     public static void productAvailableNow(String recipientEmail, String userName, String prodName, String prodId) throws MessagingException {
         String recipient = recipientEmail;
         String subject = "Product " + prodName + " is Now Available at THE MYSHOP Store";
@@ -65,7 +64,7 @@ public class MailMessage {
         
     }
     
-    public static void transactionSuccess(String recipientEmail, String name, String transId, double transAmount) {
+    public static void transactionSuccess(String recipientEmail, String name, String transId, double transAmount) throws Exception {
 	String recipient = recipientEmail;
 	String subject = "Order Placed at THE MYSHOP STORE";
 	String htmlTextMessage = "<html>" + "  <body>" + "    <p>" + "      Hey " + name + ",<br/><br/>"
@@ -76,11 +75,23 @@ public class MailMessage {
             + "      <font style=\"color:red;font-weight:bold;\">Order Id:</font>"
             + "      <font style=\"color:black;font-weight:bold;\">" + transId + "</font><br/>" + "      <br/>"
             + "      <font style=\"color:black;font-weight:bold;\">Amount Paid:</font> <font style=\"color:red;font-weight:bold;\">"
-            + transAmount + "</font>" + "      <br/><br/>" + "      Thanks for shopping with us!<br/><br/>"
+            + transAmount + "</font>" + "      <br/><br/>" +
+                "\n<p>Please check the attached PDF.</p>"+
+                "      Thanks for shopping with us!<br/><br/>"
             + "      Please visit Again and continue shopping! <br/<br/> <font style=\"color:crimson;font-weight:bold;\">THE MYSHOP STORE.</font>"
             + "    </p>" + "    " + "  </body>" + "</html>";
         try {
-            JavaMailUtil.sendMail(recipient, subject, htmlTextMessage);
+          byte[] paypdfBytes = PaymentSlipPdfUtil.generatePaymentSlipPdf(
+                name,
+                transId,
+                transId,
+                "Card",
+                transAmount,
+                "SUCCESS"
+            );
+            
+//            JavaMailUtil.sendMail(recipient, subject, htmlTextMessage);
+            JavaMailUtil.sendMailWithAttach(recipient,subject,htmlTextMessage,paypdfBytes,transId+".pdf");
 	} catch (MessagingException e) {
             e.printStackTrace();
         }
@@ -97,7 +108,8 @@ public class MailMessage {
             + "      <font style=\"color:red;font-weight:bold;\">Order Id:</font>"
             + "      <font style=\"color:black;font-weight:bold;\">" + transId + "</font><br/>" + "      <br/>"
             + "      <font style=\"color:black;font-weight:bold;\">Amount Paid:</font> <font style=\"color:red;font-weight:bold;\">"
-            + transAmount + "</font>" + "      <br/><br/>" + "      Thanks for shopping with us!<br/><br/>"
+            + transAmount + "</font>" + "      <br/><br/>" + 
+                "      Thanks for shopping with us!<br/><br/>"
             + "      Please Visit Again and continue Shopping! <br/<br/> <font style=\"color:black;font-weight:bold;\">THE MYSHOP STORE.</font>"
             + "    </p>" + "    " + "  </body>" + "</html>";
 
@@ -109,7 +121,7 @@ public class MailMessage {
     }
     
     public static void orderOutForDelivery(String recipientEmail, String name, String orderId, String deliveryDate, String prodId, String otp) {
-    String subject = "📦 Your Order is Out for Delivery - THE MYSHOP STORE";
+    String subject = "Your Order is Out for Delivery - THE MYSHOP STORE";
 
     String htmlTextMessage = "<!DOCTYPE html>" +
         "<html>" +
@@ -131,24 +143,78 @@ public class MailMessage {
         "    <p>Hi <strong>" + name + "</strong>,</p>" +
         "    <p>We're excited to let you know that your order <strong>" + orderId + "</strong> is now <strong style='color:#4CAF50;'>Out for Delivery</strong>.</p>" +
         "    <p>Estimated delivery date: <strong>" + deliveryDate + "</strong></p>" +
-        "    <p class='btn' href='" + prodId + "'>Prod ID</p>" +
+        "    <p class='btn' href=''" + prodId + "'>Prod ID</p>" +
         "    <p class='btn' href='" + otp + "'>Delivery OTP</p>" +
-            
+             "\n<p>Please check the attached PDF.</p>"+
         "    <p>If you have any questions, feel free to contact our support team.</p>" +
         "    <br/><p style='font-size:11px;color:#999;'>Note: This is a demo project email. No real transaction has been made.</p>" +
+            
         "  </div>" +
-        "  <div class='footer'>&copy; 2025 THE MYSHOP STORE. All rights reserved.</div>" +
+        "  <div class='footer'>© 2024 - "+(java.time.Year.now())+" THE MYSHOP STORE. All rights reserved.\"</div>" +
         "</div>" +
         "</body>" +
         "</html>";
 
     try {
-        JavaMailUtil.sendMail(recipientEmail, subject, htmlTextMessage);
-    } catch (MessagingException e) {
+        byte[] pdfBytes = OrderPdfUtil.generateOutForDeliveryPdf(
+                name, orderId, deliveryDate, prodId, otp
+        );
+
+        JavaMailUtil.sendMailWithAttach(recipientEmail,subject,htmlTextMessage,pdfBytes,orderId+".pdf");
+    } catch (Exception e) {
+        System.out.println("Error in out for delivery sending mail: "+e.getMessage());
         e.printStackTrace();
     }
 }
+    
+    public static void markAsDelivered(String mail) throws MessagingException {
+        String subject = "Your Order Has Been Delivered - THE MYSHOP STORE";
+        
+        String htmlTextMessage =
+        "<!DOCTYPE html>" +
+        "<html>" +
+        "<head>" +
+        "<meta charset='UTF-8'>" +
+        "<style>" +
+        "body { font-family: Arial, sans-serif; background-color: #f7f7f7; margin: 0; padding: 0; }" +
+        ".container { background-color: #ffffff; max-width: 600px; margin: 30px auto; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }" +
+        ".header { background-color: #2196F3; color: white; padding: 10px 20px; border-top-left-radius: 8px; border-top-right-radius: 8px; }" +
+        ".content { padding: 20px; color: #333; }" +
+        ".badge { display: inline-block; padding: 8px 14px; background-color: #2196F3; color: #fff; border-radius: 5px; font-size: 13px; }" +
+        ".footer { font-size: 12px; color: #777; text-align: center; margin-top: 20px; }" +
+        "</style>" +
+        "</head>" +
+        "<body>" +
+        "<div class='container'>" +
 
+        "<div class='header'><h2>Order Delivered Successfully</h2></div>" +
+
+        "<div class='content'>" +
+//        "<p>Hi <strong>" + name + "</strong>,</p>" +
+
+//        "<p>We’re happy to inform you that your order <strong>" + orderId + "</strong> has been <span class='badge'>DELIVERED</span>.</p>" +
+
+//        "<p><strong>Delivery Date:</strong> " + ts + "</p>" +
+//        "<p><strong>Product ID:</strong> " + prodId + "</p>" +
+
+        "<p>We hope you enjoyed shopping with <strong>THE MYSHOP STORE</strong>.</p>" +
+
+        "<p>If you have any questions or need support, feel free to contact us.</p>" +
+
+        "<br/>" +
+        "<p style='font-size:11px;color:#999;'>Note: This is a demo project email. No real transaction has been made.</p>" +
+        "</div>" +
+
+        "<div class='footer'>© " + java.time.Year.now() +
+        " THE MYSHOP STORE. All rights reserved.</div>" +
+
+        "</div>" +
+        "</body>" +
+        "</html>";
+        
+        JavaMailUtil.sendMail(mail, subject, htmlTextMessage);
+    }
+    
     
     public static String sendMessage(String toEmailId, String subject, String htmlTextMessage) {
         try {

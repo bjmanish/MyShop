@@ -2,15 +2,19 @@ package com.myshop.srv;
 
 import com.myshop.service.impl.OrderServiceImpl;
 import com.myshop.beans.AssignOrder;
+import com.myshop.utility.JavaMailUtil;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.sql.Timestamp;
+import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.*;
 
 @WebServlet(name = "DeliveredSrv", urlPatterns = {"/DeliveredSrv"})
 public class DeliveredSrv extends HttpServlet {
+
+    private static final long serialVersionUID = 1L;
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
@@ -39,21 +43,36 @@ public class DeliveredSrv extends HttpServlet {
         System.out.println("DB OTP : "+ dbOtp);
         System.out.println("user OTP : "+ enteredOtp);
         
-        if (enteredOtp.equals(dbOtp)) {
-            // ✅ Update delivery status in AssignOrder
-            String updateStatus = new OrderServiceImpl().markOrderAsDelivered(assignId, staffId);
+        OrderServiceImpl service = new OrderServiceImpl();
+        
+        // ❌ OTP mismatch
+        if (dbOtp == null || !enteredOtp.equals(dbOtp)) {
 
-            if ("SUCCESS".equalsIgnoreCase(updateStatus)) {
-                new OrderServiceImpl().updateOrderStatus(orderId, "DELIVERED");
-                response.sendRedirect("assignedDeliveries.jsp?message=" +URLEncoder.encode("OTP verified! Order marked as Delivered successfully!", "UTF-8"));
-            } else {
-                response.sendRedirect("assignedDeliveries.jsp?message=" +
-                        URLEncoder.encode("Failed to update order delivery status.", "UTF-8"));
-            }
-        } else {
-            // ❌ Wrong OTP
+            request.setAttribute("otpError", "Invalid OTP! Please try again.");
+            request.setAttribute("errorOrderId", orderId);
+
+            RequestDispatcher rd = request.getRequestDispatcher("assignedDeliveries.jsp");
+            rd.forward(request, response);
+            return;
+        }
+
+        // ✅ OTP matched → update status
+        String updateStatus = service.markOrderAsDelivered(assignId, staffId);
+
+        if ("SUCCESS".equalsIgnoreCase(updateStatus)) {
+
+            service.updateOrderStatus(orderId, "DELIVERED");
+            service.updateOTPAfterDelivery(assignId);
+
             response.sendRedirect("assignedDeliveries.jsp?message=" +
-                    URLEncoder.encode("Invalid OTP! Please check and try again.", "UTF-8"));
+                    URLEncoder.encode("OTP verified! Order marked as Delivered successfully!", "UTF-8"));
+        } else {
+
+            request.setAttribute("otpError", "Failed to update delivery status. Please try again.");
+            request.setAttribute("errorOrderId", orderId);
+
+            RequestDispatcher rd = request.getRequestDispatcher("assignedDeliveries.jsp");
+            rd.forward(request, response);
         }
     }
 }

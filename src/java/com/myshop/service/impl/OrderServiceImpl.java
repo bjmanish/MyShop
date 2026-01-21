@@ -3,10 +3,12 @@ package com.myshop.service.impl;
 import com.myshop.beans.AssignOrder;
 import com.myshop.beans.CartBean;
 import com.myshop.beans.OrderBean;
+import com.myshop.beans.OrderDelivery;
 import com.myshop.beans.OrderDetails;
 import com.myshop.beans.TransactionBean;
 import com.myshop.service.OrderService;
 import com.myshop.utility.DeliveryDate;
+import com.myshop.utility.JavaMailUtil;
 import com.myshop.utility.MailMessage;
 import com.myshop.utility.dbUtil;
 import java.sql.Connection;
@@ -133,7 +135,13 @@ public class OrderServiceImpl implements OrderService{
         if (ordered) {
             ordered = new OrderServiceImpl().addTransaction(transaction);
             if (ordered) {
-                MailMessage.transactionSuccess(userName, new UserServiceImpl().getFirstName(userName),transaction.getTransId(), transaction.getTransAmount());
+                try {
+                    MailMessage.transactionSuccess(userName, new UserServiceImpl().getFirstName(userName),transaction.getTransId(), transaction.getTransAmount());
+                } catch (Exception ex) {
+                    System.out.println("Error in sending transaction email: "+ex.getMessage());
+                    ex.printStackTrace();
+//                    Logger.getLogger(OrderServiceImpl.class.getName()).log(Level.SEVERE, null, ex);
+                }
                 status = "Order Placed Successfully!";
             }
 //            status = "Order Placed Successfully!";
@@ -177,8 +185,8 @@ public class OrderServiceImpl implements OrderService{
             ps.setString(2, prodId);
             int k = ps.executeUpdate();
             if (k > 0) {
-                
                 status = "Order Has been shipped successfully!!";
+                updateOrderStatus(orderId, "ORDER_SHIPPED");
             }
         } catch (SQLException e) {
             System.out.println("Error in shippedNow db for shipped product: "+e.getMessage());
@@ -286,20 +294,9 @@ public class OrderServiceImpl implements OrderService{
     } 
       
     @Override
-    public String outForDelivery(String userId, String orderId, String prodId) {
-    String status = null;
-
-    Connection conn = dbUtil.provideConnection();
-    PreparedStatement ps = null;
-
-    String query = "UPDATE ORDERS o "
-                 + "JOIN TRANSACTIONS t ON o.orderId = t.transId "
-                 + "SET o.status = ? "
-                 + "WHERE o.orderId = t.transId "
-                 + "AND t.userName = ? "
-                 + "AND o.status = 'SHIPPED' "
-                 + "AND o.orderId = ?";
-
+    public boolean outForDelivery(String userId, String orderId, String prodId, AssignOrder assignOrd) {
+    boolean flag = false;
+     String status = "";
     List<OrderDetails> orders = new OrderServiceImpl().getAllOrderDetails(userId);
     SimpleDateFormat sdf2 = new SimpleDateFormat("dd:MM:yyyy HH:mm");
 
@@ -327,37 +324,20 @@ public class OrderServiceImpl implements OrderService{
         // Generate OTP
         String otp = String.format("%06d", new Random().nextInt(1000000));
         LocalDateTime otpTime = LocalDateTime.now();
-
-        try {
-            ps = conn.prepareStatement(query);
-            ps.setString(1, "OUT_FOR_DELIVERY");
-            ps.setString(2, userId);
-            ps.setString(3, orderId);
-
-            int k = ps.executeUpdate();
-            if (k > 0) {
-                status = "Your order has been marked as Out for Delivery!";
-                System.out.println("Delivery Status: " + status);
-
-                // Send email notification
-                MailMessage.orderOutForDelivery(
-                    userId,
-                    new UserServiceImpl().getFirstName(userId),
-                    orderId,
-                    formattedDeliveryDate,
-                    prodId,
-                    otp
-                );
-            }
-        } catch (SQLException e) {
-            status = "Error while updating Out for Delivery status!";
-            System.out.println("Error in outForDelivery db: " + e.getMessage());
-        } finally {
-            dbUtil.closeConnection(ps);
-            dbUtil.closeConnection(conn);
+        boolean k1 = assignOrder(assignOrd);
+        boolean k = updateOrderStatus(orderId, "OUT_FOR_DELIVERY");
+        if (k==true && k1==true) {
+//            assignOrder(order);
+            flag = true;
+            status = "Your order has been marked as Out for Delivery!";
+            System.out.println("Delivery Status: " + status);
+    
+            // Send email notification
+            MailMessage.orderOutForDelivery(userId,new UserServiceImpl().getFirstName(userId),orderId,formattedDeliveryDate,prodId,otp    );
         }
+//        dbUtil.closeConnection(conn);
     }
-    return status;
+    return flag;
 }
 
     @Override
@@ -369,8 +349,7 @@ public class OrderServiceImpl implements OrderService{
         String sql2 = "SELECT sname FROM DELIVERYSTAFF WHERE semail = ?";        
         int aId = assignId();
         System.out.println("AssignId :"+aId);
-        try{
-            Connection conn = dbUtil.provideConnection();
+        try(Connection conn = dbUtil.provideConnection()){          
             PreparedStatement ps = conn.prepareStatement(sql);
             PreparedStatement ps2 = conn.prepareStatement(sql2);
             ps2.setString(1, order.getStaffId());
@@ -417,10 +396,6 @@ public class OrderServiceImpl implements OrderService{
         
         return id;
     }
-    
-//    public static void main(String[] args) {
-//        System.out.println( new OrderServiceImpl().assignId());
-//    }
 
     public Timestamp getDeliveryDateByOrderId(String orderId) {
     Timestamp deliveryDate = null;
@@ -479,9 +454,9 @@ public class OrderServiceImpl implements OrderService{
         String query = "UPDATE AssignOrderForStaff SET DeliveryStatus = ?, deliveredAt = ? WHERE assignId = ? AND staffId = ?";
         try (Connection conn = dbUtil.provideConnection();
          PreparedStatement ps = conn.prepareStatement(query)) {
-
+            Timestamp ts = new Timestamp(System.currentTimeMillis());
             ps.setString(1, "DELIVERED");
-            ps.setTimestamp(2, new Timestamp(System.currentTimeMillis()));
+            ps.setTimestamp(2, ts);
             ps.setInt(3, assignId);
             ps.setString(4, staffId);
 
@@ -489,6 +464,13 @@ public class OrderServiceImpl implements OrderService{
             if (rows > 0) {
                 status = "SUCCESS";
                 System.out.println("AssignOrder updated to Delivered for orderId: " + assignId);
+                
+//               OrderService order =  (OrderService) new OrderServiceImpl().getAllOrderDetails(orderId);
+                
+//                MailMessage.markAsDelivered(
+//                    order,
+//                    ts
+//                );
             }
         } catch (SQLException e) {
             System.out.println("Error in markOrderAsDelivered(): " + e.getMessage());
@@ -496,7 +478,7 @@ public class OrderServiceImpl implements OrderService{
         return status;
     }
 
-public boolean updateOrderStatus(String orderId, String newStatus) {
+    public boolean updateOrderStatus(String orderId, String newStatus) {
     boolean updated = false;
     String query = "UPDATE ORDERS SET status = ? WHERE orderId = ?";
     try (Connection conn = dbUtil.provideConnection();
@@ -516,7 +498,7 @@ public boolean updateOrderStatus(String orderId, String newStatus) {
     return updated;
 }
 
-public String getOtpByAssignId(int assignId) {
+    public String getOtpByAssignId(int assignId) {
     String otp = null;
     String query = "SELECT otp FROM AssignOrderForStaff WHERE assignId = ?";
     try (Connection conn = dbUtil.provideConnection();
@@ -533,7 +515,41 @@ public String getOtpByAssignId(int assignId) {
     return otp;
 }
 
+    @Override
+    public boolean updateOTPAfterDelivery(int assignId){
+        boolean status = false;
+        
+        String query = "UPDATE AssignOrderForStaff SET otp = ? WHERE assignId = ?";
+        try (Connection conn = dbUtil.provideConnection();
+            PreparedStatement ps = conn.prepareStatement(query)) {
+            
+            ps.setString(1, "EXPIRED");
+            ps.setInt(2, assignId);
+            int k = ps.executeUpdate();
+            if(k>0){
+                System.out.println("OTP Expired!/removed from DB after Delivery.");
+            }
+        } catch (SQLException e) {
+            System.out.println("Error in UpdateOtpAfterDelivery: " + e.getMessage());
+        }
+        
+        return status;
+    }
     
-
-
+    public String getOtpByOrderId(String orderId) throws SQLException{
+        String otp = "";
+        Connection conn = dbUtil.provideConnection();
+        PreparedStatement ps = conn.prepareStatement("Select otp from ASSIGNORDERFORSTAFF where orderId = ?");
+        
+        ps.setString(1, orderId);
+        
+        ResultSet rs = ps.executeQuery();
+        if(rs.next()){
+            otp = rs.getString(1);
+        }
+        
+        return otp;
+    }
+    
+    
 }

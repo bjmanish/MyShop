@@ -24,7 +24,7 @@ public interface OrderService {
     
     public List <OrderDetails> getAllOrderDetails(String userEmailId);
     
-    public String outForDelivery(String userId, String orderId, String prodId);
+    public boolean outForDelivery(String userId, String orderId, String prodId, AssignOrder assignOrder);
     
     public boolean assignOrder(AssignOrder order);
     
@@ -33,4 +33,8 @@ public interface OrderService {
     List<AssignOrder> getAssignedOrdersByStaff(String staffEmail);
     
     public String markOrderAsDelivered(int assignId, String staffId);
+    
+    public boolean updateOTPAfterDelivery(int assignId);
+        
+    
 }
