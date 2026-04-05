@@ -1,237 +1,242 @@
+<%
+    String message = request.getParameter("message");
+%>
+
+<%@ page language="java" contentType="text/html; charset=UTF-8"%>
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The MYSHOP - Register</title>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
-    <style>
-        .register-container {
-            background: 1px 4px rgba(0, 0, 0, 0.6);
-            padding:  10px;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            width: 100%;
-            max-width: 650px;
-            margin: 30px auto;
-            margin-bottom: 150px ;
-        }
+<title>Register</title>
 
-        .register-container h2 {
-            background: 0 4px rgba(0, 0, 0, 0);
-            margin-bottom: 5px;
-            color: crimson;
-            text-align: center;
-        }
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
 
-        .register-container .form-label {
-            color: #555;
-            font-weight: bold;
-        }
+<style>
+body {
+    /*background: linear-gradient(135deg, #1d2671, #c33764);*/
+     background: linear-gradient(135deg, #141e30, #243b55);
+    min-height: 100vh;
+}
 
-        .register-container .input-group-addon {
-            background-color: #f8f9fa;
-            border: 1px solid #ddd;
-            margin-left: 0px;
-            width: 10%;
-        }
+.register-container {
+    min-height: 80vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 80px;
+}
 
-        .register-container .input-group-addon i {
-            color: #007bff;
-            margin-right: 10px;
-            width: 20px;
-            /*margin-right: 20px;*/
-        }
+.glass-card {
+    background: rgba(255,255,255,0.15);
+    backdrop-filter: blur(15px);
+    border-radius: 15px;
+    padding: 25px;
+    color: white;
+    width: 100%;
+    max-width: 550px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+}
 
-        .register-container .form-control {
-            border-radius: 4px;
-            width: 100%;
-        }
+.form-control {
+    background: transparent;
+    color: white;
+    border: 1px solid rgba(255,255,255,0.3);
+}
 
-        .register-container .btn-primary {
-            width: 100%;
-            background-color: #007bff;
-            border-color: #007bff;
-            padding: 20px;
-            font-size: 16px;
-        }
+.form-control::placeholder { color: #ddd; }
 
-        .register-container .btn-primary:hover {
-            background-color: #0056b3;
-            border-color: #0056b3;
-        }
+.input-group-text {
+    background: transparent;
+    color: white;
+    cursor: pointer;
+}
 
-        .register-container .error,
-        .register-container .success {
-            margin-bottom: 15px;
-            text-align: center;
-        }
+.image-preview {
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    display: none;
+    border: 2px solid white;
+    margin-bottom: 10px;
+}
 
-        .register-container .error {
-            color: #ff0000;
-        }
+.btn-light {
+    font-weight: bold;
+    border-radius: 25px;
+}
 
-        .register-container .success {
-            color: #28a745;
-        }
-
-        .register-container a {
-            display: block;
-            text-align: center;
-            margin-top: 10px;
-            color: #007bff;
-            text-decoration: none;
-        }
-
-        .register-container a:hover {
-            text-decoration: underline;
-        }
-        .image-preview {
-            width: 100px;
-            height: 100px;
-            border-radius: 50%;
-            object-fit: cover;
-            display: none;
-            margin: 0 auto 10px auto;
-            border: 0.5px solid green;
-        }
-
-        .image-upload-btn {
-            display: block;
-            width: 100%;
-            margin-bottom: 15px;
-        }
-        
-        .input-group i{
-            width: 20px;
-            height: 20.5px;
-            margin-right: -20px;
-        }
-/*        .glyphicon{
-            width: -10px;
-            height: 10px;
-            margin-right: 20px;
-        }*/
-        #togglePassword i, #toggleConfPassword i, #toggleIcon {
-            color: #007bff;
-            width: 10%;
-            /*height: 20.5px;*/
-            justify-content: center;
-            align-content: center;
-            display: flex;
-            
-        }
-    </style>
+/* ALERT ANIMATION */
+.alert-box {
+    width: 50%;    
+    display: none;
+    transition: all 0.4s ease;
+    margin: 0 auto;
+}
+</style>
 </head>
-<body style="background-color: #E6F9E6;">
-    <!-- Header Include -->
-    <jsp:include page="header.jsp"></jsp:include>
 
-    <%
-        String message = request.getParameter("message");
-    %>
+<body>
 
-    <!-- Registration Form -->
-    <div class="register-container">
-        <h2>Registration Form</h2>
-        <form id="registerForm" action="./RegisterSrv" style="border: 1px solid black; border-radius: 10px; background-color: #FFE5CC; padding: 10px;">
-            <!-- Error & Success Messages -->
-            <div class="alert alert-danger error" id="errorMessage" style="display: none;"></div>
-            <div class="alert alert-success success" id="successMessage" style="display: none;"></div>
-            
-            
-            <!-- Profile Image -->
-            <div class="form-group text-center">
-                <img src="" alt="Profile Preview" class="image-preview" id="profilePreview">
-                <input type="file" id="profileImage" name="profileImage" accept="image/*" class="form-control image-upload-btn" onchange="previewImage(event)">
-            </div>
-            
-            <!-- Username -->
-            <div class="form-group">
-                <label for="username" class="form-label">Name</label>
-                <div class="input-group">
-                    <span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>
-                    <input type="text" class="form-control" id="username" name="username" placeholder="Enter your username" required>
-                </div>
-            </div>
+<!-- REGISTER -->
+<div class="container register-container">
 
-            <!-- Email -->
-            <div class="form-group">
-                <label for="email" class="form-label">Email</label>
-                <div class="input-group">
-                    <span class="input-group-addon"><i class="glyphicon glyphicon-envelope"></i></span>
-                    <input type="email" class="form-control" id="email" name="email" placeholder="Enter your email" required>
-                </div>
-            </div>
-            
-            <!-- Phone Number -->
-            <div class="form-group">
-                <label for="mobile" class="form-label">Phone No.</label>
-                <div class="input-group">
-                    <span class="input-group-addon"><i class="glyphicon glyphicon-phone"></i></span>
-                    <input type="tel" class="form-control" id="mobile" name="mobile" placeholder="Enter your Phone Number" required>
-                </div>
-            </div>
-            
-            <!-- Address -->
-            <div class="form-group">
-                <label for="address" class="form-label">Address</label>
-                <div class="input-group">
-                    <span class="input-group-addon"><i class="glyphicon glyphicon-home"></i></span>
-                    <textarea type="text" class="form-control" id="address" name="address" placeholder="Enter your Address" required></textarea>
-                </div>
-            </div>
-            
-            <!-- Pincode -->
-            <div class="form-group">
-                <label for="pincode" class="form-label">PinCode</label>
-                <div class="input-group" >
-                    <span class="input-group-addon"><i class="glyphicon glyphicon-map-marker"></i></span>
-                    <input type="text" class="form-control" id="pincode" name="pincode" placeholder="Enter your Pincode" required>
-                </div>
-            </div>
+<div class="glass-card">
+    <!-- ALERT BOX -->
+    <div id="successBox" class="alert alert-success text-center alert-box"></div>
+    <div id="errorBox" class="alert alert-danger text-center alert-box"></div>
+<h3 class="text-center mb-4">Create Account</h3>
 
-            <!-- Password -->
-            <div class="form-group">
-                <label for="password" class="form-label">Password</label>
-                <div class="input-group" style="display: flex;">
-                    <div class="input-group-prepend">
-                        <span class="input-group-addon"><i class="glyphicon glyphicon-lock"></i></span>
-                    </div>
-                    <input type="password" class="form-control" id="password" name="password" placeholder="Enter your password" required>
-                    <div class="input-group-append">
-                        <span class="input-group-addon" id="togglePassword"><i class="fa fa-eye" id="toggleIcon"></i></span>
-                    </div>
-                </div>                
-            </div>
+<form id="registerForm" enctype="multipart/form-data">
 
-            <!-- Confirm Password -->
-            <div class="form-group">
-                <label for="confirmPassword" class="form-label">Confirm Password</label>
-                <div class="input-group" style="display: flex;">
-                    <div class="input-group-prepend">
-                        <span class="input-group-addon"><i class="glyphicon glyphicon-lock"></i></span>
-                    </div>
-                    <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" placeholder="Enter your password" required>
-                    <div class="input-group-append">
-                        <span class="input-group-addon" id="toggleConfPassword"><i class="fa fa-eye" id="toggleIcon"></i></span>
-                    </div>
-                </div>                
-            </div>
+<!-- IMAGE -->
+<div class="text-center">
+    <img id="preview" class="image-preview">
+    <input type="file" name="image" class="form-control mb-3" onchange="previewImage(event)">
+</div>
 
-            <!-- Register Button -->
-            <button type="button" class="btn btn-primary" id="registerButton">Register</button>
-        </form>
+<!-- NAME -->
+<input type="text" name="name" class="form-control mb-3" placeholder="Full Name" required>
 
-        <!-- Login Link -->
-        <a href="login.jsp">Already have an account? Login</a>
-    </div>
+<!-- EMAIL -->
+<input type="email" name="email" class="form-control mb-3" placeholder="Email" required>
 
-    <!-- Footer Include -->
-    <jsp:include page="footer.html"></jsp:include>
-    
-    <script src="./js/allJsCode.js"></script>    
+<!-- MOBILE -->
+<input type="text" name="mobile" class="form-control mb-3" placeholder="Mobile Number" required>
+
+<!-- ADDRESS -->
+<textarea name="address" class="form-control mb-3" placeholder="Address" required></textarea>
+
+<!-- PINCODE -->
+<input type="text" name="pincode" class="form-control mb-3" placeholder="Pincode" required>
+
+<!-- PASSWORD -->
+<div class="input-group mb-3">
+<input type="password" id="password" name="password" class="form-control" placeholder="Password" required>
+<span class="input-group-text" onclick="togglePassword('password','eye1')">
+<i id="eye1" class="fa fa-eye"></i>
+</span>
+</div>
+
+<!-- CONFIRM PASSWORD -->
+<div class="input-group mb-4">
+<input type="password" id="confirmPassword" name="confirmPassword" class="form-control" placeholder="Confirm Password" required>
+<span class="input-group-text" onclick="togglePassword('confirmPassword','eye2')">
+<i id="eye2" class="fa fa-eye"></i>
+</span>
+</div>
+
+<!-- BUTTON -->
+<button type="button" id="registerBtn" onclick="registerUser()" class="btn btn-light w-100">
+    Register
+</button>
+
+</form>
+
+<div class="text-center mt-3">
+<a href="login.jsp" class="text-white">Already have account? Login</a>
+</div>
+
+</div>
+</div>
+
+<script>
+
+/* IMAGE PREVIEW */
+function previewImage(event) {
+    const img = document.getElementById("preview");
+    img.src = URL.createObjectURL(event.target.files[0]);
+    img.style.display = "block";
+}
+
+/* PASSWORD TOGGLE */
+function togglePassword(id, iconId) {
+    const input = document.getElementById(id);
+    const icon = document.getElementById(iconId);
+
+    if (input.type === "password") {
+        input.type = "text";
+        icon.classList.replace("fa-eye", "fa-eye-slash");
+    } else {
+        input.type = "password";
+        icon.classList.replace("fa-eye-slash", "fa-eye");
+    }
+}
+
+/* SHOW SUCCESS */
+function showSuccess(msg) {
+    const box = document.getElementById("successBox");
+    box.innerText = msg;
+    box.style.display = "block";
+
+    setTimeout(() => {
+        box.style.display = "none";
+    }, 3000);
+}
+
+/* SHOW ERROR */
+function showError(msg) {
+    const box = document.getElementById("errorBox");
+    box.innerText = msg;
+    box.style.display = "block";
+
+    setTimeout(() => {
+        box.style.display = "none";
+    }, 4000);
+}
+
+/* REGISTER AJAX */
+function registerUser() {
+
+    const btn = document.getElementById("registerBtn");
+    btn.disabled = true;
+    btn.innerText = "Registering...";
+
+    const form = document.getElementById("registerForm");
+    const formData = new FormData(form);
+
+    const password = document.getElementById("password").value;
+    const confirmPassword = document.getElementById("confirmPassword").value;
+
+    if (password !== confirmPassword) {
+        showError("Passwords do not match");
+        btn.disabled = false;
+        btn.innerText = "Register";
+        return;
+    }
+
+    fetch("RegisterSrv", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded"
+        },
+        body: formData
+    })
+    .then(res => res.text())
+    .then(data => {
+
+        if (data.status === "success") {
+            showSuccess("Registration Successful!");
+
+            setTimeout(() => {
+                window.location.href = "login.jsp";
+            }, 1500);
+
+        } else {
+            showError(data.message || "Registration Failed");
+        }
+
+        btn.disabled = false;
+        btn.innerText = "Register";
+    })
+    .catch(err => {
+        console.error(err);
+        showError("Server Error!");
+        btn.disabled = false;
+        btn.innerText = "Register";
+    });
+}
+
+</script>
+
 </body>
 </html>

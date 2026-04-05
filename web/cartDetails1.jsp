@@ -22,19 +22,21 @@
         
         <%
             String userName = (String)session.getAttribute("username");
-            String password = (String)session.getAttribute("password");
-            String userType = (String)session.getAttribute("usertype");
+            String password = (String)session.getAttribute("sessionId");
+            String userType = (String)session.getAttribute("role");
+            
+            String message = request.getParameter("error");
             
             if (userType == null || !userType.equalsIgnoreCase("customer")) {
-                response.sendRedirect("login.jsp?error=access_denied");
+                response.sendRedirect("login.jsp?message=Access_Denied! Please Login and then continue to shopping.");
                 return;
             }
             if (userName == null || password == null) {
-                response.sendRedirect("login.jsp?error=session_expired");
+                response.sendRedirect("login.jsp?message=session_expired");
                 return;
             }
             
-            String message = request.getParameter("message");
+            
             
             String adds = request.getParameter("add");
             if(adds != null){
@@ -44,26 +46,26 @@
                 String pid = request.getParameter("pid");
                 int avail = Integer.parseInt(request.getParameter("avail"));
                 int cartQty = Integer.parseInt(request.getParameter("qty"));
-                
+                String cartId = request.getParameter("cId");
                 CartServiceImpl cart = new CartServiceImpl();
                 if(add == 1){
                     //Add Product into the cart
                     cartQty +=1;
                     if(cartQty <= avail){
-                        cart.addProductToCart(uid, 1, pid);
+                        cart.addProductToCart(uid,cartId, pid, 1);
                     }else{
                         response.sendRedirect("./AddtoCart?pid=" + pid + "&pqty=" + cartQty);
                     }
                 }else if(add == 0){
                     // Remove Product from cart
-                    cart.removeProductFromCart(uid, pid);
+                    cart.removeProductFromCart(uid, cartId, pid);
                 }
             }            
         %>
         
         <!-- get details to how many data will be add to cart -->
 
-        <jsp:include page="header.jsp" ></jsp:include>
+        <jsp:include page="/header.jsp" ></jsp:include>
         <%if( message != null){%>
         <div class="text-center" style="color: red; font-weight: 500; font-size: 16px;"><p><%=message%></p></div>
         <%}%>
@@ -139,7 +141,7 @@
     </div>
 </div>
         
-        <jsp:include page="footer.html"></jsp:include>
+        <jsp:include page="/footer.html"></jsp:include>
 
     </body>
 </html>

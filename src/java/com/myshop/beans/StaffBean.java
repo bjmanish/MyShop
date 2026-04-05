@@ -5,38 +5,24 @@
  */
 package com.myshop.beans;
   
-import java.io.InputStream;
 import java.io.Serializable;
 
 @SuppressWarnings("serial")
 public class StaffBean implements Serializable{
     
-    private String sId;
     private String staffId;
-    private String staffName;
-    private String mobile;
-    private String password;
-    private InputStream staffProfile;
+    private String vehicle_type;
+    private String license_number;
+    private String availability_status;
 
     public StaffBean() {
-        super();
-    }
-
-    public StaffBean(String staffId, String sId, String staffName, String mobile, String password, InputStream staffProfile) {
-        this.staffId = staffId;
-        this.sId = sId;
-        this.staffName = staffName;
-        this.mobile = mobile;
-        this.password = password;
-        this.staffProfile = staffProfile;
     }
     
-    public String getsId() {
-        return sId;
-    }
-
-    public void setsId(String sId) {
-        this.sId = sId;
+    public StaffBean(String staffId, String vehicle_type, String license_number, String availability_status) {
+        this.staffId = staffId;
+        this.vehicle_type = vehicle_type;
+        this.license_number = license_number;
+        this.availability_status = availability_status;
     }
 
     public String getStaffId() {
@@ -47,44 +33,32 @@ public class StaffBean implements Serializable{
         this.staffId = staffId;
     }
 
-    public String getStaffName() {
-        return staffName;
+    public String getVehicle_type() {
+        return vehicle_type;
     }
 
-    public void setStaffName(String staffName) {
-        this.staffName = staffName;
+    public void setVehicle_type(String vehicle_type) {
+        this.vehicle_type = vehicle_type;
     }
 
-    public String getMobile() {
-        return mobile;
+    public String getLicense_number() {
+        return license_number;
     }
 
-    public void setMobile(String mobile) {
-        this.mobile = mobile;
+    public void setLicense_number(String license_number) {
+        this.license_number = license_number;
     }
 
-    public String getPassword() {
-        return password;
+    public String getAvailability_status() {
+        return availability_status;
     }
 
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public InputStream getStaffProfile() {
-        return staffProfile;
-    }
-
-    public void setStaffProfile(InputStream staffProfile) {
-        this.staffProfile = staffProfile;
+    public void setAvailability_status(String availability_status) {
+        this.availability_status = availability_status;
     }
 
     @Override
     public String toString() {
-        return "StaffBean{" + "staffId=" + staffId + ", staffName=" + staffName + ", mobile=" + mobile + ", password=" + password + ", staffProfile=" + staffProfile + '}';
-    }   
-    
-    
-    
-    
+        return "StaffBean{" + "staffId=" + staffId + ", vehicle_type=" + vehicle_type + ", license_number=" + license_number + ", availability_status=" + availability_status + '}';
+    }    
 }

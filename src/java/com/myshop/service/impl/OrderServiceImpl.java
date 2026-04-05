@@ -3,13 +3,11 @@ package com.myshop.service.impl;
 import com.myshop.beans.AssignOrder;
 import com.myshop.beans.CartBean;
 import com.myshop.beans.OrderBean;
-import com.myshop.beans.OrderDelivery;
 import com.myshop.beans.OrderDetails;
+import com.myshop.beans.OrderItem;
 import com.myshop.beans.TransactionBean;
 import com.myshop.service.OrderService;
-import com.myshop.utility.DeliveryDate;
-import com.myshop.utility.JavaMailUtil;
-import com.myshop.utility.MailMessage;
+//import com.myshop.utility.MailMessage;
 import com.myshop.utility.dbUtil;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -17,27 +15,26 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 
 public class OrderServiceImpl implements OrderService{
-    private Connection conn = dbUtil.provideConnection();
+//    private
 
     @Override
     public boolean addOrder(OrderBean order) {
         boolean flag = false;
-//        Connection conn = dbUtil.provideConnection();
         try {
-            PreparedStatement ps = conn.prepareStatement("INSERT INTO ORDERS VALUES(?,?,?,?,?,?,?,?)");
-            ps.setString(1, order.getTransId());
+            Connection conn = dbUtil.provideConnection();
+            PreparedStatement ps = conn.prepareStatement("INSERT INTO ORDERS VALUES(?,?,?,?,?)");
+//            ps.setString(1, order.getTransId()); orderID
             ps.setString(2, order.getProdId());
             ps.setInt(3, order.getQuantity());
             ps.setDouble(4, order.getAmount());
@@ -63,9 +60,10 @@ public class OrderServiceImpl implements OrderService{
     @Override
     public boolean addTransaction(TransactionBean transaction) {
         boolean flag = false;
-        Connection conn = dbUtil.provideConnection();
+       
         PreparedStatement ps = null;
         try {
+            Connection conn = dbUtil.provideConnection();
             ps = conn.prepareStatement("INSERT INTO TRANSACTIONS VALUES(?,?,?,?)");
             ps.setString(1, transaction.getTransId());
             ps.setString(2, transaction.getUserName());
@@ -82,7 +80,7 @@ public class OrderServiceImpl implements OrderService{
             e.printStackTrace();    
         }
         
-        dbUtil.closeConnection(conn);
+        
         dbUtil.closeConnection(ps);
         
         return flag;
@@ -136,7 +134,7 @@ public class OrderServiceImpl implements OrderService{
             ordered = new OrderServiceImpl().addTransaction(transaction);
             if (ordered) {
                 try {
-                    MailMessage.transactionSuccess(userName, new UserServiceImpl().getFirstName(userName),transaction.getTransId(), transaction.getTransAmount());
+//                    MailMessage.transactionSuccess(userName, new UserServiceImpl().getFirstName(userName),transaction.getTransId(), transaction.getTransAmount());
                 } catch (Exception ex) {
                     System.out.println("Error in sending transaction email: "+ex.getMessage());
                     ex.printStackTrace();
@@ -154,11 +152,12 @@ public class OrderServiceImpl implements OrderService{
     @Override
     public int countSoldItem(String prodId) {
         int count = 0;
-	Connection conn = dbUtil.provideConnection();
+//	Connection conn = dbUtil.provideConnection();
         PreparedStatement ps = null;
         ResultSet rs = null;
         try {
-            ps = conn.prepareStatement("SELECT SUM(quantity) FROM ORDERS WHERE prodId=?");
+            Connection conn = dbUtil.provideConnection();
+            ps = conn.prepareStatement("SELECT SUM(quantity) FROM ORDER_ITEMS WHERE product_id=?");
             ps.setString(1, prodId);
             rs = ps.executeQuery();
             if (rs.next())
@@ -167,7 +166,7 @@ public class OrderServiceImpl implements OrderService{
             count = 0;
             System.out.println("Error for counting the sold item from db:"+e.getMessage());
         }
-        dbUtil.closeConnection(conn);
+        
         dbUtil.closeConnection(ps);
         dbUtil.closeConnection(rs);
 
@@ -177,10 +176,11 @@ public class OrderServiceImpl implements OrderService{
     @Override
     public String shipNow(String orderId, String prodId) {
         String status = "FAILURE";
-        Connection conn = dbUtil.provideConnection();
+       
         PreparedStatement ps = null;
         try {
-            ps = conn.prepareStatement("UPDATE ORDERS SET shipped=1 WHERE orderId=? AND prodId=? AND shipped = 0");
+            Connection conn = dbUtil.provideConnection();
+            ps = conn.prepareStatement("UPDATE ORDERS SET shipped=1 WHERE orderId=? AND product_id=? AND shipped = 0");
             ps.setString(1, orderId);
             ps.setString(2, prodId);
             int k = ps.executeUpdate();
@@ -192,55 +192,91 @@ public class OrderServiceImpl implements OrderService{
             System.out.println("Error in shippedNow db for shipped product: "+e.getMessage());
         }
 
-	dbUtil.closeConnection(conn);
+	
 	dbUtil.closeConnection(ps);
 
         return status;
     }
 
     @Override
-    public List<OrderBean> getAllOrders() {
-        List<OrderBean> orderList = new ArrayList<>();
-               
-        Connection conn = dbUtil.provideConnection();
-        try {
-            PreparedStatement ps = conn.prepareStatement("SELECT * FROM ORDERS");
-            ResultSet rs = ps.executeQuery();
-            while(rs.next()){
-                OrderBean order = new OrderBean(
-                        rs.getString("orderId"), 
-                        rs.getString("prodId"), 
-                        rs.getInt("quantity"), 
-                        rs.getDouble("amount"), 
-                        rs.getInt("shipped"), 
-                        rs.getString("status"),
-                        rs.getTimestamp("delivery_date"),
-                        rs.getTimestamp("order_date")
-                );
-                orderList.add(order);
-            }
-        } catch (SQLException ex) {
-            System.out.println("Error: "+ex.getMessage());
+    public List<OrderDetails> getAllOrders() {
+
+        List<OrderDetails> orderList = new ArrayList<>();
+        Map<String, OrderDetails> orderMap = new HashMap<>();
+
+        String query = "SELECT " +
+            "o.order_id, o.user_id, o.total_amount, o.status, o.order_date " +
+            "u.name AS user_name, u.email, " +
+            "oi.product_id, oi.quantity, oi.price, " +
+            "p.name AS product_name " +
+            "FROM ORDERS o " +
+            "JOIN USERS u ON o.user_id = u.user_id " +
+            "JOIN ORDER_ITEMS oi ON o.order_id = oi.order_id " +
+            "JOIN PRODUCTS p ON oi.product_id = p.product_id " +
+            "ORDER BY o.order_date DESC";
+
+        try (
+            Connection conn = dbUtil.provideConnection();
+            PreparedStatement ps = conn.prepareStatement(query);
+            ResultSet rs = ps.executeQuery()
+        ) {
+
+            while (rs.next()) {
+
+                String orderId = rs.getString("order_id");
+                OrderDetails order = orderMap.get(orderId);
+                // 🔹 Create new order if not exists
+                if (order == null) {
+                    order = new OrderDetails();
+
+                    order.setOrderId(orderId);
+                    order.setUserId(rs.getString("user_id"));
+                    order.setProdId(rs.getString("product_id")); // optional field
+                    order.setAmount(rs.getDouble("total_amount"));
+                    order.setStatus(rs.getString("status"));
+                    order.setDatetime(rs.getTimestamp("order_date"));
+//                    order.setDeliveryDate(rs.getTimestamp("order_date"));
+                    order.setQnty(rs.getInt("quantity"));
+
+                    // initialize product list
+                    order.setItems(new ArrayList<>());
+
+                    orderMap.put(orderId, order);
+                    orderList.add(order);
+                }
+
+            // 🔹 Add product item
+            OrderItem item = new OrderItem();
+            item.setProductId(rs.getString("product_id"));
+            item.setProductName(rs.getString("product_name"));
+            item.setQuantity(rs.getInt("quantity"));
+            item.setPrice(rs.getDouble("price"));
+
+            order.getItems().add(item);
         }
-        dbUtil.closeConnection(conn);
-        
-        return orderList;
+
+    } catch (SQLException ex) {
+        System.out.println("Error fetching orders: " + ex.getMessage());
+        ex.printStackTrace();
     }
 
+    return orderList;
+}
     @Override
     public List<OrderBean> getOrderByUserId(String emailId) {
         List<OrderBean> orderList = new ArrayList<>();
-        Connection conn = dbUtil.provideConnection();
+       
          
         String query = "SELECT * FROM ORDERS o INNER JOIN TRANSACTIONS t ON o.orderId = t.transId WHERE userName=?";
         try {
+            Connection conn = dbUtil.provideConnection();
             PreparedStatement ps = conn.prepareStatement(query);
             ps.setString(1, emailId);
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
                 OrderBean order = new OrderBean();                
                 order.setTransId(rs.getString("t.transId"));
-                order.setProdId(rs.getString("t.prodId"));
+                order.setProdId(rs.getString("t.product_id"));
                 order.setQuantity(rs.getInt("quantity"));
                 order.setAmount(rs.getDouble("t.amount"));
                 order.setShipped(rs.getInt("shipped"));
@@ -259,12 +295,13 @@ public class OrderServiceImpl implements OrderService{
         List<OrderDetails> orders = new ArrayList<>();
         String query =  "SELECT P.pId AS ProdId, O.orderId AS orderId, t.transId As transId, O.shipped AS shipped, P.image AS image, "
                 + " P.pName AS pName, O.quantity AS quantity, O.amount AS amount,o.delivery_date AS deliveryDate, o.status AS status, o.order_date AS orderDate FROM ORDERS O, TRANSACTIONS T , PRODUCTS P"
-                + " WHERE O.orderId = T.transId AND O.orderId = T.transId AND O.prodId = P.pId AND T.userName=?";
-//        Connection conn = dbUtil.provideConnection();
+                + " WHERE O.orderId = T.transId AND O.orderId = T.transId AND O.product_id = P.pId AND T.userName=?";
+//       
         //System.out.println(userEmailId);
         
         OrderDetails order = null;
         try {
+            Connection conn = dbUtil.provideConnection();
             PreparedStatement ps = conn.prepareStatement(query);
             ps.setString(1, userEmailId);
             ResultSet rs = ps.executeQuery();
@@ -272,7 +309,7 @@ public class OrderServiceImpl implements OrderService{
             while(rs.next()){
                 order =  new OrderDetails();
                 order.setOrderId(rs.getString("orderId"));
-                order.setProdId(rs.getString("prodId"));
+                order.setProdId(rs.getString("product_id"));
                 order.setProdName(rs.getString("pName"));
                 order.setAmount(rs.getDouble("amount"));
                 order.setDatetime(rs.getTimestamp("orderDate"));
@@ -289,7 +326,7 @@ public class OrderServiceImpl implements OrderService{
             System.out.println("Error in get all orderDetails from db: "+ex.getMessage());
         }
         
-//        dbUtil.closeConnection(conn);
+//        
         return orders;
     } 
       
@@ -333,9 +370,9 @@ public class OrderServiceImpl implements OrderService{
             System.out.println("Delivery Status: " + status);
     
             // Send email notification
-            MailMessage.orderOutForDelivery(userId,new UserServiceImpl().getFirstName(userId),orderId,formattedDeliveryDate,prodId,otp    );
+//            MailMessage.orderOutForDelivery(userId,new UserServiceImpl().getFirstName(userId),orderId,formattedDeliveryDate,prodId,otp    );
         }
-//        dbUtil.closeConnection(conn);
+//        
     }
     return flag;
 }
@@ -538,7 +575,7 @@ public class OrderServiceImpl implements OrderService{
     
     public String getOtpByOrderId(String orderId) throws SQLException{
         String otp = "";
-        Connection conn = dbUtil.provideConnection();
+       Connection conn = dbUtil.provideConnection();
         PreparedStatement ps = conn.prepareStatement("Select otp from ASSIGNORDERFORSTAFF where orderId = ?");
         
         ps.setString(1, orderId);
@@ -549,6 +586,38 @@ public class OrderServiceImpl implements OrderService{
         }
         
         return otp;
+    }
+
+    @Override
+    public OrderDetails getOrderDetailsByOrdId(String ordId) {
+        OrderDetails order = null;
+
+    String query = "SELECT * FROM ORDER_ITEMS WHERE order_id=?";
+
+    try (
+        Connection conn = dbUtil.provideConnection();
+        PreparedStatement ps = conn.prepareStatement(query)
+    ) {
+
+        ps.setString(1, ordId);
+
+        ResultSet rs = ps.executeQuery();
+
+        if (rs.next()) {
+            order = new OrderDetails();
+            
+            order.setOrderId(rs.getString("order_id"));
+            order.setProdId(rs.getString("product_id"));
+            order.setAmount(rs.getDouble("price"));
+            order.setQnty(rs.getInt("quantity"));
+        }
+
+    } catch (SQLException ex) {
+        System.out.println("Error fetching user: " + ex.getMessage());
+        ex.printStackTrace();
+    }
+
+    return order;
     }
     
     

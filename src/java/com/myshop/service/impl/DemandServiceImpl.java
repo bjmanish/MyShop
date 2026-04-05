@@ -53,12 +53,13 @@ public class DemandServiceImpl implements DemandService{
     public boolean removeProduct(String userId, String prodId) {
         boolean flag = false;
         
-        Connection conn = dbUtil.provideConnection();
+        
         PreparedStatement ps = null;
         PreparedStatement ps2 = null;
         ResultSet rs = null;
         
         try{
+            Connection conn = dbUtil.provideConnection();
             ps = conn.prepareStatement("SELECT * FROM USER_DEMAND WHERE userName=? AND prodId=?");
             ps.setString(1, userId);
             ps.setString(2, prodId);
@@ -81,7 +82,7 @@ public class DemandServiceImpl implements DemandService{
             ex.getMessage();
         }
         
-        dbUtil.closeConnection(conn);
+        
         dbUtil.closeConnection(ps);
         dbUtil.closeConnection(ps2);
         dbUtil.closeConnection(rs);

@@ -3,13 +3,14 @@ package com.myshop.beans;
 import java.io.InputStream;
 import java.io.Serializable;
 import java.sql.Timestamp;
+import java.util.List;
 
 @SuppressWarnings("serial")
 public class OrderDetails implements Serializable {
     
     private String orderId;
     private String prodId;
-//    private String userId;
+    private String userId;
     private String prodName;
     private int qnty;
     private double amount;
@@ -18,6 +19,9 @@ public class OrderDetails implements Serializable {
     private Timestamp deliveryDate;
     private InputStream prodImage;
     private String status;
+    
+    private List<OrderItem> items;
+    private String userName;
 
     public OrderDetails() {
         super();
@@ -45,6 +49,16 @@ public class OrderDetails implements Serializable {
         this.orderId = orderId;
     }
 
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
+
+    
+    
     public String getProdId() {
         return prodId;
     }
@@ -117,11 +131,27 @@ public class OrderDetails implements Serializable {
         this.status = status;
     }
 
-    
-    
+    public List<OrderItem> getItems() {
+        return items;
+    }
+
+    public void setItems(List<OrderItem> items) {
+        this.items = items;
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+
     @Override
     public String toString() {
-        return "OrderDetails{" + "orderId=" + orderId + ", prodId=" + prodId + ", prodName=" + prodName + ", qnty=" + qnty + ", amount=" + amount + ", shipped=" + shipped + ", datetime=" + datetime + ", prodImage=" + prodImage + ", status=" + status + '}';
-    }   
+        return "OrderDetails{" + "orderId=" + orderId + ", prodId=" + prodId + ", userId=" + userId + ", prodName=" + prodName + ", qnty=" + qnty + ", amount=" + amount + ", shipped=" + shipped + ", datetime=" + datetime + ", deliveryDate=" + deliveryDate + ", prodImage=" + prodImage + ", status=" + status + ", items=" + items.toString() + ", userName=" + userName + '}';
+    }
+
+   
     
 }

@@ -1,17 +1,8 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.myshop.utility;
 
+import com.myshop.service.impl.UserServiceImpl;
 import java.util.Base64;
 
-
-/**
- *
- * @author Admin
- */
 public class PasswordEncryption {
     public static String getEncryptedPassword(String pwd){
         Base64.Encoder en=Base64.getEncoder();
@@ -25,8 +16,10 @@ public class PasswordEncryption {
         return decryptedPwd;
     }
    
-    public static void main(String[] args) {
-        System.out.println("Decrypted password :"+getDecryptedPassword("TWFuaXNoMTIzNA=="));
-        System.out.println("Encrypted Password :"+getEncryptedPassword("Manish123"));
+    public static void main(String[] args) throws Exception {
+//        System.out.println("Decrypted password :"+getDecryptedPassword("YWRtaW5AMTIz"));
+//        System.out.println("Encrypted Password :"+getEncryptedPassword("admin@123"));
+
+//        System.out.println("USER ID: "+new UserServiceImpl().generateUserId());
     }
 }

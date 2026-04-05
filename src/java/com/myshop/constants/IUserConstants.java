@@ -1,7 +1,7 @@
 package com.myshop.constants;
 
 public interface IUserConstants {
-    public String TABLE_USER = "USER";
+    public String TABLE_USER = "USERS";
     public String COLUMN_EMAIL = "email";
     public String COLUMN_NAME = "name";
     public String COLUMN_MOBILE = "mobile";    

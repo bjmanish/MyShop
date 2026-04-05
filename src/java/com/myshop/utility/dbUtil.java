@@ -8,72 +8,57 @@ import java.sql.SQLException;
 import java.util.ResourceBundle;
 
 public class dbUtil {
-    private static Connection conn;
 
-    public dbUtil() {
-    }
-    
-    public static Connection provideConnection(){
+    private static final ResourceBundle rb = ResourceBundle.getBundle("application");
+
+    private static final String URL = rb.getString("db.connectionString");
+    private static final String USER = rb.getString("db.username");
+    private static final String PASS = rb.getString("db.password");
+    private static final String DRIVER = rb.getString("db.driverName");
+
+    static {
         try {
-            if(conn == null  || conn.isClosed()){
-                ResourceBundle rb = ResourceBundle.getBundle("application");
-                String connString = rb.getString("db.connectionString");
-                String driverName = rb.getString("db.driverName");
-                String userName = rb.getString("db.username");
-                String password = rb.getString("db.password");
-                try{
-                        Class.forName(driverName);
-                }catch(ClassNotFoundException cnf){
-                        cnf.printStackTrace();
-                }
-                conn = DriverManager.getConnection(connString, userName, password);
-                System.out.println("Connection Opened Sucessfully.");
-            }
-        } catch (SQLException ex) {
-                ex.printStackTrace();
+            Class.forName(DRIVER); // optional but safe
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
         }
-        return conn;
-    }
-    
-    public static void closeConnection(Connection conn) {
-        /*
-	try { 
-            if (con != null && !con.isClosed()) {
-               con.close(); 
-            } 
-        } catch (SQLException e) { 
-             e.printStackTrace(); 
-        }
-	*/
-    }
-    
-    
-    public static void closeConnection(ResultSet rs) {
-	try {
-            if (rs != null && !rs.isClosed()) {
-                try {
-                    rs.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-		}
-            }
-	} catch (SQLException e) {
-	    e.printStackTrace();
-	}
     }
 
-    public static void closeConnection(PreparedStatement ps) {
-	try{
-            if (ps != null && !ps.isClosed()) {
-		try {
-                    ps.close();
-		} catch (SQLException e) {
-                    e.printStackTrace();
-                }
+    // ✅ Always return NEW connection (best practice)
+    public static Connection provideConnection() throws SQLException {
+        return DriverManager.getConnection(URL, USER, PASS);
+    }
+
+    // ✅ Close Connection
+    public static void closeConnection(Connection conn) {
+        try {
+            if (conn != null && !conn.isClosed()) {
+                conn.close();
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
-    
+
+    // ✅ Close ResultSet
+    public static void closeConnection(ResultSet rs) {
+        try {
+            if (rs != null && !rs.isClosed()) {
+                rs.close();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    // ✅ Close PreparedStatement
+    public static void closeConnection(PreparedStatement ps) {
+        try {
+            if (ps != null && !ps.isClosed()) {
+                ps.close();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
 }

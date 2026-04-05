@@ -18,7 +18,7 @@ public interface OrderService {
     
     public String shipNow(String orderId, String prodId);
     
-    public List <OrderBean> getAllOrders();
+    public List <OrderDetails> getAllOrders();
     
     public List <OrderBean> getOrderByUserId(String emailId);
     
@@ -36,5 +36,6 @@ public interface OrderService {
     
     public boolean updateOTPAfterDelivery(int assignId);
         
+    public OrderDetails getOrderDetailsByOrdId(String ordId);
     
 }

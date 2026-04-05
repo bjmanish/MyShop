@@ -1,6 +1,6 @@
 package com.myshop.srv;
 
-import com.myshop.utility.MailMessage;
+//import com.myshop.utility.MailMessage;
 import java.io.IOException;
 import java.io.PrintWriter;
 import javax.servlet.RequestDispatcher;
@@ -38,18 +38,18 @@ public class FanMessage extends HttpServlet {
 		+ "<br/><br/>We are glad that fans are choosing us! <br/><br/>Thanks & Regards<br/><br/>Auto Generated Mail"
 		+ "</body>" + "</html>";
         
-        String message = MailMessage.sendMessage("themyshop2025@gmail.com", "Fans Message | "+ name + " | " + email, htmlTextMessage);
+//        String message = MailMessage.sendMessage("themyshop2025@gmail.com", "Fans Message | "+ name + " | " + email, htmlTextMessage);
         
-        if("SUCCESS".equals(message)){
-            message = "Comments sent SuccessFully";
-        }else{
-            message = "Failed: Please Configure mailer.email.email and password in application.properties first";
-        }
+//        if("SUCCESS".equals(message)){
+//            message = "Comments sent SuccessFully";
+//        }else{
+//            message = "Failed: Please Configure mailer.email.email and password in application.properties first";
+//        }
         
         RequestDispatcher rd = request.getRequestDispatcher("index.jsp");
         rd.include(request, response);
         
-        response.getWriter().print("<script>alert('"+message+"')</script>");
+        response.getWriter().print("<script>alert('message')</script>");
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">

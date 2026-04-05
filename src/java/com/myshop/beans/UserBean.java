@@ -1,5 +1,3 @@
-//also known as pojo
-
 package com.myshop.beans;
 
 import java.io.Serializable;
@@ -7,6 +5,8 @@ import java.io.InputStream;
 
 @SuppressWarnings("serial")
 public class UserBean implements Serializable {
+    
+    private String id;
     private InputStream image;
     private String name;
     private String mobile;
@@ -17,9 +17,15 @@ public class UserBean implements Serializable {
     private int emailVerified = 1;   // default
     private int mobileVerified = 0;  // default
     
+    private String roleId;
+    private String roleName;
+    
+    
+    
     public UserBean() {}
 
-    public UserBean(InputStream image, String name, String mobile, String email, String address, int pincode, String password) {
+    public UserBean(String id, InputStream image, String name, String mobile, String email, String address, int pincode, String password) {
+        this.id = id;
         this.image = image;
         this.name = name;
         this.mobile = mobile;
@@ -29,6 +35,16 @@ public class UserBean implements Serializable {
         this.password = password;
     }
 
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    
+    
     public InputStream getImage() {
         return image;
     }
@@ -101,10 +117,30 @@ public class UserBean implements Serializable {
         this.mobileVerified = mobileVerified;
     }
 
+    public String getRoleId() {
+        return roleId;
+    }
+
+    public void setRoleId(String roleId) {
+        this.roleId = roleId;
+    }
+
+    public String getRoleName() {
+        return roleName;
+    }
+
+    public void setRoleName(String roleName) {
+        this.roleName = roleName;
+    }
+
     @Override
     public String toString() {
-        return "UserBean{" + "image=" + image + ", name=" + name + ", mobile=" + mobile + ", email=" + email + ", address=" + address + ", pincode=" + pincode + '}';
+        return "UserBean{" + "id=" + id + ", image=" + image + ", name=" + name + ", mobile=" + mobile + ", email=" + email + ", address=" + address + ", pincode=" + pincode + ", password=" + password + ", emailVerified=" + emailVerified + ", mobileVerified=" + mobileVerified + ", roleId=" + roleId + ", roleName=" + roleName + '}';
     }
+
+    
+    
+    
     
     
 }

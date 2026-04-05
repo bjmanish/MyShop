@@ -15,7 +15,7 @@ public class TransactionBean implements Serializable{
 
     public TransactionBean() {
         super();
-        this.transId = idUtil.generatedTransId();
+        this.transId = idUtil.generateTransactionId();
         SimpleDateFormat sdf = new SimpleDateFormat("YYYY:MM:DD hh:mm:ss");
         Timestamp timestamp = new Timestamp(System.currentTimeMillis());
         sdf.format(timestamp);
@@ -26,7 +26,7 @@ public class TransactionBean implements Serializable{
         super();
         this.userName = userName;
         this.transAmount = transAmount;
-        this.transId = idUtil.generatedTransId();
+        this.transId = idUtil.generateTransactionId();
         SimpleDateFormat sdf = new SimpleDateFormat("YYYY:MM:DD hh:mm:ss");
         Timestamp timestamp = new Timestamp(System.currentTimeMillis());
         sdf.format(timestamp);
@@ -48,7 +48,7 @@ public class TransactionBean implements Serializable{
         super();
         this.userName = userName;
         this.transDateTime = transDateTime;
-        this.transId = idUtil.generatedTransId();
+        this.transId = idUtil.generateTransactionId();
         this.transAmount = transAmount;
     }
     

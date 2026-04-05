@@ -39,7 +39,8 @@ public class UpdateToCart extends HttpServlet {
         
         // login Check Successfull
         String userId = userName;
-        String prodId = request.getParameter("pid");
+        String prodId = request.getParameter("pid").trim();
+        String cartId = request.getParameter("cartId").trim();
         int pQty = Integer.parseInt(request.getParameter("pqty"));
         CartServiceImpl cart = new CartServiceImpl();
         ProductServiceImpl productDao = new ProductServiceImpl();
@@ -60,7 +61,7 @@ public class UpdateToCart extends HttpServlet {
                 status += "<br/>Later, We Will Mail You when " + product.getProdName()+ " will be available into the Store!";
             response.sendRedirect("cartDetails.jsp?message="+status);
         } else {
-            status = cart.updateProductToCart(userId, prodId, pQty);
+            status = cart.updateProductToCart(cartId, userId, prodId, pQty);
             response.sendRedirect("cartDetails.jsp?message="+status);
         }
     }

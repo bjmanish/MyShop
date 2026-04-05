@@ -2,7 +2,7 @@ package com.myshop.srv;
 
 import com.myshop.service.impl.OrderServiceImpl;
 import com.myshop.service.impl.UserServiceImpl;
-import com.myshop.utility.MailMessage;
+//import com.myshop.utility.MailMessage;
 import java.io.IOException;
 import java.io.PrintWriter;
 import javax.servlet.RequestDispatcher;
@@ -53,7 +53,7 @@ public class ShipmentSrv extends HttpServlet {
             if(status.equalsIgnoreCase("FAILURE")){
                 pageName  = "unShippedItems.jsp";
             }else{
-                MailMessage.orderShipped(userId, new UserServiceImpl().getFirstName(userId) , orderId, amount);
+//                MailMessage.orderShipped(userId, new UserServiceImpl().getFirstName(userId) , orderId, amount);
             }
             PrintWriter pw = response.getWriter();
             RequestDispatcher rd = request.getRequestDispatcher(pageName);

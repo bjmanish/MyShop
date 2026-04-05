@@ -24,25 +24,47 @@ public class ShowImage extends HttpServlet {
     
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        
         byte [] image = null;
-        
-        String prodId = request.getParameter("pid");
-        ProductServiceImpl dao = new ProductServiceImpl();
-        image = dao.getProductImage(prodId);        
-        //System.out.println("images: "+image);
-        
-        if(image == null){
-            File fnew = new File(request.getServletContext().getRealPath("images/noimage.jpg") );
-            BufferedImage originalImage = ImageIO.read(fnew);
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            ImageIO.write(originalImage, "jpg", baos);
-            image = baos.toByteArray();
+        try {
+            String prodId = request.getParameter("pid");
+//            System.out.println("PID: " + prodId);
+
+            ProductServiceImpl dao = new ProductServiceImpl();
+            image = dao.getProductImage(prodId);
+
+            // ✅ If DB image not found → load fallback
+            if (image == null || image.length == 0) {
+
+                String path = request.getServletContext().getRealPath("/images/noimage.jpg");
+                File file = new File(path);
+
+//                System.out.println("Fallback path: " + path);
+
+                BufferedImage img = ImageIO.read(file);
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                ImageIO.write(img, "jpg", baos);
+
+                image = baos.toByteArray();
+            }
+
+//            System.out.println("Final Image Size: " + image.length);
+
+            // ✅ MUST
+            response.setContentType("image/jpeg");
+            response.setContentLength(image.length);
+
+            try (ServletOutputStream out = response.getOutputStream()) {
+                out.write(image);
+                out.flush();
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+
+            // VERY IMPORTANT DEBUG RESPONSE
+            response.setContentType("text/plain");
+            response.getWriter().print("ERROR: " + e.getMessage());
         }
-        
-        ServletOutputStream sos = null;
-        sos = response.getOutputStream();
-        sos.write(image);
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">

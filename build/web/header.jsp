@@ -1,183 +1,261 @@
-<%@ page language="java" %>
+<%@ page language="java"%>
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <!-- Bootstrap 5 CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <!-- Bootstrap Icons -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+<!-- BOOTSTRAP -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
-    <!-- Custom CSS -->
-   <link rel="stylesheet" href="css/main.css">
+<style>
+
+/* BACKGROUND */
+body {
+    background: linear-gradient(135deg, #141e30, #243b55);
+    transition: 0.3s;
+}
+
+/* DARK MODE */
+.dark-mode {
+    background: #000 !important;
+    color: #fff !important;
+}
+
+/* NAVBAR */
+.modern-nav {
+    background: rgba(0,0,0,0.7);
+    backdrop-filter: blur(10px);
+    transition: 0.3s;
+}
+
+/* SCROLL EFFECT */
+.nav-scrolled {
+    padding: 5px 0;
+    background: black !important;
+}
+
+/* LOGO */
+.logo {
+    font-weight: bold;
+    color: white !important;
+}
+
+/* SEARCH */
+.search-box input {
+    width: 280px;
+    border-radius: 20px;
+}
+
+/* NAV LINKS */
+.nav-link {
+    color: white !important;
+}
+
+/* NOTIFICATION */
+.notif-badge {
+    position: absolute;
+    top: 0;
+    right: -5px;
+    background: red;
+    color: white;
+    font-size: 10px;
+    padding: 2px 5px;
+    border-radius: 50%;
+}
+
+/* MOBILE MENU */
+#mobileMenu {
+    position: fixed;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: #111;
+    padding: 20px;
+    transition: 0.3s;
+    z-index: 2000;
+}
+
+#mobileMenu.active {
+    left: 0;
+}
+
+#mobileMenu a {
+    display: block;
+    padding: 15px;
+    color: white;
+    font-size: 18px;
+    text-decoration: none;
+}
+
+/* OVERLAY */
+#menuOverlay {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+    display: none;
+    z-index: 1500;
+}
+
+#menuOverlay.active {
+    display: block;
+}
+
+</style>
+
 </head>
 <body>
 
 <%
-    String userrole = (String) session.getAttribute("usertype");
-    String username = (String) session.getAttribute("username");
-    String id = session.getId();
-//    System.out.println("role: "+userrole);
-    int cartCount = 0;
-    Object cartObj = session.getAttribute("cartCount");
-    if (cartObj != null) {
-        try { cartCount = Integer.parseInt(cartObj.toString()); }
-        catch (Exception e) { cartCount = 0; }
-    }
+String role = (String) session.getAttribute("role");
+String name = (String) session.getAttribute("name");
 
-    String homePage = "index.jsp";
-    if ("customer".equalsIgnoreCase(userrole)) homePage = "userHome.jsp";
-    else if ("admin".equalsIgnoreCase(userrole)) homePage = "adminHome.jsp";
-    else if ("staff".equalsIgnoreCase(userrole)) homePage = "staffHome.jsp";
+String homePage = "index.jsp";
+if ("customer".equalsIgnoreCase(role)) homePage = "userHome.jsp";
+else if ("admin".equalsIgnoreCase(role)) homePage = "adminHome.jsp";
+else if ("staff".equalsIgnoreCase(role) || "delivery".equalsIgnoreCase(role)) homePage = "staffHome.jsp";
 %>
 
 <!-- NAVBAR -->
-<nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top shadow-sm">
-    <div class="container">
+<nav class="navbar navbar-expand-lg modern-nav fixed-top" id="navbar">
+<div class="container">
 
-        <!-- LOGO -->
-        <a class="navbar-brand d-flex align-items-center" href="<%= homePage %>">
-            <img src="images/Myshop-logo.png" alt="MyShop" style="height:40px;width:80px;border-radius:50%;">
-        </a>
+<a class="navbar-brand logo" href="<%=homePage%>">
+<i class="bi bi-bag-heart-fill"></i> MYSHOP
+</a>
 
-        <!-- TOGGLER -->
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMenu">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-
-        <!-- MENU -->
-        <div class="collapse navbar-collapse" id="navbarMenu">
-            <ul class="navbar-nav ms-auto">
-
-                <% if (userrole == null) { %>
-                    <li class="nav-item">
-                    <a class="nav-link" href="adminViewProduct.jsp?id=<%=id%>">Products</a>
-                </li>
-
-                <!-- CATEGORY DROPDOWN -->
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                        Category
-                    </a>
-                    <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="<%= homePage %>?type=mobile">Mobiles</a></li>
-                        <li><a class="dropdown-item" href="<%= homePage %>?type=tv">TVs</a></li>
-                        <li><a class="dropdown-item" href="<%= homePage %>?type=laptop">Laptops</a></li>
-                        <li><a class="dropdown-item" href="<%= homePage %>?type=camera">Cameras</a></li>
-                        <li><a class="dropdown-item" href="<%= homePage %>?type=speaker">Speakers</a></li>
-                        <li><a class="dropdown-item" href="<%= homePage %>?type=tablet">Tablets</a></li>
-                    </ul>
-                </li>
-
-                    <li class="nav-item"><a class="nav-link" href="login.jsp">Login</a></li>
-                    <li class="nav-item"><a class="nav-link" href="register.jsp">Register</a></li>
-
-                <% } else if ("customer".equalsIgnoreCase(userrole)) { %>
-                    
-                    <li class="nav-item">
-                    <a class="nav-link" href="adminViewProduct.jsp?id=<%=id%>">Products</a>
-                </li>
-
-                <!-- CATEGORY DROPDOWN -->
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                        Category
-                    </a>
-                    <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="<%= homePage %>?type=mobile">Mobiles</a></li>
-                        <li><a class="dropdown-item" href="<%= homePage %>?type=tv">TVs</a></li>
-                        <li><a class="dropdown-item" href="<%= homePage %>?type=laptop">Laptops</a></li>
-                        <li><a class="dropdown-item" href="<%= homePage %>?type=camera">Cameras</a></li>
-                        <li><a class="dropdown-item" href="<%= homePage %>?type=speaker">Speakers</a></li>
-                        <li><a class="dropdown-item" href="<%= homePage %>?type=tablet">Tablets</a></li>
-                    </ul>
-                </li>
-                    <li class="nav-item">
-                        <a class="nav-link position-relative" href="cartDetails.jsp?id=<%=id%>">
-                            <i class="bi bi-cart-fill"></i> Cart
-                            <% if (cartCount > 0) { %>
-                                <span class="badge bg-danger position-absolute top-0 start-100 translate-middle">
-                                    <%= cartCount %>
-                                </span>
-                            <% } %>
-                        </a>
-                    </li>
-
-                    <li class="nav-item"><a class="nav-link" href="orderDetails.jsp?id=<%=id%>">Orders</a></li>
-                    <li class="nav-item"><a class="nav-link" href="userProfile.jsp?id=<%=id%>"><i class="bi bi-person-fill"></i> Profile</a></li>
-                    <li class="nav-item"><a class="nav-link" href="./LogoutSrv"><i class="bi bi-box-arrow-right"></i> Logout</a></li>
-
-                <% } else if ("staff".equalsIgnoreCase(userrole)) { %>
-
-                    <li class="nav-item"><a class="nav-link  active" href="assignedDeliveries.jsp?id=<%=id%>">Assigned Deliveries</a></li>
-                    <li class="nav-item"><a class="nav-link " href="updateDeliveryStatus.jsp?id=<%=id%>">Update Status</a></li>
-                    <li class="nav-item"><a class="nav-link " href="staffProfile.jsp?id=<%=id%>">Profile</a></li>
-                    <li class="nav-item"><a class="nav-link " href="./LogoutSrv">Logout</a></li>
-
-                <% } else { %>
-                    
-                    <li class="nav-item">
-                    <a class="nav-link" href="adminViewProduct.jsp?id=<%=id%>">Products</a>
-                </li>
-
-                <!-- CATEGORY DROPDOWN -->
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                        Category
-                    </a>
-                    <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="<%= homePage %>?type=mobile">Mobiles</a></li>
-                        <li><a class="dropdown-item" href="<%= homePage %>?type=tv">TVs</a></li>
-                        <li><a class="dropdown-item" href="<%= homePage %>?type=laptop">Laptops</a></li>
-                        <li><a class="dropdown-item" href="<%= homePage %>?type=camera">Cameras</a></li>
-                        <li><a class="dropdown-item" href="<%= homePage %>?type=speaker">Speakers</a></li>
-                        <li><a class="dropdown-item" href="<%= homePage %>?type=tablet">Tablets</a></li>
-                    </ul>
-                </li>
-                    <!-- ADMIN -->
-                    <li class="nav-item"><a class="nav-link " href="adminStock.jsp?id=<%=id%>">Stock</a></li>
-                    <li class="nav-item"><a class="nav-link " href="shippedItems.jsp?id=<%=id%>">Shipped</a></li>
-                    <li class="nav-item"><a class="nav-link" href="unShippedItems.jsp?id=<%=id%>">Orders</a></li>
-
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" role="button"
-                            data-bs-toggle="dropdown" aria-expanded="false">
-                                Manage Items
-                        </a>
-                        <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="addProduct.jsp?id=<%=id%>">Add Product</a></li>
-                            <li><a class="dropdown-item" href="removeProduct.jsp?id=<%=id%>">Remove Product</a></li>
-                            <li><a class="dropdown-item" href="updateProductById.jsp?id=<%=id%>">Update Product</a></li>
-                        </ul>
-                    </li>
-
-                    <li class="nav-item"><a class="nav-link" href="./LogoutSrv">Logout</a></li>
-
-                <% } %>
-            </ul>
-        </div>
-    </div>
-</nav>
-
-<!-- SPACER -->
-<div style="margin-top:90px;"></div>
-
-<!-- HEADER SEARCH -->
-<div class="text-center p-3 bg-success text-white">
-    <h2 class="fw-bold">THE MYSHOP</h2>
-    <h6>We are ready for fast and secure services</h6>
-
-    <form class="d-flex justify-content-center mt-2" action="index.jsp" method="get">
-        <input class="form-control w-50 me-2" type="search" name="search" placeholder="Search Items" required>
-        <button class="btn btn-danger">Search</button>
-    </form>
+<!-- SEARCH -->
+<div class="search-box d-none d-lg-flex mx-3">
+<input type="text" class="form-control" placeholder="Search products...">
 </div>
 
-<!-- Bootstrap JS -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<!-- TOGGLE -->
+<button class="navbar-toggler text-white" id="navToggleBtn">
+<i class="bi bi-list"></i>
+</button>
+
+<!-- MENU -->
+<div class="collapse navbar-collapse" id="menu">
+<ul class="navbar-nav ms-auto align-items-lg-center gap-lg-3">
+
+<!-- ? -->
+<li class="nav-item position-relative">
+<a class="nav-link"><i class="bi bi-bell"></i><span class="notif-badge">3</span></a>
+</li>
+
+<!-- ? -->
+<li class="nav-item">
+<a class="nav-link" id="themeToggle"><i class="bi bi-moon"></i></a>
+</li>
+
+<% if (role == null) { %>
+
+<li class="nav-item"><a class="nav-link" href="index.jsp">Home</a></li>
+<li class="nav-item"><a class="nav-link" href="login.jsp">Login</a></li>
+
+<% } else { %>
+
+<li class="nav-item"><a class="nav-link" href="<%=homePage%>">Home</a></li>
+<li class="nav-item"><a class="nav-link" href="#">Welcome <%=name%></a></li>
+<li class="nav-item"><a class="nav-link" href="#" onclick="openLogoutModal()">Logout</a></li>
+
+<% } %>
+
+</ul>
+</div>
+</div>
+</nav>
+
+<!-- MOBILE MENU -->
+<div id="mobileMenu">
+
+<div class="d-flex justify-content-between">
+<h4>Menu</h4>
+<button id="closeMenu" class="btn btn-light btn-sm">X</button>
+</div>
+
+<input type="text" class="form-control my-3" placeholder="Search...">
+
+<a href="<%=homePage%>">Home</a>
+<a href="#">Orders</a>
+<a href="#">Profile</a>
+<a href="#" onclick="openLogoutModal()">Logout</a>
+
+</div>
+
+<!-- OVERLAY -->
+<div id="menuOverlay"></div>
+
+<!-- LOGOUT MODAL -->
+<div class="modal fade" id="logoutModal">
+<div class="modal-dialog modal-dialog-centered">
+<div class="modal-content text-center">
+
+<div class="modal-header">
+<h5>Confirm Logout</h5>
+<button class="btn-close" data-bs-dismiss="modal"></button>
+</div>
+
+<div class="modal-body">
+<p>Are you sure you want to logout?</p>
+</div>
+
+<div class="modal-footer justify-content-center">
+<button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+<button class="btn btn-danger" onclick="confirmLogout()">Logout</button>
+</div>
+
+</div>
+</div>
+</div>
+
+<script>
+
+// MOBILE MENU
+const toggleBtn = document.getElementById("navToggleBtn");
+const mobileMenu = document.getElementById("mobileMenu");
+const overlay = document.getElementById("menuOverlay");
+const closeBtn = document.getElementById("closeMenu");
+
+toggleBtn.onclick = () => {
+    mobileMenu.classList.add("active");
+    overlay.classList.add("active");
+};
+
+closeBtn.onclick = closeMenu;
+overlay.onclick = closeMenu;
+
+function closeMenu(){
+    mobileMenu.classList.remove("active");
+    overlay.classList.remove("active");
+}
+
+// DARK MODE
+document.getElementById("themeToggle").onclick = () => {
+    document.body.classList.toggle("dark-mode");
+};
+
+// SCROLL NAVBAR
+window.addEventListener("scroll", () => {
+    document.getElementById("navbar")
+    .classList.toggle("nav-scrolled", window.scrollY > 50);
+});
+
+// LOGOUT
+function openLogoutModal() {
+    new bootstrap.Modal(document.getElementById('logoutModal')).show();
+}
+
+function confirmLogout() {
+    window.location.href = "<%=request.getContextPath()%>/LogoutSrv";
+}
+
+</script>
 
 </body>
 </html>

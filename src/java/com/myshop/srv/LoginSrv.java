@@ -1,10 +1,7 @@
 package com.myshop.srv;
 
-import com.myshop.beans.StaffBean;
 import com.myshop.beans.UserBean;
-import com.myshop.service.impl.StaffServiceImpl;
 import com.myshop.service.impl.UserServiceImpl;
-import com.myshop.utility.PasswordEncryption;
 
 import java.io.IOException;
 import javax.servlet.ServletException;
@@ -16,86 +13,39 @@ public class LoginSrv extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-
-        String userName = request.getParameter("username");
-        String password = request.getParameter("password");
-        String userType = request.getParameter("usertype");
-
+        throws ServletException, IOException {
+        
         HttpSession session = request.getSession();
-        session.setMaxInactiveInterval(30 * 60); // 30 minutes
 
-        try {
+    String email = request.getParameter("username");
+    String password = request.getParameter("password");
+    
+//    System.out.println("email and password from servlet :"+email+", "+password);
 
-            /* ================= ADMIN LOGIN ================= */
-            if ("admin".equalsIgnoreCase(userType)) {
+    response.setContentType("text/plain"); 
+    
+    session.setMaxInactiveInterval(30 * 60);
+    
+    UserServiceImpl service = new UserServiceImpl();
+    UserBean user = service.loginUser(email, password);
+//    System.out.println("Login User :"+user.toString());
+        
+    if (user != null && user.getRoleName() != null) {
 
-                if ("admin123@gmail.com".equalsIgnoreCase(userName) && "admin".equals(password)) {
+        session.setAttribute("user_id", user.getId());
+        session.setAttribute("username", user.getEmail());
+        session.setAttribute("role", user.getRoleName());
+        session.setAttribute("name", user.getName());
+        session.setAttribute("sessionId", session.getId());
 
-                    session.setAttribute("username", userName);
-                    session.setAttribute("usertype", "admin");
-                    session.setAttribute("password", PasswordEncryption.getEncryptedPassword(password));        
-                    response.sendRedirect("adminHome.jsp?id="+session.getId());
-                    return;
-                } else {
-                    session.setAttribute("error", "Invalid admin credentials");
-                }
-            }
+        // ✅ RETURN ROLE INSTEAD OF REDIRECT
+        response.getWriter().write(user.getRoleName());
+        System.out.println("data for staff:"+user.getRoleName());
 
-            /* ================= STAFF LOGIN ================= */
-            else if ("staff".equalsIgnoreCase(userType)) {
-
-                StaffServiceImpl staffDao = new StaffServiceImpl();
-                String status = staffDao.isValidCredential(userName, password);
-
-                if ("valid".equalsIgnoreCase(status)) {
-
-                    StaffBean staff = staffDao.getStaffDetails(userName, password);
-
-                    session.setAttribute("username", userName);
-                    session.setAttribute("staffname", staff.getStaffName());
-                    session.setAttribute("usertype", "staff");
-                     session.setAttribute("password", PasswordEncryption.getEncryptedPassword(password));
-                    response.sendRedirect("staffHome.jsp?id="+session.getId());
-                    return;
-                } else {
-                    session.setAttribute("error", status);
-                }
-            }
-
-            /* ================= CUSTOMER LOGIN ================= */
-            else if ("customer".equalsIgnoreCase(userType)) {
-
-                UserServiceImpl udao = new UserServiceImpl();
-                String status = udao.isValidCredential(userName, password);
-
-                if ("valid".equalsIgnoreCase(status)) {
-
-                    UserBean user = udao.getUserDetails(userName, password);
-
-                    session.setAttribute("username", userName);
-                    session.setAttribute("usertype", "customer");
-                    session.setAttribute("password", PasswordEncryption.getEncryptedPassword(password));
-                    response.sendRedirect("userHome.jsp?id="+session.getId());
-                    return;
-                } else {
-                    session.setAttribute("error", status);
-                }
-            }
-
-            /* ================= INVALID TYPE ================= */
-            else {
-                session.setAttribute("error", "Invalid user type selected");
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            session.setAttribute("error", "Something went wrong. Try again.");
-        }
-
-        response.sendRedirect("login.jsp");
+    } else {
+        response.getWriter().write("Invalid");
     }
-
+}
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {

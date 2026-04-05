@@ -8,19 +8,26 @@ public class CartBean implements Serializable {
     public CartBean(){
         
     }
-    
+    private String cartId;
     private String userId;
     private String prodId;
     private int quantity;
 
-    public CartBean(String userId, String prodId, int quantity) {
+    public CartBean(String cartId, String userId, String prodId, int quantity) {
         super();
+        this.cartId = cartId;
         this.userId = userId;
         this.prodId = prodId;
         this.quantity = quantity;
     }
-    
-    
+
+    public String getCartId() {
+        return cartId;
+    }
+
+    public void setCartId(String cartId) {
+        this.cartId = cartId;
+    }
 
     public String getUserId() {
         return userId;

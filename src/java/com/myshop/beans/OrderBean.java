@@ -10,6 +10,7 @@ public class OrderBean implements Serializable{
 
     private String transId;
     private String prodId;
+    private String userId;
     private String status;
     private int quantity;
     private double amount;
@@ -43,6 +44,17 @@ public class OrderBean implements Serializable{
         this.orderDate = orderDate;
     }
 
+    public OrderBean(String transId, String userId, double amount, String status, Timestamp orderDate, Timestamp deliveryDate) {
+        this.transId = transId;
+        this.userId = userId;
+//        this.status = status;
+        this.amount = amount;
+        this.status = status;
+        this.orderDate = orderDate;
+        this.deliveryDate = deliveryDate;
+    }
+    
+    
 
     public String getTransId() {
         return transId;
@@ -110,11 +122,17 @@ public class OrderBean implements Serializable{
         this.deliveryDate = deliveryDate;
     }
 
-    
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
 
     @Override
     public String toString() {
-        return "OrderBean{" + "transId=" + transId + ", prodId=" + prodId + ", quantity=" + quantity + ", amount=" + amount + ", shipped=" + shipped + ", orderDate=" + orderDate + ", deliveryDate=" + deliveryDate + '}';
+        return "OrderBean{" + "transId=" + transId + ", prodId=" + prodId + ", userId=" + userId + ", status=" + status + ", quantity=" + quantity + ", amount=" + amount + ", shipped=" + shipped + ", orderDate=" + orderDate + ", deliveryDate=" + deliveryDate + '}';
     }
 
     

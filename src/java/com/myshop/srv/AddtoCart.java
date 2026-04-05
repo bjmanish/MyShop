@@ -29,8 +29,12 @@ public class AddtoCart extends HttpServlet {
         HttpSession  session = request.getSession();
         String userName = (String) session.getAttribute("username");
         String password = (String) session.getAttribute("password");
-        String userType = (String) session.getAttribute("usertype");
-        //System.out.println("data:" +userName+""+ password+"" +userType);
+        String userType = (String) session.getAttribute("role");
+        String cartId = (String) session.getAttribute("cartId");
+        
+        
+        
+        //System.out.println("d ata:" +userName+""+ password+"" +userType);
         if(userName == null || password == null || userType == null || !userType.equalsIgnoreCase("customer")){
             response.sendRedirect("login.jsp?message=Session Expired!! Please Login And Continue to Purchase.");
             return;
@@ -55,7 +59,7 @@ public class AddtoCart extends HttpServlet {
         pQty += cartQty;
                 
         if(pQty == cartQty){
-            status = cart.removeProductFromCart(userId, prodId);
+            status = cart.removeProductFromCart(userId, cartId, prodId);
             response.sendRedirect("userHome.jsp?message="+status);
             
         }else if(availableQty < pQty){
@@ -63,7 +67,7 @@ public class AddtoCart extends HttpServlet {
             if(availableQty == 0){
                 status = "Product is out of Stock!";
             }else{
-                cart.updateProductToCart(userId, prodId, pQty);
+                cart.updateProductToCart(userId, cartId, prodId, pQty);
                 
                 status = "Only "+ availableQty +" no of "+ product.getProdName()
                         + " are available in the shop! So we are adding only "+ availableQty
@@ -80,7 +84,7 @@ public class AddtoCart extends HttpServlet {
             }
                         
         }else{            
-            status = cart.updateProductToCart(userId, prodId, pQty);
+            status = cart.updateProductToCart(userId, cartId, prodId, pQty);
             response.sendRedirect("userHome.jsp?message="+status);
         }
     }

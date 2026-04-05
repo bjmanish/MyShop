@@ -35,5 +35,8 @@ public interface ProductService {
     public int getProductQuantity(String prodId);
     
     public List <String> getAllProductId();
+    
+    public boolean updateProductImage(String prodId);
+    
 }
 

@@ -58,8 +58,6 @@ CREATE TABLE IF NOT EXISTS `MYSHOP`.`USER`(
     `address` VARCHAR(500) DEFAULT NULL,
     `pincode` INT DEFAULT NULL,
     `password` VARCHAR(20) DEFAULT NULL,
-    `email_verified` TINYINT(1) NOT NULL DEFAULT 1,
-    `mobile_verified` TINYINT(1) NOT NULL DEFAULT 0,
     PRIMARY KEY (`email`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
@@ -118,6 +116,7 @@ DROP TABLE IF EXISTS `MYSHOP`.`ASSIGNORDERFORSTAFF` ;
 
 CREATE TABLE ASSIGNORDERFORSTAFF (
     assignId INT AUTO_INCREMENT PRIMARY KEY,
+    prodId VARCHAR(45) NULL,
     orderId VARCHAR(45) NOT NULL,        
     staffId VARCHAR(20) NOT NULL,
     staffName VARCHAR(30) NULL,
@@ -129,6 +128,9 @@ CREATE TABLE ASSIGNORDERFORSTAFF (
     CONSTRAINT fk_orderId FOREIGN KEY(orderId) REFERENCES orders(orderId)
         ON DELETE CASCADE
         ON UPDATE CASCADE,
+	CONSTRAINT fk_prodId FOREIGN KEY(prodId) REFERENCES products(pId)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE,
     CONSTRAINT fk_staffId FOREIGN KEY (staffId) REFERENCES deliverystaff(semail)
         ON DELETE CASCADE
         ON UPDATE CASCADE
@@ -137,16 +139,60 @@ ENGINE=InnoDB
 DEFAULT CHARSET=utf8mb4 
 COLLATE=utf8mb4_0900_ai_ci;
 
+CREATE TABLE admin (
+    admin_id INT AUTO_INCREMENT PRIMARY KEY,
+    admin_name VARCHAR(50) NOT NULL,
+    email VARCHAR(100) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL,
+    mobile VARCHAR(15),
+    role VARCHAR(20) DEFAULT 'ADMIN',
+    status VARCHAR(20) DEFAULT 'ACTIVE',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP 
+        ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB
+DEFAULT CHARSET=utf8mb4
+COLLATE=utf8mb4_unicode_ci;
+
 -- Restore original settings
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
 -- -----========================---------
+use myshop;
+ALTER TABLE `MYSHOP`.`USER`
+ADD COLUMN `email_verified` TINYINT(1) NOT NULL DEFAULT 1,   -- email verified by default
+ADD COLUMN `mobile_verified` TINYINT(1) NOT NULL DEFAULT 0;  -- mobile not verified by default
+
 SELECT * FROM ORDERS;
 SELECT * FROM USER;
+desc DELIVERYstaff;
 SELECT * FROM PRODUCTS;
 SELECT * FROM TRANSACTIONS;
 SELECT * FROM USER_DEMAND;
 SELECT * FROM USERCART;
 SELECT * FROM ASSIGNORDERFORSTAFF;
 SELECT * FROM DELIVERYSTAFF;
+select * from admin;
+
+update ASSIGNORDERFORSTAFF set otp= "879086", deliveryStatus="OUT_FOR_DELIVERY" where assignid=1002 And orderid = "T20260109020328";
+
+
+SELECT o.orderId, o.status, o.delivery_date, 
+            u.name, u.email, a.staffId, a.otp 
+            FROM orders o 
+            JOIN user u ON o.orderId = u.orderId
+		    JOIN assignorderforstaff a ON o.orderId = a.orderId 
+            WHERE o.status IN ('OUT_FOR_DELIVERY', 'DELIVERED');
+            
+            
+
+
+INSERT INTO admin (admin_name, email, password, mobile)
+VALUES (
+    'Super Admin',
+    'admin123@gmail.com',
+    'YWRtaW4=',
+    '6206848898'
+);
+

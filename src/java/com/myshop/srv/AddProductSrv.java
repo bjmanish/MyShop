@@ -24,14 +24,14 @@ public class AddProductSrv extends HttpServlet {
         HttpSession session = request.getSession();
 
         // Validate admin session
-        String userType = (String) session.getAttribute("usertype");
+        String userType = (String) session.getAttribute("role");
         String userName = (String) session.getAttribute("username");
-        String password = (String) session.getAttribute("password");
+        String sId = (String) session.getAttribute("sessionId");
 
-        if (userType == null || !userType.equals("admin")) {
+        if (userType == null || !userType.equalsIgnoreCase("admin")) {
             response.sendRedirect("login.jsp?message=Access Denied!");
             return;
-        } else if (userName == null || password == null) {
+        } else if (userName == null || sId == null) {
             response.sendRedirect("login.jsp?message=Session Expired, Login Again to Continue!");
             return;
         }
@@ -48,7 +48,7 @@ public class AddProductSrv extends HttpServlet {
             int prodQuantity = Integer.parseInt(request.getParameter("productQuantity"));
             Part part = request.getPart("productImage");
             //InputStream prodImage  = request.getInputStream("productImage");
-            //System.out.println("Data: "+prodName+"/"+prodType+"/"+prodInfo+"/"+prodPrice+"/"+prodQuantity+"/"+part);
+            System.out.println("Data: "+prodName+"/"+prodType+"/"+prodInfo+"/"+prodPrice+"/"+prodQuantity+"/"+part);
             
             // Validate product image
             InputStream prodImage = null;
@@ -56,7 +56,7 @@ public class AddProductSrv extends HttpServlet {
                 prodImage = part.getInputStream();
             } else {
                 status = "Please provide a valid product image.";
-                response.sendRedirect("addProduct.jsp?message="+status);
+                response.sendRedirect("admin/addProduct.jsp?message="+status);
                 return;
             }
            // BufferedImage bufferedImage = ImageIO.read(prodImage);
@@ -73,13 +73,15 @@ public class AddProductSrv extends HttpServlet {
             // Call service layer to add the product
             ProductServiceImpl productService = new ProductServiceImpl();
             status = productService.addProduct(product);
+            System.out.println("status "+status);
 
         } catch (IOException | NumberFormatException | ServletException e) {
-            status = "Error occurred while adding the product: " + e.getMessage();
+            System.out.println("error during insert product:"+e.getMessage());
+            status = "Error occurred while adding the product";
         }
 
         // Forward to the addProduct page with status message
-        response.sendRedirect("addProduct.jsp?message="+status);
+        response.sendRedirect("admin/addProduct.jsp?message="+status);
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">

@@ -27,10 +27,10 @@ public class RemoveProductSrv extends HttpServlet {
         HttpSession session  = request.getSession();
         
         String username = (String)session.getAttribute("username");
-        String password = (String)session.getAttribute("password");
-        String usertype = (String)session.getAttribute("usertype");
+        String password = (String)session.getAttribute("sessionId");
+        String usertype = (String)session.getAttribute("role");
             
-        if(usertype == null || !usertype.equals("admin")){
+        if(usertype == null || !usertype.equalsIgnoreCase("admin")){
             response.sendRedirect("login.jsp?message=Access Denied! Please Login as Admin.");
         }else if(username == null || password == null){
             response.sendRedirect("login.jsp?message=Session Expired!. Please Login Again.");
@@ -42,7 +42,7 @@ public class RemoveProductSrv extends HttpServlet {
         
         String status = new ProductServiceImpl().removeProduct(prodId);
         
-        RequestDispatcher rd = request.getRequestDispatcher("removeProduct.jsp?message="+status);
+        RequestDispatcher rd = request.getRequestDispatcher("admin/removeProduct.jsp?message="+status);
         rd.forward(request, response);
     }
 

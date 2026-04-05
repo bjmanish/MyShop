@@ -3,44 +3,59 @@ package com.myshop.srv;
 import com.myshop.beans.ProductBean;
 import com.myshop.service.impl.ProductServiceImpl;
 import java.io.IOException;
-import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
+import javax.servlet.http.*;
 
 @WebServlet(name = "UpdateProductSrv", urlPatterns = {"/UpdateProductSrv"})
 public class UpdateProductSrv extends HttpServlet {
 
     private static final long serialVersionUID = 1L;
-    
+
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        
+
         HttpSession session = request.getSession();
 
-        // Validate admin session
-        String userType = (String) session.getAttribute("usertype");
+        // ✅ SESSION VALIDATION
+        String userType = (String) session.getAttribute("role");
         String userName = (String) session.getAttribute("username");
-        String password = (String) session.getAttribute("password");
+        String password = (String) session.getAttribute("sessionId");
 
-        if (userType == null || !userType.equals("admin")) {
+        if (userType == null || !userType.equalsIgnoreCase("admin")) {
             response.sendRedirect("login.jsp?message=Access Denied!");
             return;
-        } else if (userName == null || password == null) {
-            response.sendRedirect("login.jsp?message=Session Expired, Login Again to Continue!");
+        }
+
+        if (userName == null || password == null) {
+            response.sendRedirect("login.jsp?message=Session Expired!");
             return;
         }
-//        String prodId = request.getParameter("prodid");
+
+        // ✅ GET PARAMETERS
+        String prodId = request.getParameter("pid");
         String prodName = request.getParameter("name");
         String prodType = request.getParameter("type");
         String prodInfo = request.getParameter("info");
-        double prodPrice = Double.parseDouble(request.getParameter("price"));
-        int prodQuantity = Integer.parseInt(request.getParameter("quantity"));
-        String prodId = request.getParameter("pid");
-        //System.out.println("prodId:"+prodId+" & pid:"+pId);
+
+        double prodPrice = 0;
+        int prodQuantity = 0;
+
+        try {
+            prodPrice = Double.parseDouble(request.getParameter("price"));
+            prodQuantity = Integer.parseInt(request.getParameter("quantity"));
+        } catch (Exception e) {
+            response.sendRedirect("updateProduct.jsp?pid=" + prodId + "&message=Invalid Input");
+            return;
+        }
+
+        // ✅ VALIDATION
+        if (prodId == null || prodId.trim().isEmpty()) {
+            response.sendRedirect("adminViewProduct.jsp?message=Invalid Product ID");
+            return;
+        }
+
+        // ✅ SET DATA
         ProductBean product = new ProductBean();
         product.setProdId(prodId);
         product.setProdName(prodName);
@@ -48,49 +63,24 @@ public class UpdateProductSrv extends HttpServlet {
         product.setProdInfo(prodInfo);
         product.setProdPrice(prodPrice);
         product.setProdQuantity(prodQuantity);
-        
+
+        // ✅ UPDATE (WITHOUT IMAGE)
         ProductServiceImpl dao = new ProductServiceImpl();
         String status = dao.updateProductWithoutImage(prodId, product);
-        response.sendRedirect("updateProductById.jsp?prodid="+ prodId +"&message="+status);
+
+        // 🔥 FIXED REDIRECT (IMPORTANT)
+        response.sendRedirect("admin/updateProduct.jsp?pid=" + prodId + "&message=" + status);
     }
 
-    // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
-    /**
-     * Handles the HTTP <code>GET</code> method.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         processRequest(request, response);
     }
 
-    /**
-     * Handles the HTTP <code>POST</code> method.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         processRequest(request, response);
     }
-
-    /**
-     * Returns a short description of the servlet.
-     *
-     * @return a String containing servlet description
-     */
-    @Override
-    public String getServletInfo() {
-        return "Short description";
-    }// </editor-fold>
-
 }

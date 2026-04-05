@@ -6,6 +6,7 @@
 package com.myshop.service;
 
 import com.myshop.beans.StaffBean;
+import com.myshop.beans.UserBean;
 import java.io.InputStream;
 import java.util.List;
 
@@ -16,9 +17,9 @@ import java.util.List;
 public interface StaffService {
     
     
-    public int getNewId();
+    public String generateStaffId();
     
-    public String registerStaff(StaffBean user, InputStream inputStreamImage);
+    public String registerStaff(UserBean user, StaffBean staff, InputStream inputStreamImage);
     
     public boolean isRegistered(String emailId);
     

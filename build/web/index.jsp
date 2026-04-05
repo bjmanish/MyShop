@@ -1,34 +1,84 @@
 <%@page import="com.myshop.service.impl.CartServiceImpl"%>
-<%@page import="com.myshop.service.impl.ProductServiceImpl"%>
+<%@page import="java.util.ArrayList"%>
 <%@page import="com.myshop.beans.ProductBean"%>
-<%@page import="java.util.*"%>
-<%--<%@ page language="java" contentType="text/html; charset=UTF-8"%>--%>
+<%@page import="java.util.List"%>
+<%@page import="com.myshop.service.impl.ProductServiceImpl"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" %>
+
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <!--<meta charset="UTF-8">-->
-    <title>THE MYSHOP</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="icon" type="image/x-icon" href="Myshop-logo.png">
+    <title>MYSHOP - Home</title>
 
     <!-- Bootstrap 5 -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="./css/main.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- SweetAlert -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <style>
+        body {
+            background: linear-gradient(135deg, #1d2671, #c33764);
+            min-height: 100vh;
+        }
+
+        .product-card {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(15px);
+            border-radius: 20px;
+            color: white;
+            transition: 0.3s;
+            padding: 15px;
+        }
+
+        .product-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+        }
+
+        .product-img {
+            height: 180px;
+            object-fit: contain;
+            border-radius: 15px;
+            background: white;
+            padding: 10px;
+        }
+
+        .price {
+            color: #00ff88;
+            font-weight: bold;
+        }
+
+        .old-price {
+            text-decoration: line-through;
+            color: #ccc;
+            font-size: 13px;
+        }
+
+        .discount {
+            color: #00ff88;
+            font-size: 13px;
+        }
+
+        .btn-custom {
+            border-radius: 30px;
+            font-weight: 500;
+        }
+        .full-description {
+            transition: all 0.3s ease;
+        }
+    </style>
+
 </head>
-<body style="background-color: #E6F9E6;">
+
+<body>
+
+<jsp:include page="/header.jsp" />
 
 <%
-    // User validation
     String userName = (String) session.getAttribute("username");
-    String password = (String) session.getAttribute("password");
-    String userType = (String) session.getAttribute("usertype");
-//    String id = session.getId();
-//    if (userType == null || userName == null || password == null || !"customer".equals(userType)) {
-//        response.sendRedirect("login.jsp?message=Please login as a customer");
-//        return;
-//    }
+    boolean isLoggedIn = (userName != null && !userName.trim().isEmpty());
 
-    // Product fetching
     ProductServiceImpl prodDao = new ProductServiceImpl();
     List<ProductBean> products = new ArrayList<>();
 
@@ -38,106 +88,151 @@
 
     if (search != null) {
         products = prodDao.searchAllProducts(search);
-        message = "Showing results for '" + search + "'";
+        message = "Results for '" + search + "'";
     } else if (type != null) {
         products = prodDao.getAllProductsByType(type);
-        message = "Showing results for '" + type + "'";
+        message = "Category: " + type;
     } else {
         products = prodDao.getAllProducts();
     }
-
-    if (products.isEmpty()) {
-        message = "No items found for '" + (search != null ? search : type) + "'";
-    }
-
-    // Load cart once for optimization
-    CartServiceImpl cartService = new CartServiceImpl();
-    Map<Integer, Integer> cartMap = new HashMap<>();
-    for (ProductBean p : products) {
-        int qty = cartService.getCartItemCount(userName, p.getProdId());
-//        cartMap.put(userName,p.getProdId());
-    }
 %>
 
-<!-- Header -->
-<jsp:include page="header.jsp" />
+<div class="container mt-5 pt-5">
+    <h3 class="text-center pt-5 text-white fw-bold"><%=message%></h3>
 
-<div class="container my-3">
-    <div class="text-center fw-bold text-dark"><%=message%></div>
-    <div class="row g-2 mt-3">
+    <div class="row mt-4">
 
-        <%
-        for (ProductBean product : products) {
-            int cartQty = cartMap.getOrDefault(product.getProdId(), 0);
-            String description = product.getProdInfo() != null ? product.getProdInfo() : "";
-            String shortDescription = description.substring(0, Math.min(description.length(), 100));
-        %>
+    <% for (ProductBean product : products) { 
+        String desc = product.getProdInfo() != null ? product.getProdInfo() : "";
+        String shortDesc = desc.substring(0, Math.min(desc.length(), 80));
 
-        <div class="col-md-4 col-sm-5">
-            <div class="card h-100 shadow-sm border-0">
-                <img src="./ShowImage?pid=<%=product.getProdId()%>" 
-                     class="card-img-top p-3" alt="Product" style="height:180px; object-fit:contain; border-radius: 100%;">
+        double price = product.getProdPrice();
+        double oldPrice = price + 500;
+        int discount = (int)((500/oldPrice)*100);
+    %>
 
-                <div class="card-body d-flex flex-column">
-                    <h6 class="card-title text-truncate"><%=product.getProdName()%></h6>
-                    
-                    <p class="card-text small text-muted">
-                        <span class="short-description"><%= shortDescription %></span>
-                        <% if (description.length() > 100) { %>
-                            <span class="full-description d-none"><%= description %></span>
-                            <a href="#" class="read-more fw-bold text-primary" 
-                               onclick="toggleDescription(this); return false;">Read More..</a>
-                        <% } %>
-                    </p>
+        <div class="col-md-3 col-sm-6 mb-4">
+            <div class="product-card h-100 d-flex flex-column">
+                <!-- IMAGE (JS WILL LOAD) -->
+                <img data-src="<%=request.getContextPath()%>/ShowImage?pid=<%=product.getProdId()%>" class="product-img lazy-img mx-auto mb-2" 
+                     src="images/loader.gif"
+                     onerror="this.src='images/noimage.jpg'">
+                <h6 class="text-truncate"><%=product.getProdName()%></h6>
+                <p class="small">
+                    <span class="short-description"><%=shortDesc%></span>
+                    <span class="full-description" style="display:none;"><%=desc%></span>
+                    <% if(desc.length() > 80){ %>
+                        <a href="javascript:void(0);" onclick="toggleDescription(this)" style="color:#00ffcc; cursor:pointer;">Read More..</a>
+                    <% } %>
+                </p>
 
-                    <p class="fw-bold text-success">&#8377; <%=product.getProdPrice()%></p>
+                <p>
+                    <span class="price">₹ <%=price%></span>
+                    <span class="old-price">₹ <%=oldPrice%></span>
+                    <span class="discount">(<%=discount%>% OFF)</span>
+                </p>
 
-                    <form class="mt-auto" method="post">
-                        <% if (cartQty == 0) { %>
-                            <button type="submit" 
-                                formaction="./AddtoCart?uid=<%=userName%>&pid=<%=product.getProdId()%>&pqty=0" 
-                                class="btn btn-sm btn-success w-100 mb-2">Add To Cart</button>
-                            <button type="submit" 
-                                formaction="./AddtoCart?uid=<%=userName%>&pid=<%=product.getProdId()%>&pqty=1" 
-                                class="btn btn-sm btn-primary w-100">Buy Now</button>
-                        <% } else { %>
-                            <button type="submit" 
-                                formaction="./AddtoCart?uid=<%=userName%>&pid=<%=product.getProdId()%>&pqty=0" 
-                                class="btn btn-sm btn-danger w-100 mb-2">Remove From Cart</button>
-                            <button type="submit" 
-                                formaction="cartDetails.jsp" 
-                                class="btn btn-sm btn-warning w-100">Checkout</button>
-                        <% } %>
-                    </form>
-                </div>
+                <!-- BUTTONS -->
+                <% if (isLoggedIn) { %>
+
+                    <a href="<%=request.getContextPath()%>/AddtoCart?pid=<%=product.getProdId()%>"
+                       class="btn btn-success btn-sm w-100 mb-2 btn-custom">
+                       Add To Cart
+                    </a>
+
+                    <a href="<%=request.getContextPath()%>/AddtoCart?prodid=<%=product.getProdId()%>&userid=<%=userName%>"
+                       class="btn btn-warning btn-sm w-100 btn-custom">
+                       Buy Now
+                    </a>
+
+                <% } else { %>
+
+                    <a href="<%=request.getContextPath()%>/AddtoCart?pid=<%=product.getProdId()%>&guest=true"
+                       class="btn btn-success btn-sm w-100 mb-2 btn-custom">
+                       Add To Cart
+                    </a>
+
+                    <button onclick="showLoginAlert()" 
+                        class="btn btn-warning btn-sm w-100 btn-custom">
+                        Buy Now
+                    </button>
+
+                <% } %>
+
             </div>
         </div>
 
-        <% } %>
+    <% } %>
 
     </div>
 </div>
 
-<!-- Footer -->
-<%@ include file="footer.html" %>
+<jsp:include page="/footer.html" />
 
-<!-- Bootstrap 5 JS -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<!-- ================= JS SECTION ================= -->
 
 <script>
-function toggleDescription(link) {
-    const parent = link.closest(".card-text");
-    const shortDesc = parent.querySelector(".short-description");
-    const fullDesc = parent.querySelector(".full-description");
+    
+document.addEventListener("DOMContentLoaded", function () {
 
-    if (shortDesc.classList.contains("d-none")) {
-        shortDesc.classList.remove("d-none");
-        fullDesc.classList.add("d-none");
-        link.innerText = "Read More..";
+    const images = document.querySelectorAll(".lazy-img");
+
+    const observer = new IntersectionObserver((entries, observer) => {
+        entries.forEach(entry => {
+
+            if (entry.isIntersecting) {
+                const img = entry.target;
+
+                const realSrc = img.getAttribute("data-src");
+
+                img.src = realSrc;
+
+                img.onload = () => {
+                    img.classList.add("loaded");
+                };
+
+                observer.unobserve(img);
+            }
+
+        });
+    }, {
+        rootMargin: "50px"
+    });
+
+    images.forEach(img => observer.observe(img));
+});
+    
+    function showLoginAlert(){
+        Swal.fire({
+            icon: 'warning',
+            title: 'Login Required',
+            text: 'Please signup/login first to continue purchase!',
+            confirmButtonText: 'Go to Login',
+            cancelButtonText: 'Cancel',
+            showCancelButton: true,
+            reverseButtons: true
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = "login.jsp";
+            }
+            // if cancelled → do nothing
+        });
+    }
+    
+function toggleDescription(link){
+    var parent = link.parentElement;
+
+    var shortDesc = parent.querySelector('.short-description');
+    var fullDesc = parent.querySelector('.full-description');
+
+    if(shortDesc.style.display === 'none'){
+        shortDesc.style.display = 'inline';
+        fullDesc.style.display = 'none';
+        link.innerText = 'Read More..';
     } else {
-        shortDesc.classList.add("d-none");
-        fullDesc.classList.remove("d-none");
-        link.innerText = "Read Less";
+        shortDesc.style.display = 'none';
+        fullDesc.style.display = 'inline';
+        link.innerText = 'Read Less';
     }
 }
 </script>
