@@ -107,11 +107,13 @@ Step 11: The default Username And Password For User Is "guest@gmail.com" And "gu
 
 Note:- This is a Sample Project for learning purpose, we have not much considered of web security.
 
+##<bold>For Video References</bold></br>
+    Link:  https://www.awesomescreenshot.com/video/51167890?key=fc87bd05f2f5dcdda6a8b6f4535c4289
 
 #### "Suggestions and project improvement ideas are welcomed!"
 
 <bold>Thanks a lot,</bold><br/>
-                                                                                                        Project Leader<br/>
-                                                                                                         <b>Manish Kumar</b>
+    Project Leader<br/>
+    <b>Manish Kumar</b>
 
 

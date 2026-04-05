@@ -1,176 +1,241 @@
 <%@page import="com.myshop.service.impl.CartServiceImpl"%>
-<%@page import="java.util.*"%>
+<%@page import="java.util.ArrayList"%>
 <%@page import="com.myshop.beans.ProductBean"%>
+<%@page import="java.util.List"%>
 <%@page import="com.myshop.service.impl.ProductServiceImpl"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" %>
 
 <!DOCTYPE html>
 <html>
 <head>
-<title>MyShop - Home</title>
+    <title>MYSHOP - Home</title>
 
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 
-<!--<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.6.2/css/bootstrap.min.css">-->
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+    <!-- SweetAlert -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-<style>
-body { background:#f1f3f6; }
+    <style>
+        body {
+            background: linear-gradient(135deg, #1d2671, #c33764);
+            min-height: 100vh;
+        }
 
-.product-card {
-    border-radius:10px;
-    transition:0.3s;
-    background:#fff;
-}
-.product-card:hover {
-    transform:translateY(-5px);
-    box-shadow:0 4px 20px rgba(0,0,0,0.2);
-}
+        .product-card {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(15px);
+            border-radius: 20px;
+            color: white;
+            transition: 0.3s;
+            padding: 15px;
+        }
 
-.product-img {
-    height:180px;
-    object-fit:contain;
-}
+        .product-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+        }
 
-.price { color:#28a745; font-weight:bold; }
+        .product-img {
+            height: 180px;
+            object-fit: contain;
+            border-radius: 15px;
+            background: white;
+            padding: 10px;
+        }
 
-.old-price {
-    text-decoration: line-through;
-    color:gray;
-    font-size:13px;
-}
+        .price {
+            color: #00ff88;
+            font-weight: bold;
+        }
 
-.discount {
-    color:green;
-    font-size:13px;
-}
+        .old-price {
+            text-decoration: line-through;
+            color: #ccc;
+            font-size: 13px;
+        }
 
-.cart-badge {
-    position:absolute;
-    top:10px;
-    right:10px;
-    background:red;
-    color:#fff;
-    padding:3px 7px;
-    border-radius:50%;
-}
+        .discount {
+            color: #00ff88;
+            font-size: 13px;
+        }
 
-.search-box {
-    width:50%;
-    margin:auto;
-}
+        .btn-custom {
+            border-radius: 30px;
+            font-weight: 500;
+        }
+        .full-description {
+            transition: all 0.3s ease;
+        }
+    </style>
 
-</style>
 </head>
 
 <body>
 
-<jsp:include page="/header.jsp"/>
+<jsp:include page="/header.jsp" />
 
 <%
-String userName = (String)session.getAttribute("username");
-String userType = (String)session.getAttribute("role");
-String user_id = (String)session.getAttribute("user_id");
+    String userName = (String) session.getAttribute("username");
+    boolean isLoggedIn = (userName != null && !userName.trim().isEmpty());
 
-if(userType == null || !userType.equalsIgnoreCase("customer")){
-    response.sendRedirect("login.jsp");
-    return;
-}
+    ProductServiceImpl prodDao = new ProductServiceImpl();
+    List<ProductBean> products = new ArrayList<>();
 
-ProductServiceImpl dao = new ProductServiceImpl();
-List<ProductBean> products = dao.getAllProducts();
+    String search = request.getParameter("search");
+    String type = request.getParameter("type");
+    String message = "All Products";
+
+    if (search != null) {
+        products = prodDao.searchAllProducts(search);
+        message = "Results for '" + search + "'";
+    } else if (type != null) {
+        products = prodDao.getAllProductsByType(type);
+        message = "Category: " + type;
+    } else {
+        products = prodDao.getAllProducts();
+    }
 %>
 
-<!-- ? SEARCH 
-<div class="container mt-4">
-    <input type="text" id="searchBox" class="form-control search-box" placeholder="Search products...">
-</div>-->
+<div class="container mt-5 pt-5">
+    <h3 class="text-center pt-5 text-white fw-bold"><%=message%></h3>
 
-<!-- CATEGORY FILTER -->
-<div class="text-center mt-3">
-    <a href="?type=mobile" class="btn btn-outline-primary btn-sm">Mobiles</a>
-    <a href="?type=laptop" class="btn btn-outline-success btn-sm">Laptops</a>
-    <a href="?type=Electronics" class="btn btn-outline-danger btn-sm">Watches</a>
+    <div class="row mt-4">
+
+    <% for (ProductBean product : products) { 
+        String desc = product.getProdInfo() != null ? product.getProdInfo() : "";
+        String shortDesc = desc.substring(0, Math.min(desc.length(), 80));
+
+        double price = product.getProdPrice();
+        double oldPrice = price + 500;
+        int discount = (int)((500/oldPrice)*100);
+    %>
+
+        <div class="col-md-3 col-sm-6 mb-4">
+            <div class="product-card h-100 d-flex flex-column">
+                <!-- IMAGE (JS WILL LOAD) -->
+                <img data-src="<%=request.getContextPath()%>/ShowImage?pid=<%=product.getProdId()%>" class="product-img lazy-img mx-auto mb-2" 
+                     src="images/loader.gif"
+                     onerror="this.src='images/noimage.jpg'">
+                <h6 class="text-truncate"><%=product.getProdName()%></h6>
+                <p class="small">
+                    <span class="short-description"><%=shortDesc%></span>
+                    <span class="full-description" style="display:none;"><%=desc%></span>
+                    <% if(desc.length() > 80){ %>
+                        <a href="javascript:void(0);" onclick="toggleDescription(this)" style="color:#00ffcc; cursor:pointer;">Read More..</a>
+                    <% } %>
+                </p>
+
+                <p>
+                    <span class="price">₹ <%=price%></span>
+                    <span class="old-price">₹ <%=oldPrice%></span>
+                    <span class="discount">(<%=discount%>% OFF)</span>
+                </p>
+
+                <!-- BUTTONS -->
+                <% if (isLoggedIn) { %>
+
+                    <a href="<%=request.getContextPath()%>/AddtoCart?pid=<%=product.getProdId()%>"
+                       class="btn btn-success btn-sm w-100 mb-2 btn-custom">
+                       Add To Cart
+                    </a>
+
+                    <a href="<%=request.getContextPath()%>/AddtoCart?prodid=<%=product.getProdId()%>&userid=<%=userName%>"
+                       class="btn btn-warning btn-sm w-100 btn-custom">
+                       Buy Now
+                    </a>
+
+                <% } else { %>
+
+                    <a href="<%=request.getContextPath()%>/AddtoCart?pid=<%=product.getProdId()%>&guest=true"
+                       class="btn btn-success btn-sm w-100 mb-2 btn-custom">
+                       Add To Cart
+                    </a>
+
+                    <button onclick="showLoginAlert()" 
+                        class="btn btn-warning btn-sm w-100 btn-custom">
+                        Buy Now
+                    </button>
+
+                <% } %>
+
+            </div>
+        </div>
+
+    <% } %>
+
+    </div>
 </div>
-
-<div class="container mt-4">
-<div class="row" id="productContainer">
-
-<%
-for(ProductBean p : products){
-int cartQty = new CartServiceImpl().getCartItemCount(user_id, p.getProdId());
-
-// Fake discount logic
-double price = p.getProdPrice();
-double oldPrice = price + 500;
-int discount = (int)((500/oldPrice)*100);
-%>
-
-<div class="col-md-3 mb-4 product-item">
-
-<div class="card product-card p-2 text-center position-relative">
-
-<% if(cartQty > 0){ %>
-<span class="cart-badge">?</span>
-<% } %>
-
-<img src="<%=request.getContextPath()%>/ShowImage?pid=<%=p.getProdId()%>" class="product-img" onerror="this.src='../images/noimage.jpg';" >
-
-<h6><%=p.getProdName()%></h6>
-
-<p> <%=p.getProdInfo()%> </p>
-
-<p>
-<span class="price">&#8377; <%=price%></span>
-<span class="old-price">&#8377; <%=oldPrice%></span>
-<span class="discount">(<%=discount%>% OFF)</span>
-</p>
-
-<button class="btn btn-sm btn-success addCartBtn"
-    data-id="<%=p.getProdId()%>">
-    Add to Cart
-</button>
-
-<button class="btn btn-sm btn-outline-danger mt-1">
-    Wishlist
-</button>
-
-</div>
-</div>
-
-<% } %>
-
-</div>
-</div>
-
-<script>
-
-// ? LIVE SEARCH FILTER
-$("#searchBox").on("keyup", function(){
-    var value = $(this).val().toLowerCase();
-    $(".product-item").filter(function(){
-        $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
-    });
-});
-
-// ? AJAX ADD TO CART
-$(".addCartBtn").click(function(){
-    var pid = $(this).data("id");
-
-    $.ajax({
-        url: "AddtoCart",
-        method: "GET",
-        data: { pid: pid, pqty:1 },
-        success: function(){
-            alert("Added to cart!");
-            location.reload();
-        }
-    });
-});
-
-</script>
 
 <jsp:include page="/footer.html" />
+
+<!-- ================= JS SECTION ================= -->
+
+<script>
+    
+document.addEventListener("DOMContentLoaded", function () {
+
+    const images = document.querySelectorAll(".lazy-img");
+
+    const observer = new IntersectionObserver((entries, observer) => {
+        entries.forEach(entry => {
+
+            if (entry.isIntersecting) {
+                const img = entry.target;
+
+                const realSrc = img.getAttribute("data-src");
+
+                img.src = realSrc;
+
+                img.onload = () => {
+                    img.classList.add("loaded");
+                };
+
+                observer.unobserve(img);
+            }
+
+        });
+    }, {
+        rootMargin: "50px"
+    });
+
+    images.forEach(img => observer.observe(img));
+});
+    
+    function showLoginAlert(){
+        Swal.fire({
+            icon: 'warning',
+            title: 'Login Required',
+            text: 'Please signup/login first to continue purchase!',
+            confirmButtonText: 'Go to Login',
+            cancelButtonText: 'Cancel',
+            showCancelButton: true,
+            reverseButtons: true
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = "login.jsp";
+            }
+            // if cancelled → do nothing
+        });
+    }
+    
+function toggleDescription(link){
+    var parent = link.parentElement;
+
+    var shortDesc = parent.querySelector('.short-description');
+    var fullDesc = parent.querySelector('.full-description');
+
+    if(shortDesc.style.display === 'none'){
+        shortDesc.style.display = 'inline';
+        fullDesc.style.display = 'none';
+        link.innerText = 'Read More..';
+    } else {
+        shortDesc.style.display = 'none';
+        fullDesc.style.display = 'inline';
+        link.innerText = 'Read Less';
+    }
+}
+</script>
 
 </body>
 </html>
