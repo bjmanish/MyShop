@@ -5,6 +5,7 @@ import com.myshop.beans.DemandBean;
 import com.myshop.beans.ProductBean;
 import com.myshop.service.CartService;
 import com.myshop.utility.dbUtil;
+import com.myshop.utility.idUtil;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -18,18 +19,35 @@ public class CartServiceImpl implements CartService{
     public String addProductToCart(String userId, String cartId, String prodId, int prodQty) {
         String status = "Failed to add product into cart!";
         int prodQTY = prodQty;
-        try{
-            Connection conn = dbUtil.provideConnection();
-            PreparedStatement ps = conn.prepareStatement("SELECT * FROM CART WHERE cart_id=? AND user_id= ? AND product_id=?");
+        
+        if(cartId==null){
+            cartId=getCartId(userId);
+        }
+        System.out.println("CARt id from add product to cart method :"+cartId);
+        String sql = "SELECT * FROM CART WHERE cart_id=? AND user_id= ? AND product_id=?";
+        try(Connection conn = dbUtil.provideConnection();
+            PreparedStatement ps = conn.prepareStatement(sql);){
+            
             ps.setString(1, cartId);
             ps.setString(2, userId);
             ps.setString(3, prodId);
             ResultSet rs = ps.executeQuery();
-            if(rs.next()){
-                int cartQTY = rs.getInt("quantity");                
+            if(rs.next() || rs.wasNull()){
+                int cartQTY = rs.getInt("quantity");
+                if(cartQTY <1){
+                    PreparedStatement ps2 = conn.prepareStatement("INSERT INTO CART(CART_ID, USER_ID, PRODUCT_ID, QUANTITY) VALUES(?, ?, ?, ?)");
+                    ps2.setString(1, cartId);
+                    ps2.setString(2, userId);
+                    ps2.setString(3, prodId);
+                    ps2.setInt(4, prodQty);                    
+//                    int ResultSet rs2 = ps2.executeQuery();
+                    if(ps2.executeUpdate() > 0){
+                        System.out.println("Product add in cart with cartId :"+cartId);
+                    }
+                }
                 ProductBean product = new ProductServiceImpl().getProductDetails(prodId);
                 int availableQTY = product.getProdQuantity();
-                prodQTY += cartQTY;
+                prodQTY += prodQty;
                 
                 if( availableQTY < prodQTY){
                     
@@ -49,6 +67,8 @@ public class CartServiceImpl implements CartService{
         } catch (SQLException ex) {
             status = "error: "+ex.getMessage();
             System.out.println("Error in add product to cart:"+status);
+            ex.printStackTrace();
+            
         }
         
         return status;
@@ -60,10 +80,10 @@ public class CartServiceImpl implements CartService{
         
         try{
             Connection conn = dbUtil.provideConnection();
-            PreparedStatement ps = conn.prepareStatement("SELECT * FROM CART WHERE cart_id AND user_id=? AND prododuct_id=?");
+            PreparedStatement ps = conn.prepareStatement("SELECT * FROM CART WHERE cart_id AND user_id=?");
             ps.setString(1, cartId);
             ps.setString(2, userId);
-            ps.setString(3, prodId);
+//            ps.setString(3, prodId);
             ResultSet rs = ps.executeQuery();
             if(rs.next()){
                 if(prodQty > 0){
@@ -99,6 +119,7 @@ public class CartServiceImpl implements CartService{
         } catch (SQLException ex) {
              status = "Error in updateProductToCart: "+ex.getMessage();
              System.out.println(status);
+             ex.printStackTrace();
         }
         
         return status;
@@ -255,17 +276,17 @@ public class CartServiceImpl implements CartService{
     @Override
     public int getProductCount(String userId, String prodId) {
         int count = 0;
-        PreparedStatement ps = null;
-	ResultSet rs = null;
-
-        try {
-            Connection conn = dbUtil.provideConnection();
-            ps = conn.prepareStatement("SELECT SUM(quantity) FROM CART WHERE name=? AND prodid=?");
+        
+//	ResultSet rs = null;
+        String query = "SELECT SUM(quantity) FROM CART WHERE user_id=? AND product_id = ?";
+        try(Connection conn = dbUtil.provideConnection(); 
+                PreparedStatement ps = conn.prepareStatement(query);) {
             ps.setString(1, userId);
             ps.setString(2, prodId);
-            rs = ps.executeQuery();
-            if (rs.next() && !rs.wasNull())
+            ResultSet rs = ps.executeQuery();
+            if (rs.next() && !rs.wasNull()){
                 count = rs.getInt(1);
+            }
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -276,7 +297,7 @@ public class CartServiceImpl implements CartService{
     public String getCartId(String userId) {
         String cartId = null;
         
-        String sql = "SELECT CART_ID FROM CART WHERE USER_ID = ?";
+        String sql = "SELECT cart_id FROM CART WHERE USER_ID = ?";
         
         try(Connection conn = dbUtil.provideConnection();
                 PreparedStatement ps = conn.prepareStatement(sql);){
@@ -284,7 +305,11 @@ public class CartServiceImpl implements CartService{
             ResultSet rs = ps.executeQuery();
             if(rs.next()){
                 cartId=rs.getString("cart_id");
-            }            
+                if(cartId==null){
+                    cartId = idUtil.generateUUIDCartId();
+                }
+            }   
+            System.out.println("cart id from getId method :"+cartId);
         } catch (SQLException ex) {
             System.out.println("Error in getCartID method:: "+ex.getMessage());
             ex.printStackTrace();

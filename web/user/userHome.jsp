@@ -115,7 +115,7 @@
             <div class="product-card h-100 d-flex flex-column">
                 <!-- IMAGE (JS WILL LOAD) -->
                 <img data-src="<%=request.getContextPath()%>/ShowImage?pid=<%=product.getProdId()%>" class="product-img lazy-img mx-auto mb-2" 
-                     src="images/loader.gif"
+                     src="<%=request.getContextPath()%>/images/loader.gif"
                      onerror="this.src='images/noimage.jpg'">
                 <h6 class="text-truncate"><%=product.getProdName()%></h6>
                 <p class="small">
@@ -135,12 +135,12 @@
                 <!-- BUTTONS -->
                 <% if (isLoggedIn) { %>
 
-                    <a href="<%=request.getContextPath()%>/AddtoCart?pid=<%=product.getProdId()%>"
+                    <a href="<%=request.getContextPath()%>/AddtoCart?pid=<%=product.getProdId()%>&uid=<%=(String)session.getAttribute("user_id")%>&pqty=1"
                        class="btn btn-success btn-sm w-100 mb-2 btn-custom">
                        Add To Cart
                     </a>
 
-                    <a href="<%=request.getContextPath()%>/AddtoCart?prodid=<%=product.getProdId()%>&userid=<%=userName%>"
+                    <a href="<%=request.getContextPath()%>/AddtoCart?pid=<%=product.getProdId()%>&uid=<%=(String)session.getAttribute("user_id")%>"
                        class="btn btn-warning btn-sm w-100 btn-custom">
                        Buy Now
                     </a>

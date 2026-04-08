@@ -161,7 +161,7 @@ else if ("staff".equalsIgnoreCase(role) || "delivery".equalsIgnoreCase(role)) ho
 <% } else { %>
 
 <li class="nav-item"><a class="nav-link" href="<%=homePage%>">Home</a></li>
-<li class="nav-item"><a class="nav-link" href="#">Welcome <%=name%></a></li>
+<li class="nav-item"><a class="nav-link" href="userProfile.jsp">Welcome <%=name%></a></li>
 <li class="nav-item"><a class="nav-link" href="#" onclick="openLogoutModal()">Logout</a></li>
 
 <% } %>
@@ -183,7 +183,7 @@ else if ("staff".equalsIgnoreCase(role) || "delivery".equalsIgnoreCase(role)) ho
 
 <a href="<%=homePage%>">Home</a>
 <a href="#">Orders</a>
-<a href="#">Profile</a>
+<a href="userProfile.jsp">Profile</a>
 <a href="#" onclick="openLogoutModal()">Logout</a>
 
 </div>

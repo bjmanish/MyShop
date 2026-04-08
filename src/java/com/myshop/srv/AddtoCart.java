@@ -28,10 +28,9 @@ public class AddtoCart extends HttpServlet {
         
         HttpSession  session = request.getSession();
         String userName = (String) session.getAttribute("username");
-        String password = (String) session.getAttribute("password");
+        String password = (String) session.getAttribute("sessionId");
         String userType = (String) session.getAttribute("role");
         String cartId = (String) session.getAttribute("cartId");
-        
         
         
         //System.out.println("d ata:" +userName+""+ password+"" +userType);
@@ -51,16 +50,24 @@ public class AddtoCart extends HttpServlet {
             return;
         }
         CartServiceImpl cart = new CartServiceImpl();
+        if(cartId==null){
+            cartId = cart.getCartId(userId);
+        }
+        System.out.println("user Id "+userId+" Cart id:"+cartId);
         ProductServiceImpl productDao = new ProductServiceImpl();
         ProductBean product = productDao.getProductDetails(prodId);
         int availableQty = product.getProdQuantity();
         int cartQty = cart.getProductCount(userId, prodId);
         
+        if(cartQty<=0){
+            cart.addProductToCart(userId, cartId, prodId, pQty);
+        }
+        
         pQty += cartQty;
                 
         if(pQty == cartQty){
             status = cart.removeProductFromCart(userId, cartId, prodId);
-            response.sendRedirect("userHome.jsp?message="+status);
+            response.sendRedirect("user/userHome.jsp?message="+status);
             
         }else if(availableQty < pQty){
             
@@ -84,8 +91,8 @@ public class AddtoCart extends HttpServlet {
             }
                         
         }else{            
-            status = cart.updateProductToCart(userId, cartId, prodId, pQty);
-            response.sendRedirect("userHome.jsp?message="+status);
+            status = cart.addProductToCart(userId, cartId, prodId, pQty);
+            response.sendRedirect("user/userHome.jsp?message="+status);
         }
     }
 

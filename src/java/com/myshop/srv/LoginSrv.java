@@ -40,7 +40,7 @@ public class LoginSrv extends HttpServlet {
 
         // ✅ RETURN ROLE INSTEAD OF REDIRECT
         response.getWriter().write(user.getRoleName());
-        System.out.println("data for staff:"+user.getRoleName());
+//        System.out.println("data for staff:"+user.getRoleName());
 
     } else {
         response.getWriter().write("Invalid");

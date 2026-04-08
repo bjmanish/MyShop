@@ -14,7 +14,7 @@
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 
     </head>
-    <body style="background-color: #E6F9E6"> 
+    <body> 
         
         <%
 //            Checking the User crendentials
@@ -30,10 +30,10 @@
         %>
 
         <jsp:include page="/header.jsp"/>
-        <div class="mt-5">
-            <div></div>
+        <div class="mt-4 pt-5">
+            <div class="mt-4 pt-5"></div>
         </div>
-        <div class="container bg-secondary">
+        <div class="container ">
             
             <div class="row">
                 <div class="col">
@@ -55,12 +55,34 @@
                             <!--<bold>User Profile</bold>-->
                             <span style="margin-left: -5px; justify-content: center; align-items: center; font-size:larger; font-weight: bold;">User Profile</span>                          
                         </div>
-                        
-                        <div class="card-body text-center">
-                            <img src="<%=request.getContextPath()%>/showProfileImg?uid=<%=(String)session.getAttribute("user_id") %>" alt="Profile Image" style="height: 150px; max-width: 180px;" 
-                                 onerror="this.src='../images/noimage.jpg';">
-                            <p class="fw-bold" style="font-size: 20px; color:#009966; font-weight: 700;"><span style="font-size: 20px; color:#000; font-weight: 700;">Hello</span>&nbsp;<%=user.getName()%></p>
-                        </div>                        
+
+                        <div class="card-body text-center position-relative">
+                            <!-- Profile Image -->
+                            <div style="position: relative; display: inline-block;">
+                                <img id="profileImg" src="<%=request.getContextPath()%>/showProfileImg?uid=<%=(String)session.getAttribute("user_id") %>" 
+                                     alt="Profile Image"
+                                     style="height: 150px; width: 150px; border-radius: 50%; object-fit: cover;"
+                                     onerror="this.src='../images/noimage.jpg';">
+                                
+                                <!-- ?? Edit Button -->
+                                <label for="fileInput" 
+                                       style="position: absolute; bottom: 5px; right: 5px; 
+                                       background: #fff; border-radius: 50%; 
+                                       padding: 6px; cursor: pointer; 
+                                       box-shadow: 0 2px 6px rgba(0,0,0,0.2);">
+                                    <i class="bi bi-pencil-fill"></i>
+                                </label>
+                                
+                                <!-- Hidden File Input -->
+                                <form id="uploadForm" action="<%=request.getContextPath()%>/UploadProfileImage" method="post" enctype="multipart/form-data">
+                                    <input type="file" id="fileInput" name="profileImg" accept="image/*" hidden onchange="uploadImage()">
+                                </form>
+                            </div>
+                            <!-- Username -->
+                            <p class="fw-bold mt-3" style="font-size: 20px; color:#009966;">
+                                <span style="color:#000;">Hello</span> <%=user.getName()%>
+                            </p>
+                        </div>
                     </div>
 
                     <div class="card mb-4 mb-lg-4">
@@ -81,7 +103,7 @@
 
                 </div>
 
-                <div class="col-lg-8">
+                <div class="col-4 justify-content-center align-middle">
                     <div class="card mb-4">
                         <div class="card-body">
 
@@ -173,10 +195,44 @@
             function joinAndSendOtp() {
                 // 1?? Open WhatsApp sandbox join link
                 window.open("https://wa.me/+14155238886?text=join%20difficult-glass", "_blank");
-                    // 2?? After 5 seconds, redirect to your OTP servlet
-                    setTimeout(function() { window.location.href = "SendOTPSrv";}, 5000);
-                                            }
-        </script>
+                // 2?? After 5 seconds, redirect to your OTP servlet
+                setTimeout(function() { window.location.href = "SendOTPSrv";}, 5000);
+            }
+            
+
+function uploadImage() {
+    const fileInput = document.getElementById("fileInput");
+    const file = fileInput.files[0];
+
+    if (!file) return;
+
+    // ? Preview instantly
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        document.getElementById("profileImg").src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+
+    // ? Upload to server
+    const formData = new FormData();
+    formData.append("profileImg", file);
+
+    fetch("<%=request.getContextPath()%>/UploadProfileImage", {
+        method: "POST",
+        body: formData
+    })
+    .then(res => res.text())
+    .then(data => {
+        console.log("Upload:", data);
+        // Optional success alert
+    })
+    .catch(err => {
+        console.error(err);
+        alert("Upload failed");
+    });
+}
+</script>
+            
         
     </body>
 </html>

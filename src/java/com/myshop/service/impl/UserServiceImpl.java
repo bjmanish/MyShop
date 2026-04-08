@@ -232,7 +232,8 @@ public class UserServiceImpl implements UserService {
 
     if (rs.next()) {
         String lastId = rs.getString("user_id");
-        int num = Integer.parseInt(lastId.substring(3));
+         String numStr = lastId.substring(3, 6); // "005"
+        int num = Integer.parseInt(numStr);
         num++;
         baseId = String.format("USR%03d", num);
     } else {
@@ -286,5 +287,65 @@ public class UserServiceImpl implements UserService {
         }
         return list;
     }
+    
+    
+    @Override
+    public UserBean loginOrRegisterGoogleUser(String name, String email) {
+    UserBean user = null;
+
+    try (Connection con = dbUtil.provideConnection()) {
+        // ✅ 1. Check if user exists
+        String query = "SELECT u.*, r.role_name FROM USERS u " +
+                       "JOIN ROLES r ON u.role_id = r.role_id " +
+                       "WHERE u.email = ?";
+        PreparedStatement ps = con.prepareStatement(query);
+        ps.setString(1, email);
+//        ps.setString()
+        ResultSet rs = ps.executeQuery();
+
+        if (rs.next()) {
+                user = new UserBean();
+                user.setName(rs.getString("name"));
+                user.setMobile(rs.getString("mobile"));
+                user.setEmail(rs.getString("email"));
+                user.setAddress(rs.getString("address"));
+                user.setPincode(rs.getInt("pincode"));
+                user.setImage(rs.getBinaryStream("image"));
+                user.setId(rs.getString("user_id"));
+                
+                String roleId = rs.getString("role_id");
+                String roleName = rs.getString("role_name");
+                
+                if(roleId == null ){
+                    roleId = "R003";
+                    roleName = "CUSTOMER";
+                }
+                
+                user.setRoleId(roleId);
+                user.setRoleName(roleName);
+                
+            } else {
+            // ✅ 2. Insert new user
+            String insertQuery = "INSERT INTO users (user_id, name, email, password, role_id) VALUES (?, ?, ?, ?, ?)";
+            PreparedStatement insertPs = con.prepareStatement(insertQuery);
+            String id = generateUserId();
+            insertPs.setString(1, id);
+            System.out.println("user Id:"+id);
+            insertPs.setString(2, name);
+            insertPs.setString(3, email);
+            insertPs.setString(4, "GOOGLE_AUTH"); // or NULL
+            insertPs.setString(5, "R003"); // default role
+
+            insertPs.executeUpdate();
+
+//            roleName = "CUSTOMER";
+        }
+
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+
+    return user;
+}
     
 }

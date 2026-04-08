@@ -22,6 +22,7 @@ public class AuthFilter implements Filter {
         // ✅ Allow public resources
         if (uri.contains("login.jsp") ||
             uri.contains("LoginSrv") ||
+            uri.contains("GoogleLoginServlet") ||
             uri.contains("register.jsp") ||
             uri.contains("RegisterSrv") ||
             uri.contains("LogoutSrv") ||

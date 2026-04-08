@@ -30,4 +30,6 @@ public interface UserService {
     public String generateUserId();
     
     public List<UserDetails> getAllUsers();
+    
+    public UserBean loginOrRegisterGoogleUser(String name, String email);
 }
