@@ -1,6 +1,7 @@
 package com.myshop.srv;
 
 import com.myshop.beans.UserBean;
+import com.myshop.service.impl.CartServiceImpl;
 import com.myshop.service.impl.UserServiceImpl;
 import com.myshop.utility.idUtil;
 import java.io.*;
@@ -45,19 +46,22 @@ public class GoogleLoginServlet extends HttpServlet {
 
             // 🔥 Main logic
             UserBean user = userDao.loginOrRegisterGoogleUser(name, email);
+            int cartCount = new CartServiceImpl().getCartCount(user.getId());
+
+            
 //            System.out.println("role "+role);
                 // ✅ Create session
             HttpSession session = request.getSession();
             if (user != null && user.getRoleName() != null) {
-
             session.setAttribute("user_id", user.getId());
             session.setAttribute("username", user.getEmail());
             session.setAttribute("role", user.getRoleName());
             session.setAttribute("name", user.getName());
             session.setAttribute("sessionId", session.getId());
-            String cartId = idUtil.generateUUIDCartId();
+            String cartId = new CartServiceImpl().getCartId(user.getId());
             session.setAttribute("cartId", cartId);
-                System.out.println("Cart Id from Login servlet "+cartId);
+            session.setAttribute("cartCount", cartCount);
+            System.out.println("Cart Id from Login servlet "+cartId);
 
             // ✅ RETURN ROLE INSTEAD OF REDIRECT
                 response.getWriter().write(user.getRoleName());

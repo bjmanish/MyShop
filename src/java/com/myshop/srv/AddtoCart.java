@@ -13,126 +13,100 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-
 @WebServlet(name = "AddtoCart", urlPatterns = {"/AddtoCart"})
 public class AddtoCart extends HttpServlet {
 
-    private static final long serialVersionUID = 1L;
-
-    public AddtoCart() {
-        super();
-    }
-    
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        
-        HttpSession  session = request.getSession();
+
+        HttpSession session = request.getSession();
+
         String userName = (String) session.getAttribute("username");
-        String password = (String) session.getAttribute("sessionId");
         String userType = (String) session.getAttribute("role");
         String cartId = (String) session.getAttribute("cartId");
-        
-        
-        //System.out.println("d ata:" +userName+""+ password+"" +userType);
-        if(userName == null || password == null || userType == null || !userType.equalsIgnoreCase("customer")){
-            response.sendRedirect("login.jsp?message=Session Expired!! Please Login And Continue to Purchase.");
+
+        // ✅ Session validation
+        if (userName == null || userType == null || !"customer".equalsIgnoreCase(userType)) {
+            response.sendRedirect("login.jsp?message=Please login first!");
             return;
         }
-        
-        String status = null;
-        
+
+        // ✅ Get parameters
         String userId = request.getParameter("uid");
         String prodId = request.getParameter("pid");
-        int pQty = Integer.parseInt(request.getParameter("pqty"));
-       // System.out.println("data:" +userId+""+ prodId+"" +pQty);
-        if(userId == null || prodId == null || pQty < 0){
-            response.sendRedirect("login.jsp?message=Please Login and then continue to shopping.");
+
+        int pQty = 0;
+        try {
+            pQty = Integer.parseInt(request.getParameter("pqty"));
+        } catch (Exception e) {
+            response.sendRedirect("user/userHome.jsp?message=Invalid Quantity!");
             return;
         }
-        CartServiceImpl cart = new CartServiceImpl();
-        if(cartId==null){
-            cartId = cart.getCartId(userId);
+
+        if (pQty <= 0) {
+            response.sendRedirect("user/userHome.jsp?message=Quantity must be greater than 0!");
+            return;
         }
-        System.out.println("user Id "+userId+" Cart id:"+cartId);
-        ProductServiceImpl productDao = new ProductServiceImpl();
-        ProductBean product = productDao.getProductDetails(prodId);
+
+        CartServiceImpl cartService = new CartServiceImpl();
+
+        // ✅ Get cartId if not exists
+        if (cartId == null) {
+            cartId = cartService.getCartId(userId);
+            session.setAttribute("cartId", cartId);
+        }
+
+        ProductServiceImpl productService = new ProductServiceImpl();
+        ProductBean product = productService.getProductDetails(prodId);
+
         int availableQty = product.getProdQuantity();
-        int cartQty = cart.getProductCount(userId, prodId);
-        
-        if(cartQty<=0){
-            cart.addProductToCart(userId, cartId, prodId, pQty);
+        int existingQty = cartService.getProductCount(userId, prodId);
+
+        int totalQty = existingQty + pQty;
+
+        String status;
+
+        // ✅ OUT OF STOCK
+        if (availableQty == 0) {
+            status = "Product is Out of Stock!";
         }
-        
-        pQty += cartQty;
-                
-        if(pQty == cartQty){
-            status = cart.removeProductFromCart(userId, cartId, prodId);
-            response.sendRedirect("user/userHome.jsp?message="+status);
-            
-        }else if(availableQty < pQty){
-            
-            if(availableQty == 0){
-                status = "Product is out of Stock!";
-            }else{
-                cart.updateProductToCart(userId, cartId, prodId, pQty);
-                
-                status = "Only "+ availableQty +" no of "+ product.getProdName()
-                        + " are available in the shop! So we are adding only "+ availableQty
-                        + " products into your cart "+ "";
-            }
-            
-            DemandBean demandBean = new DemandBean(userName, product.getProdId(), pQty - availableQty);
-            DemandServiceImpl demands = new DemandServiceImpl();
-            boolean flag = demands.addProduct(demandBean);
-            
-            if(flag){
-                status += "<br/>Later, We will Mail you when "+ product.getProdName()
-                        + " will be available into the Stores!";
-            }
-                        
-        }else{            
-            status = cart.addProductToCart(userId, cartId, prodId, pQty);
-            response.sendRedirect("user/userHome.jsp?message="+status);
+
+        // ✅ IF REQUEST EXCEEDS STOCK
+        else if (totalQty > availableQty) {
+
+            cartService.updateProductToCart(userId, cartId, prodId, availableQty);
+
+            int demandQty = totalQty - availableQty;
+
+            DemandBean demand = new DemandBean(userName, prodId, demandQty);
+            DemandServiceImpl demandService = new DemandServiceImpl();
+            demandService.addProduct(demand);
+
+            status = "Only " + availableQty + " items available. Added maximum to cart.";
         }
+
+        // ✅ NORMAL FLOW
+        else {
+            if (existingQty > 0) {
+                status = cartService.updateProductToCart(userId, cartId, prodId, totalQty);
+            } else {
+                status = cartService.addProductToCart(userId, cartId, prodId, pQty);
+            }
+        }
+
+        // ✅ FINAL REDIRECT (always)
+        response.sendRedirect("user/userHome.jsp?message=" + status);
     }
 
-    // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
-    /**
-     * Handles the HTTP <code>GET</code> method.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         processRequest(request, response);
     }
 
-    /**
-     * Handles the HTTP <code>POST</code> method.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         processRequest(request, response);
     }
-
-    /**
-     * Returns a short description of the servlet.
-     *
-     * @return a String containing servlet description
-     */
-    @Override
-    public String getServletInfo() {
-        return "Short description";
-    }// </editor-fold>
-
 }

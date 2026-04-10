@@ -1,3 +1,4 @@
+<%@page import="com.myshop.service.impl.CartServiceImpl"%>
 <%@ page language="java"%>
 <!DOCTYPE html>
 <html lang="en">
@@ -30,6 +31,7 @@ body {
     background: rgba(0,0,0,0.7);
     backdrop-filter: blur(10px);
     transition: 0.3s;
+    z-index: 10000;
 }
 
 /* SCROLL EFFECT */
@@ -99,7 +101,7 @@ body {
     height: 100%;
     background: rgba(0,0,0,0.5);
     display: none;
-    z-index: 1500;
+    z-index: -1500;
 }
 
 #menuOverlay.active {
@@ -114,7 +116,9 @@ body {
 <%
 String role = (String) session.getAttribute("role");
 String name = (String) session.getAttribute("name");
-
+String userId = (String)session.getAttribute("user_id");
+int cartCount = new CartServiceImpl().getCartCount(userId);
+System.out.println("cart qnty :"+cartCount);
 String homePage = "index.jsp";
 if ("customer".equalsIgnoreCase(role)) homePage = "userHome.jsp";
 else if ("admin".equalsIgnoreCase(role)) homePage = "adminHome.jsp";
@@ -160,7 +164,16 @@ else if ("staff".equalsIgnoreCase(role) || "delivery".equalsIgnoreCase(role)) ho
 
 <% } else { %>
 
-<li class="nav-item"><a class="nav-link" href="<%=homePage%>">Home</a></li>
+<%--<li class="nav-item"><a class="nav-link" href="<%=homePage%>">Home</a></li>--%>
+<!-- ? CART (NEW - ADDED) -->
+<li class="nav-item position-relative">
+<a class="nav-link" href="cartDetails.jsp?cartId=<%=(String)session.getAttribute("cartId")%>&uid=<%=userId%>" onclick="handleCartClick()">
+<i class="bi bi-cart3"></i>
+<span class="notif-badge" id="cartCount">
+<%= ( (cartCount != 0) ? cartCount : 0 )%>
+</span>
+</a>
+</li>
 <li class="nav-item"><a class="nav-link" href="userProfile.jsp">Welcome <%=name%></a></li>
 <li class="nav-item"><a class="nav-link" href="#" onclick="openLogoutModal()">Logout</a></li>
 

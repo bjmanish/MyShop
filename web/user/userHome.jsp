@@ -135,12 +135,12 @@
                 <!-- BUTTONS -->
                 <% if (isLoggedIn) { %>
 
-                    <a href="<%=request.getContextPath()%>/AddtoCart?pid=<%=product.getProdId()%>&uid=<%=(String)session.getAttribute("user_id")%>&pqty=1"
+                <a href="cartDetails.jsp?pid=<%=product.getProdId()%>&uid=<%=(String)session.getAttribute("user_id")%>&cartId=<%=(String)session.getAttribute("cartId")%>"
                        class="btn btn-success btn-sm w-100 mb-2 btn-custom">
                        Add To Cart
                     </a>
 
-                    <a href="<%=request.getContextPath()%>/AddtoCart?pid=<%=product.getProdId()%>&uid=<%=(String)session.getAttribute("user_id")%>"
+                    <a href="<%=request.getContextPath()%>/AddtoCart?pid=<%=product.getProdId()%>&uid=<%=(String)session.getAttribute("user_id")%>&pqty=1"
                        class="btn btn-warning btn-sm w-100 btn-custom">
                        Buy Now
                     </a>

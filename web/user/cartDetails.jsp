@@ -26,6 +26,9 @@
             String password = (String)session.getAttribute("sessionId");
             String userType = (String)session.getAttribute("role");
             
+            String userId = (String)session.getAttribute("userId");
+            String cartId = request.getParameter("cartId");
+            System.out.println("Cart Id: "+cartId);
             if (userType == null || !userType.equalsIgnoreCase("customer")) {
                 response.sendRedirect("login.jsp?error=access_denied");
                 return;
@@ -44,7 +47,8 @@
                 int add = Integer.parseInt(adds);
                 String uid = request.getParameter("uid");
                 String pid = request.getParameter("pid");
-                String cid = cart.getCartId(uid);
+//                String cid = cart.getCartId(uid);
+                    String cid = cartId;
                 if(cid==null){
                     cid = idUtil.generateUUIDCartId();
                 }
@@ -71,14 +75,14 @@
 
         <jsp:include page="/header.jsp" ></jsp:include>
         <%if( message != null){%>
-        <div class="text-center" style="color: red; font-weight: 500; font-size: 16px;"><p><%=message%></p></div>
+        <div class="text-centermt-5 pt-5" style="color: red; font-weight: 500; font-size: 16px;"><p><%=message%></p></div>
         <%}%>
-        <div class="text-center" style="color: darkslategray;">
+        <div class="text-center mt-5 pt-5" style="color: darkslategray;">
             <h1>Cart Items</h1>
         </div>
 
         <!-- Start the product Item List -->
-        <div class="container-fluid">
+        <div class="container-fluid mt-5 pt-5">
             
             <div class="table-responsive">
                 
@@ -101,8 +105,8 @@
                         <%
                             CartServiceImpl carts = new CartServiceImpl();
                             List<CartBean> cartItems = new ArrayList<>();
-                            cartItems = carts.getAllCartItems(userName);
-                            //System.out.println("cart items:"+cartItems.toString());
+                            cartItems = carts.getAllCartItems(cartId);
+                            System.out.println("cart items:"+cartItems.toString());
                             double totalAmount = 0;
                                                        
                             for(CartBean item : cartItems){
@@ -119,13 +123,16 @@
                                     
                                 %>
                             <tr>
-                                <td><img src="./ShowImage?pid=<%=product.getProdId() %>" width="50" height="50"></td>
+                                <%--<td><img src="./ShowImage?pid=<%=product.getProdId() %>" width="50" height="50"></td>--%>
+                                <td><img data-src="<%=request.getContextPath()%>/ShowImage?pid=<%=prodId%>" class="product-img lazy-img mx-auto mb-2" 
+                                            src="<%=request.getContextPath()%>/images/loader.gif"
+                                            onerror="this.src='images/noimage.jpg'" width="60" height="60"></td>
                                 <td><%=product.getProdName()%></td>
                                 <td><%=product.getProdPrice()%></td>
                                 <td>
                                     <form>
                                         <input type="number" name="pqty" value="<%=prodQty%>" min="1" max="10" style="max-width: 70px;">
-                                        <input type="hidden" name="pid" value="<%=product.getProdId()%>">                                        
+                                        <input type="hidden" name="pid" value="<%=prodId%>">                                        
                                         <input type="submit" name="update" value="Update"style="max-width: 80px;">                                        
                                     </form>
                                 </td>
