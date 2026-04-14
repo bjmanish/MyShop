@@ -295,8 +295,9 @@ public class UserServiceImpl implements UserService {
 
     try (Connection con = dbUtil.provideConnection()) {
         // ✅ 1. Check if user exists
-        String query = "SELECT u.*, r.role_name FROM USERS u " +
+        String query = "SELECT u.*, r.role_name, c.cart_id FROM USERS u " +
                        "JOIN ROLES r ON u.role_id = r.role_id " +
+                       "LEFT JOIN CART c ON u.user_id = c.user_id " +
                        "WHERE u.email = ?";
         PreparedStatement ps = con.prepareStatement(query);
         ps.setString(1, email);
@@ -312,7 +313,7 @@ public class UserServiceImpl implements UserService {
                 user.setPincode(rs.getInt("pincode"));
                 user.setImage(rs.getBinaryStream("image"));
                 user.setId(rs.getString("user_id"));
-                
+                user.setCartId(rs.getString("cart_id"));
                 String roleId = rs.getString("role_id");
                 String roleName = rs.getString("role_name");
                 

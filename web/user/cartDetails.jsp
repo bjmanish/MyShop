@@ -5,6 +5,7 @@
 <%@page import="java.util.List"%>
 <%@page import="com.myshop.beans.CartBean"%>
 <%@page import="com.myshop.service.impl.CartServiceImpl"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" %>
 <!DOCTYPE html>
 <html>
     <head>
@@ -28,7 +29,7 @@
             
             String userId = (String)session.getAttribute("userId");
             String cartId = request.getParameter("cartId");
-            System.out.println("Cart Id: "+cartId);
+//            System.out.println("Cart Id: "+cartId);
             if (userType == null || !userType.equalsIgnoreCase("customer")) {
                 response.sendRedirect("login.jsp?error=access_denied");
                 return;
@@ -42,13 +43,16 @@
             
             String adds = request.getParameter("add");
             CartServiceImpl cart = new CartServiceImpl();
+            
+            String uid = request.getParameter("uid");
+            String pid = request.getParameter("pid");
+            
             if(adds != null){
                 
                 int add = Integer.parseInt(adds);
-                String uid = request.getParameter("uid");
-                String pid = request.getParameter("pid");
+                
 //                String cid = cart.getCartId(uid);
-                    String cid = cartId;
+                String cid = cartId;
                 if(cid==null){
                     cid = idUtil.generateUUIDCartId();
                 }
@@ -60,7 +64,7 @@
                     //Add Product into the cart
                     cartQty +=1;
                     if(cartQty <= avail){
-                        cart.addProductToCart(uid, cid, pid, 1);
+                        cart.addProductToCart(uid, cid, pid, cartQty);
                     }else{
                         response.sendRedirect("./AddtoCart?cartId="+ cid +"+pid=" + pid + "&pqty=" + cartQty);
                     }
@@ -106,7 +110,7 @@
                             CartServiceImpl carts = new CartServiceImpl();
                             List<CartBean> cartItems = new ArrayList<>();
                             cartItems = carts.getAllCartItems(cartId);
-                            System.out.println("cart items:"+cartItems.toString());
+//                            System.out.println("cart items:"+cartItems.toString());
                             double totalAmount = 0;
                                                        
                             for(CartBean item : cartItems){
@@ -115,10 +119,10 @@
                                 int prodQty = item.getQuantity();    
                                 ProductServiceImpl products = new ProductServiceImpl();
                                 ProductBean product = products.getProductDetails(prodId);
-                                //System.out.println("ProductBean Data: "+product);
+//                                System.out.println("ProductBean Data: "+product.toString());
                                 double currAmount = product.getProdPrice() * prodQty;
                                 totalAmount += currAmount ;
-                                //System.out.println("Cart data - prodId: "+prodId+" prodQty: "+prodQty+" current Amount: "+currAmount+" totalamount: "+totalAmount+"");
+//                                System.out.println("Cart data - prodId: "+prodId+" prodQty: "+prodQty+" current Amount: "+currAmount+" totalamount: "+totalAmount+"");
                                 if(prodQty > 0){
                                     
                                 %>
@@ -126,7 +130,7 @@
                                 <%--<td><img src="./ShowImage?pid=<%=product.getProdId() %>" width="50" height="50"></td>--%>
                                 <td><img data-src="<%=request.getContextPath()%>/ShowImage?pid=<%=prodId%>" class="product-img lazy-img mx-auto mb-2" 
                                             src="<%=request.getContextPath()%>/images/loader.gif"
-                                            onerror="this.src='images/noimage.jpg'" width="60" height="60"></td>
+                                            onerror="this.src='images/noimage.jpg'" width="70" height="70"></td>
                                 <td><%=product.getProdName()%></td>
                                 <td><%=product.getProdPrice()%></td>
                                 <td>
@@ -164,7 +168,7 @@
                                 </td>
                                 <td colspan='2' align='center'>
                                     <form method="post">
-                                        <button formaction="payment.jsp?amount=<%=totalAmount%>" style="background-color: blueviolet; color:white;">Pay Now</button>
+                                        <button formaction="payment.jsp?userId=<%=uid%>&cartId=<%=cartId%>&amount=<%=totalAmount%>" style="background-color: blueviolet; color:white;">Pay Now</button>
                                     </form>
                                 </td>
                             </tr>
@@ -180,6 +184,37 @@
 
 
         <jsp:include page="/footer.html"></jsp:include>
+        
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+
+    const images = document.querySelectorAll(".lazy-img");
+
+    const observer = new IntersectionObserver((entries, observer) => {
+        entries.forEach(entry => {
+
+            if (entry.isIntersecting) {
+                const img = entry.target;
+
+                const realSrc = img.getAttribute("data-src");
+
+                img.src = realSrc;
+
+                img.onload = () => {
+                    img.classList.add("loaded");
+                };
+
+                observer.unobserve(img);
+            }
+
+        });
+    }, {
+        rootMargin: "50px"
+    });
+
+    images.forEach(img => observer.observe(img));
+});
+        </script>
 
     </body>
 </html>

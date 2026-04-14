@@ -20,6 +20,8 @@ public class UserBean implements Serializable {
     private String roleId;
     private String roleName;
     
+    private String cartId;
+    
     
     
     public UserBean() {}
@@ -133,14 +135,19 @@ public class UserBean implements Serializable {
         this.roleName = roleName;
     }
 
-    @Override
-    public String toString() {
-        return "UserBean{" + "id=" + id + ", image=" + image + ", name=" + name + ", mobile=" + mobile + ", email=" + email + ", address=" + address + ", pincode=" + pincode + ", password=" + password + ", emailVerified=" + emailVerified + ", mobileVerified=" + mobileVerified + ", roleId=" + roleId + ", roleName=" + roleName + '}';
+    public String getCartId() {
+        return cartId;
+    }
+
+    public void setCartId(String cartId) {
+        this.cartId = cartId;
     }
 
     
     
-    
-    
+    @Override
+    public String toString() {
+        return "UserBean{" + "id=" + id +", cartId= "+ cartId + ", image=" + image + ", name=" + name + ", mobile=" + mobile + ", email=" + email + ", address=" + address + ", pincode=" + pincode + ", password=" + password + ", emailVerified=" + emailVerified + ", mobileVerified=" + mobileVerified + ", roleId=" + roleId + ", roleName=" + roleName + '}';
+    }    
     
 }

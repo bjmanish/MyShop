@@ -9,6 +9,7 @@ import javax.servlet.*;
 import javax.servlet.http.*;
 import org.json.JSONObject;
 import java.net.*;
+import java.sql.Connection;
 import javax.servlet.annotation.WebServlet;
 
 @WebServlet("/GoogleLoginServlet")
@@ -38,7 +39,7 @@ public class GoogleLoginServlet extends HttpServlet {
             String email = json.getString("email");
             String name = json.getString("name");
 
-            System.out.println("Google User: " + email);
+//            System.out.println("Google User: " + email);
             
 
 
@@ -46,26 +47,28 @@ public class GoogleLoginServlet extends HttpServlet {
 
             // 🔥 Main logic
             UserBean user = userDao.loginOrRegisterGoogleUser(name, email);
+            System.out.println("User :"+user.toString());
             int cartCount = new CartServiceImpl().getCartCount(user.getId());
-
-            
+//            System.out.println("UserId: "+user.getId());
+            String userId = user.getId();
 //            System.out.println("role "+role);
                 // ✅ Create session
             HttpSession session = request.getSession();
             if (user != null && user.getRoleName() != null) {
-            session.setAttribute("user_id", user.getId());
+            session.setAttribute("user_id", userId);
             session.setAttribute("username", user.getEmail());
             session.setAttribute("role", user.getRoleName());
             session.setAttribute("name", user.getName());
             session.setAttribute("sessionId", session.getId());
-            String cartId = new CartServiceImpl().getCartId(user.getId());
+            String cartId = new CartServiceImpl().getOrCreateCart(userId);
+            
             session.setAttribute("cartId", cartId);
             session.setAttribute("cartCount", cartCount);
-            System.out.println("Cart Id from Login servlet "+cartId);
+//            System.out.println("Cart Id from Login servlet "+cartId);
 
             // ✅ RETURN ROLE INSTEAD OF REDIRECT
                 response.getWriter().write(user.getRoleName());
-              System.out.println("data for staff:"+user.getRoleName());
+//              System.out.println("data for staff:"+user.getRoleName());
             }
             
         } catch (Exception e) {

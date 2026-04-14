@@ -29,12 +29,24 @@ public class idUtil {
     }
 
     // Cart ID (NEW)
-    public static String generateCartId() {
-        return "C" + getTimestamp() + getRandomNumber();
+    public static String generateCartItemId() {
+        return "CI" + getRandomNumber();
     }
 
     // Alternative: UUID based (100% unique)
     public static String generateUUIDCartId() {
-        return "C" + UUID.randomUUID().toString().replace("-", "").substring(0, 12);
+        return "C" + UUID.randomUUID().toString().replace("-", "").substring(0, 10).toUpperCase();
     }
+    
+    public static String generateUUIDOrderId(){
+        return "ORD" + UUID.randomUUID().toString().replace("-", "").substring(0,10).toUpperCase();
+    }
+    
+//    public static void main(String[] args) {
+//        System.out.println("cart Id: "+generateUUIDCartId());
+//        System.out.println("cart_Items Id: "+generateCartItemId());
+//        System.out.println("cart_Items Id: "+generateCartItemId()); 
+//    }
+    
+    
 }

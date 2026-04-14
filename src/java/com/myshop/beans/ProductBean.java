@@ -91,7 +91,9 @@ public class ProductBean implements Serializable{
 
     @Override
     public String toString() {
-        return "ProductBean{" + "prodId=" + prodId + ", prodName=" + prodName + ", prodType=" + prodType + ", prodInfo=" + prodInfo + ", prodPrice=" + prodPrice + ", prodQuantity=" + prodQuantity +'}';
+        return "ProductBean{" + "prodId=" + prodId + ", prodName=" + prodName + ", prodType=" + prodType + ", prodInfo=" + prodInfo + ", prodPrice=" + prodPrice + ", prodQuantity=" + prodQuantity + ", prodImage=" + prodImage + '}';
     }
+
+    
       
 }

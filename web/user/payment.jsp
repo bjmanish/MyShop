@@ -1,91 +1,336 @@
-<!DOCTYPE html >
+<%@page import="com.myshop.utility.idUtil"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" %>
+<%
+String userId = (String) session.getAttribute("user_id");
+if (userId == null) {
+    response.sendRedirect("login.jsp");
+}
+double amount = Double.parseDouble(request.getParameter("amount"));
+String paymentId = idUtil.generateTransactionId();
+String orderId = idUtil.generateUUIDOrderId();
+%>
+<!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="utf-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <title>The MYSHOP - Payment Page</title>
-        <meta name="description" content="">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-       <!-- <link rel="stylesheet" href="./css/main.css"> -->
-        <!-- Bootstrap CSS -->
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
-    </head>
-    <body style="background-color: #E6F9E6 ;">
-<!--         Checking the user credentials -->
-        <%
-            String userName = (String) session.getAttribute("username");
-            String password = (String) session.getAttribute("sessionId");
+<head>
+<meta charset="UTF-8">
+<title>MyShop - Secure Payment</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
 
-            if (userName == null || password == null){ 
-		response.sendRedirect("login.jsp?message=Session Expired, Login Again!!");
-            }
-            
-            String sAmount = request.getParameter("amount");
-            double amount = 0;
-            if( sAmount != null)
-                amount = Double.parseDouble(sAmount);
-        %>
-        <jsp:include page="/header.jsp" ></jsp:include>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+<!-- Bootstrap 5 JS (Required for modal) -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
-        <div class="container">
-            <div class="row" style="margin: 5px 2px;">
-                
-                <form action="./OrderSrv" method="post" class="col-md-6 col-md-offset-3" 
-                style="border: 1px solid black; border-radius: 10px; background: #FFE5CC;padding: 10px; ">
-                    <!-- <div class="text-center"> -->
-                        
-                        <div class="form-group text-center">
-                            <img src="images/noimage.jpg" alt="Payment Proceed" height="100px">
-                            <h2 style="color: crimson;"> Credit/Debit Card Payment</h2>
-                        </div>
-                        
-                        <div class="row">
-                            <div class="col-md-12 form-group">
-                                <label for="cardholder">Name of Card Holder</label>
-                                <input type="text" class="form-control" id="cardholder" name="cardholder" placeholder="Enter Card Holder Name" required>
-                            </div>
-                        </div>
-                        
-                        <div class="row">
-                            <div class="col-md-12 form-group">
-                                <label for="cardnumber">Card Number</label>
-                                <input type="text" minlength="19" maxlength="19" class="form-control" id="cardnumber" name="cardnumber" value="6578-9843-7854-8976" placeholder="1111-2222-3333-4444" required>
-                            </div>
-                        </div>
-                        
-                        <div class="row">
-                            
-                            <div class="col-md-6 form-group">
-                                <label for="ExMonth">Exp. Month</label>
-                                <input type="number" class="form-control" id="ExMonth" name="ExMonth" placeholder="MM" max="12" min="0" required>
-                            </div>
-                            <div class="col-md-6 form-group">
-                                <label for="ExYear">Exp. Year</label>
-                                <input type="number" class="form-control" id="ExYear" name="ExYear" placeholder="YYYY" size="4" required>
-                            </div>
-                        </div>
+<style>
+body {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #1d2671, #c33764);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
 
-                        <div class="row">
-                            
-                            <div class="col-md-6 form-group">
-                                <label for="cvv">Enter CVV</label> 
-                                <input type="number" placeholder="123" class="form-control" size="3" id="cvv" name="cvv" required> 
-                                <input type="hidden" name="amount" value="<%=amount%>">
-        
-                            </div>
-                            <div class="col-md-6 form-group">
-                                <label>&nbsp;</label>
-                                <button type="submit" class="form-control btn btn-success">Pay: RS.<%=amount%></button>
-                            </div>
-                        </div>
+.payment-card {
+    max-width: 420px;
+    padding: 25px;
+    border-radius: 18px;
+    background: white;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+}
 
-                    <!-- </div> -->
-                </form>
-            </div>
-        </div>
-        
-        <jsp:include page="/footer.html" ></jsp:include>
-    </body>
+.title {
+    text-align: center;
+    font-weight: 600;
+}
+
+.input-group-text {
+    background: #f1f1f1;
+}
+
+.btn-pay {
+    border-radius: 10px;
+    padding: 12px;
+    font-weight: 600;
+    background: linear-gradient(45deg, #00c6ff, #0072ff);
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+/* Disabled */
+.btn-pay:disabled {
+    background: #ccc !important;
+    cursor: not-allowed;
+    opacity: 0.7;
+    position: relative;
+}
+
+/* Tooltip */
+.btn-pay:disabled:hover::after {
+    content: "🚫 Fill all details";
+    position: absolute;
+    top: -35px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: black;
+    color: white;
+    font-size: 12px;
+    padding: 5px 10px;
+    border-radius: 6px;
+}
+
+/* Remove hover */
+.btn-pay:disabled:hover {
+    transform: none;
+    box-shadow: none;
+}
+
+/* Input validation */
+input:invalid { border: 1px solid red; }
+input:valid { border: 1px solid green; }
+
+.otp-box {
+    width: 50px;
+    font-size: 20px;
+}
+@keyframes shake {
+  0% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  50% { transform: translateX(5px); }
+  75% { transform: translateX(-5px); }
+  100% { transform: translateX(0); }
+}
+
+.otp-error {
+  animation: shake 0.3s;
+  border: 1px solid red !important;
+}
+</style>
+</head>
+
+<body>
+
+<div class="payment-card">
+
+<h4 class="title text-success">
+<i class="bi bi-wallet2"></i> Secure Payment
+</h4>
+
+<form>
+
+<input type="hidden" name="user_id" value="<%=userId%>">
+<input type="hidden" name="payment_id" value="<%=paymentId%>">
+<input type="hidden" name="amount" value="<%=amount%>">
+<input type="hidden" name="order_id" value="<%=orderId%>">
+
+<div class="mb-3 input-group">
+<span class="input-group-text"><i class="bi bi-person"></i></span>
+<input type="text" class="form-control required-field" placeholder="Card Holder Name">
+</div>
+
+<div class="mb-3 input-group">
+<span class="input-group-text"><i class="bi bi-credit-card"></i></span>
+<input type="text" class="form-control required-field" placeholder="Card Number">
+</div>
+
+<div class="row">
+<div class="col-6 mb-3 input-group">
+<span class="input-group-text"><i class="bi bi-calendar"></i></span>
+<input type="number" class="form-control required-field" placeholder="MM">
+</div>
+
+<div class="col-6 mb-3 input-group">
+<span class="input-group-text"><i class="bi bi-calendar2"></i></span>
+<input type="number" class="form-control required-field" placeholder="YYYY">
+</div>
+</div>
+
+<div class="mb-3 input-group">
+<span class="input-group-text"><i class="bi bi-shield-lock"></i></span>
+<input type="password" class="form-control required-field" placeholder="CVV">
+</div>
+
+<!-- Pay Button -->
+<button type="button" id="payBtn" class="btn btn-pay w-100 text-white" onclick="openOtpModal()" disabled>
+<span id="btnText">🚫 Fill Details</span>
+</button>
+
+</form>
+</div>
+
+<!-- OTP Modal -->
+<div class="modal fade" id="otpModal">
+<div class="modal-dialog modal-dialog-centered">
+<div class="modal-content text-center p-4">
+
+<h5><i class="bi bi-key"></i> OTP Verification</h5>
+
+<div class="d-flex justify-content-center mb-3">
+<input class="otp-box form-control mx-1">
+<input class="otp-box form-control mx-1">
+<input class="otp-box form-control mx-1">
+<input class="otp-box form-control mx-1">
+</div>
+
+<p id="timer">00:30</p>
+<!--<p class="otp-error"></p>-->
+<div id="loader" style="display:none;">
+<div class="spinner-border text-primary"></div>
+<p>Verifying...</p>
+</div>
+
+<button class="btn btn-success w-100 mb-2" onclick="verifyOtp()">Verify & Pay</button>
+<button class="btn btn-link" onclick="resendOtp()">Resend OTP</button>
+
+</div>
+</div>
+</div>
+
+<script>
+let timeLeft = 30, timerInterval;
+
+// 👉 Static test number (you can replace with dynamic user phone later)
+const phone = "9999999999";
+const countryCode = "+91";
+
+// ================= OPEN OTP MODAL =================
+function openOtpModal(){
+
+    fetch("<%=request.getContextPath()%>/OtpServlet", {
+        method:"POST",
+        headers: {"Content-Type":"application/x-www-form-urlencoded"},
+        body: "action=send&phone="+phone+"&countryCode="+countryCode
+    })
+    .then(res => res.json())
+    .then(data => {
+        if(data.status === "success"){
+            console.log("OTP:", data.otp); // 🔥 check console
+            // alert("TEST OTP: " + data.otp); // optional
+        } else {
+            alert("Failed to send OTP");
+        }
+    });
+
+    new bootstrap.Modal(document.getElementById('otpModal')).show();
+    startTimer();
+}
+
+// ================= TIMER =================
+function startTimer(){
+    timeLeft = 30;
+    clearInterval(timerInterval);
+
+    timerInterval = setInterval(()=>{
+        timeLeft--;
+
+        document.getElementById("timer").innerText =
+            "00:" + (timeLeft < 10 ? "0" : "") + timeLeft;
+
+        if(timeLeft <= 0){
+            clearInterval(timerInterval);
+            document.getElementById("timer").innerText = "Expired ❌";
+        }
+    },1000);
+}
+
+// ================= OTP AUTO FOCUS =================
+document.querySelectorAll(".otp-box").forEach((input,i,arr)=>{
+    input.addEventListener("keyup",(e)=>{
+        if(input.value && i < 3) arr[i+1].focus();
+        if(e.key==="Backspace" && i>0) arr[i-1].focus();
+    });
+});
+
+// ================= VERIFY OTP =================
+function verifyOtp(){
+
+    let otp = "";
+    document.querySelectorAll(".otp-box").forEach(i => otp += i.value);
+
+    if(otp.length !== 4){
+        alert("Enter valid OTP");
+        return;
+    }
+
+    // ❌ Prevent verify if expired
+    if(timeLeft <= 0){
+        alert("OTP Expired ❌");
+        return;
+    }
+
+    document.getElementById("loader").style.display = "block";
+
+    fetch("<%=request.getContextPath()%>/OtpServlet", {
+        method:"POST",
+        headers: {"Content-Type":"application/x-www-form-urlencoded"},
+        body:"action=verify&otp="+otp+"&phone="+phone+"&countryCode="+countryCode
+    })
+    .then(res => res.json())
+    .then(data => {
+
+        document.getElementById("loader").style.display = "none";
+
+        if(data.status === "success"){
+            alert("Payment Successful ✅");
+            fetch("<%=request.getContextPath()%>/OrderSrv", {
+                method:"POST",
+                headers:{"Content-Type":"application/x-www-form-urlencoded"},
+                body:"cartId=<%=request.getParameter("cartId")%>&amount=<%=request.getParameter("amount")%>&userId=<%=request.getParameter("uid")%>"
+            })
+            .then(res=>res.json())
+            .then(data=>{
+                if(data.status==="success"){
+                    window.location.href="orderSuccess.jsp?orderId="+data.orderId;
+                }
+            });
+        } else {
+            inputs.forEach(input => {
+                input.classList.add("otp-error");
+                input.value = "";
+            });
+            setTimeout(() => {
+                inputs.forEach(input => input.classList.remove("otp-error"));
+            }, 300);
+//            inputs[0].focus();
+
+        }
+    });
+}
+
+// ================= RESEND OTP =================
+function resendOtp(){
+
+    fetch("<%=request.getContextPath()%>/OtpServlet", {
+        method:"POST",
+        headers: {"Content-Type":"application/x-www-form-urlencoded"},
+        body: "action=send&phone="+phone+"&countryCode="+countryCode
+    })
+    .then(res => res.json())
+    .then(data => {
+        if(data.status === "success"){
+            console.log("New OTP:", data.otp);
+            alert("OTP Resent ✅");
+        }
+    });
+
+    startTimer();
+}
+
+// Enable/Disable Button
+const inputs=document.querySelectorAll(".required-field");
+const btn=document.getElementById("payBtn");
+
+function checkInputs(){
+let ok=true;
+inputs.forEach(i=>{ if(!i.value.trim()) ok=false; });
+
+btn.disabled=!ok;
+document.getElementById("btnText").innerHTML=
+ok ? 'Pay <i class="bi bi-currency-rupee"></i> <%=amount%>' : '🚫 Fill Details';
+}
+
+inputs.forEach(i=>i.addEventListener("input",checkInputs));
+</script>
+
+</body>
 </html>

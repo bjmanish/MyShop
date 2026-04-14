@@ -9,9 +9,13 @@ import java.text.SimpleDateFormat;
 public class TransactionBean implements Serializable{
     
     private String transId;
-    private String userName;
+    private String userName; //userId
+    private String orderId;
+    
     private Timestamp transDateTime;
     private double transAmount;
+    
+//    private DateTime created_at;
 
     public TransactionBean() {
         super();
@@ -33,10 +37,11 @@ public class TransactionBean implements Serializable{
         this.transDateTime = timestamp;
     }
 
-    public TransactionBean(String transId, String userName, double transAmount) {
+    public TransactionBean(String transId, String userName,String orderId, double transAmount) {
         super();
         this.transId = transId;
         this.userName = userName;
+        this.orderId = orderId;
         this.transAmount = transAmount;
         SimpleDateFormat sdf = new SimpleDateFormat("YYYY:MM:DD hh:mm:ss");
         Timestamp timestamp = new Timestamp(System.currentTimeMillis());
@@ -95,10 +100,20 @@ public class TransactionBean implements Serializable{
         this.transAmount = transAmount;
     }
 
+    public String getOrderId() {
+        return orderId;
+    }
+
+    public void setOrderId(String orderId) {
+        this.orderId = orderId;
+    }
+
     @Override
     public String toString() {
-        return "TransactionBean{" + "transId=" + transId + ", userName=" + userName + ", transDateTime=" + transDateTime + ", transAmount=" + transAmount + '}';
+        return "TransactionBean{" + "transId=" + transId + ", userName=" + userName + ", orderId=" + orderId + ", transDateTime=" + transDateTime + ", transAmount=" + transAmount + '}';
     }
+
+    
     
     
 }

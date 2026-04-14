@@ -1,17 +1,13 @@
 package com.myshop.srv;
 
-import com.myshop.beans.DemandBean;
 import com.myshop.beans.ProductBean;
 import com.myshop.service.impl.CartServiceImpl;
-import com.myshop.service.impl.DemandServiceImpl;
 import com.myshop.service.impl.ProductServiceImpl;
+
 import java.io.IOException;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
+import javax.servlet.http.*;
 
 @WebServlet(name = "AddtoCart", urlPatterns = {"/AddtoCart"})
 public class AddtoCart extends HttpServlet {
@@ -35,7 +31,7 @@ public class AddtoCart extends HttpServlet {
         String userId = request.getParameter("uid");
         String prodId = request.getParameter("pid");
 
-        int pQty = 0;
+        int pQty;
         try {
             pQty = Integer.parseInt(request.getParameter("pqty"));
         } catch (Exception e) {
@@ -50,52 +46,35 @@ public class AddtoCart extends HttpServlet {
 
         CartServiceImpl cartService = new CartServiceImpl();
 
-        // ✅ Get cartId if not exists
-        if (cartId == null) {
-            cartId = cartService.getCartId(userId);
-            session.setAttribute("cartId", cartId);
-        }
+        try {
 
-        ProductServiceImpl productService = new ProductServiceImpl();
-        ProductBean product = productService.getProductDetails(prodId);
-
-        int availableQty = product.getProdQuantity();
-        int existingQty = cartService.getProductCount(userId, prodId);
-
-        int totalQty = existingQty + pQty;
-
-        String status;
-
-        // ✅ OUT OF STOCK
-        if (availableQty == 0) {
-            status = "Product is Out of Stock!";
-        }
-
-        // ✅ IF REQUEST EXCEEDS STOCK
-        else if (totalQty > availableQty) {
-
-            cartService.updateProductToCart(userId, cartId, prodId, availableQty);
-
-            int demandQty = totalQty - availableQty;
-
-            DemandBean demand = new DemandBean(userName, prodId, demandQty);
-            DemandServiceImpl demandService = new DemandServiceImpl();
-            demandService.addProduct(demand);
-
-            status = "Only " + availableQty + " items available. Added maximum to cart.";
-        }
-
-        // ✅ NORMAL FLOW
-        else {
-            if (existingQty > 0) {
-                status = cartService.updateProductToCart(userId, cartId, prodId, totalQty);
-            } else {
-                status = cartService.addProductToCart(userId, cartId, prodId, pQty);
+            // ✅ STEP 1: Get/Create Cart
+            if (cartId == null || cartId.isEmpty()) {
+                cartId = cartService.getOrCreateCart(userId);
+                session.setAttribute("cartId", cartId);
             }
-        }
 
-        // ✅ FINAL REDIRECT (always)
-        response.sendRedirect("user/userHome.jsp?message=" + status);
+            // ✅ STEP 2: Get product details
+            ProductServiceImpl productService = new ProductServiceImpl();
+            ProductBean product = productService.getProductDetails(prodId);
+
+            int availableQty = product.getProdQuantity();
+
+            if (availableQty == 0) {
+                response.sendRedirect("user/userHome.jsp?message=Product is Out of Stock!");
+                return;
+            }
+
+            // ✅ STEP 3: Add product directly (service handles everything now)
+            String status = cartService.addProductToCart(userId, cartId, prodId, pQty);
+
+            // ✅ Redirect
+            response.sendRedirect("user/userHome.jsp?message=" + status);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.sendRedirect("user/userHome.jsp?message=Something went wrong!");
+        }
     }
 
     @Override

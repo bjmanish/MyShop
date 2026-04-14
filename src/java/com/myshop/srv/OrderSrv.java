@@ -1,81 +1,72 @@
 package com.myshop.srv;
 
+import com.myshop.beans.TransactionBean;
 import com.myshop.service.impl.OrderServiceImpl;
+import com.myshop.service.impl.TransactionServiceImpl;
+import com.myshop.utility.dbUtil;
+import com.myshop.utility.idUtil;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.sql.*;
+import java.text.SimpleDateFormat;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-
+import javax.servlet.http.*;
 
 @WebServlet(name = "OrderSrv", urlPatterns = {"/OrderSrv"})
 public class OrderSrv extends HttpServlet {
 
-    private static final long serialVersionUID = 1L;
-
-    public OrderSrv() {
-        super();
-    }
-
-
-    protected void processRequest(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        
-        HttpSession session = request.getSession();
-	String userName = (String) session.getAttribute("username");
-	String password = (String) session.getAttribute("password");
-        String prodId = (String) request.getAttribute("prodId");
-        if (userName == null || password == null) {
-            response.sendRedirect("login.jsp?message=Session Expired, Login Again!!");
-	}
-        
-        double paidAmount = Double.parseDouble(request.getParameter("amount"));
-        //System.out.println(new OrderServiceImpl().paymentSuccess(userName, paidAmount));
-        String status = new OrderServiceImpl().paymentSuccess(userName, paidAmount);
-        session.setAttribute("prodId", prodId);
-        response.sendRedirect("orderDetails.jsp?message="+status);
-        
-    }
-
-    // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
-    /**
-     * Handles the HTTP <code>GET</code> method.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
-    @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        processRequest(request, response);
-    }
-
-    /**
-     * Handles the HTTP <code>POST</code> method.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        processRequest(request, response);
+
+        HttpSession session = request.getSession();
+
+        String userId = (String) session.getAttribute("user_id");
+
+        if (userId == null) {
+            response.getWriter().write("{\"status\":\"error\",\"message\":\"Session expired\"}");
+            return;
+        }
+
+        try(Connection con = dbUtil.provideConnection();) {
+
+            // ✅ Get Data
+            String cartId = request.getParameter("cartId");
+            double amount = Double.parseDouble(request.getParameter("amount"));
+            
+            String orderId = idUtil.generateUUIDOrderId();
+            String paymentId = idUtil.generateTransactionId();
+            String userId1 = (String)request.getAttribute("user_id");          
+            
+            TransactionBean trans = new TransactionBean();
+            
+            trans.setTransId(paymentId);
+            trans.setUserName(userId);
+            trans.setOrderId(orderId);
+            trans.setTransAmount(amount);
+            SimpleDateFormat sdf = new SimpleDateFormat("YYYY:MM:DD hh:mm:ss");
+            Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+            sdf.format(timestamp);
+            trans.setTransDateTime(timestamp);          
+            
+            // ✅ Generate Order ID
+//            String orderId = idUtil.generateTransactionId();
+            boolean addTrans = new TransactionServiceImpl().addTransaction(trans);
+                
+            if(addTrans == true){
+                String paymentStatus = new OrderServiceImpl().paymentSuccess(paymentId, userId, cartId, amount);
+            }
+            
+            // ✅ RESPONSE JSON (IMPORTANT)
+            response.setContentType("application/json");
+
+            PrintWriter out = response.getWriter();
+            out.write("{\"status\":\"success\",\"orderId\":\"" + orderId + "\"}");
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.getWriter().write("{\"status\":\"error\"}");
+        }
     }
-
-    /**
-     * Returns a short description of the servlet.
-     *
-     * @return a String containing servlet description
-     */
-    @Override
-    public String getServletInfo() {
-        return "Short description";
-    }// </editor-fold>
-
 }

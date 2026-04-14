@@ -12,6 +12,8 @@ public class CartBean implements Serializable {
     private String userId;
     private String prodId;
     private int quantity;
+    
+    private String cartItemId;
 
     public CartBean(String cartId, String userId, String prodId, int quantity) {
         super();
@@ -52,6 +54,18 @@ public class CartBean implements Serializable {
     public void setQuantity(int quantity) {
         this.quantity = quantity;
     }
-    
+
+    public String getCartItemId() {
+        return cartItemId;
+    }
+
+    public void setCartItemId(String cartItemId) {
+        this.cartItemId = cartItemId;
+    }
+
+    @Override
+    public String toString() {
+        return "CartBean{" + "cartId=" + cartId + ", userId=" + userId + ", prodId=" + prodId + ", quantity=" + quantity + ", cartItemId=" + cartItemId + '}';
+    }    
     
 }

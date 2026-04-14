@@ -1,6 +1,7 @@
 package com.myshop.service;
 
 import com.myshop.beans.CartBean;
+import java.sql.Connection;
 import java.util.List;
 
 public interface CartService {
@@ -21,6 +22,6 @@ public interface CartService {
     
     public int getProductCount(String userId, String prodId);
     
-    public String getCartId(String userId);
+    public String getOrCreateCart(String userId);
     
 }

@@ -159,15 +159,24 @@ else if ("staff".equalsIgnoreCase(role) || "delivery".equalsIgnoreCase(role)) ho
 
 <% if (role == null) { %>
 
-<li class="nav-item"><a class="nav-link" href="index.jsp">Home</a></li>
-<li class="nav-item"><a class="nav-link" href="login.jsp">Login</a></li>
+<li class="nav-item"><a class="nav-link" href="<%=request.getContextPath()%>/index.jsp">Home</a></li>
+<li class="nav-item position-relative">
+<a class="nav-link"onclick="handleCartClick()">
+<i class="bi bi-cart3"></i>
+<span class="notif-badge" id="cartCount">
+<%= ( (cartCount != 0) ? cartCount : 0 )%>
+</span>
+</a>
+</li>
+
+<li class="nav-item"><a class="nav-link" href="<%=request.getContextPath()%>/login.jsp">Login</a></li>
 
 <% } else { %>
 
 <%--<li class="nav-item"><a class="nav-link" href="<%=homePage%>">Home</a></li>--%>
 <!-- ? CART (NEW - ADDED) -->
 <li class="nav-item position-relative">
-<a class="nav-link" href="cartDetails.jsp?cartId=<%=(String)session.getAttribute("cartId")%>&uid=<%=userId%>" onclick="handleCartClick()">
+<a class="nav-link" href="cart.jsp?cartId=<%=(String)session.getAttribute("cartId")%>&uid=<%=userId%>" onclick="handleCartClick()">
 <i class="bi bi-cart3"></i>
 <span class="notif-badge" id="cartCount">
 <%= ( (cartCount != 0) ? cartCount : 0 )%>
