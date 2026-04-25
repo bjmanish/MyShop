@@ -25,7 +25,7 @@ public interface UserService {
     
     public void verifyMobile(String mobile, String email);
     
-    public UserBean getUserDetailsById(int userId);
+    public UserBean getUserDetailsById(String userId);
     
     public String generateUserId();
     

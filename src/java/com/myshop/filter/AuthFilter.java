@@ -32,6 +32,8 @@ public class AuthFilter implements Filter {
             uri.contains("css") ||
             uri.contains("js") ||
             uri.contains("images") ||
+            uri.contains("PaymentServlet") ||
+            uri.contains("https://test.payu.in/_payment") ||
             uri.contains("fonts")) {
             chain.doFilter(request, response);
             return;

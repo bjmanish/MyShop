@@ -6,11 +6,29 @@
 
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="<%=request.getContextPath()%>/favicon.ico" type="image/png">
+<link rel="shortcut icon" href="<%=request.getContextPath()%>/favicon.ico">
+<link rel="apple-touch-icon" href="<%=request.getContextPath()%>/favicon.ico">
 
 <!-- BOOTSTRAP -->
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        function loadCartCount(){
+            fetch("<%=request.getContextPath()%>/cartCount")
+            .then(res => res.text())
+            .then(count => {
+                document.getElementById("cartCount").innerText = count;
+            });
+        }
+        //load on page start
+//        loadCartCount();
+    </script>
+
+
+
 
 <style>
 
@@ -117,12 +135,23 @@ body {
 String role = (String) session.getAttribute("role");
 String name = (String) session.getAttribute("name");
 String userId = (String)session.getAttribute("user_id");
+String cartId = (String)session.getAttribute("cartId");
 int cartCount = new CartServiceImpl().getCartCount(userId);
-System.out.println("cart qnty :"+cartCount);
+//System.out.println("cart qnty :"+cartCount);
 String homePage = "index.jsp";
-if ("customer".equalsIgnoreCase(role)) homePage = "userHome.jsp";
-else if ("admin".equalsIgnoreCase(role)) homePage = "adminHome.jsp";
-else if ("staff".equalsIgnoreCase(role) || "delivery".equalsIgnoreCase(role)) homePage = "staffHome.jsp";
+String profile =  "";
+if ("customer".equalsIgnoreCase(role)){
+    homePage = "userHome.jsp";
+    profile = "userProfile.jsp";
+}
+else if ("admin".equalsIgnoreCase(role)){
+    homePage = "adminHome.jsp";
+    profile = "adminProfile.jsp";
+}
+else if ("staff".equalsIgnoreCase(role) || "delivery".equalsIgnoreCase(role)){
+    homePage = "staffHome.jsp";
+    profile = "staffProfile.jsp";
+}
 %>
 
 <!-- NAVBAR -->
@@ -160,33 +189,36 @@ else if ("staff".equalsIgnoreCase(role) || "delivery".equalsIgnoreCase(role)) ho
 <% if (role == null) { %>
 
 <li class="nav-item"><a class="nav-link" href="<%=request.getContextPath()%>/index.jsp">Home</a></li>
-<li class="nav-item position-relative">
-<a class="nav-link"onclick="handleCartClick()">
-<i class="bi bi-cart3"></i>
-<span class="notif-badge" id="cartCount">
-<%= ( (cartCount != 0) ? cartCount : 0 )%>
-</span>
-</a>
+<li class="nav-item position-relative" >
+    <a class="nav-link" onclick="handleCartClick()" > <i class="bi bi-cart3"></i> <span class="notif-badge" id="cartCount"><%= ( (cartCount != 0) ? cartCount : 0 )%></span></a>
 </li>
 
-<li class="nav-item"><a class="nav-link" href="<%=request.getContextPath()%>/login.jsp">Login</a></li>
+<li class="nav-item"><a class="nav-link" id="loginLink" href="<%=request.getContextPath()%>/login.jsp">Login</a></li>
 
 <% } else { %>
 
 <%--<li class="nav-item"><a class="nav-link" href="<%=homePage%>">Home</a></li>--%>
-<!-- ? CART (NEW - ADDED) -->
-<li class="nav-item position-relative">
-<a class="nav-link" href="cart.jsp?cartId=<%=(String)session.getAttribute("cartId")%>&uid=<%=userId%>" onclick="handleCartClick()">
-<i class="bi bi-cart3"></i>
-<span class="notif-badge" id="cartCount">
-<%= ( (cartCount != 0) ? cartCount : 0 )%>
-</span>
-</a>
-</li>
-<li class="nav-item"><a class="nav-link" href="userProfile.jsp">Welcome <%=name%></a></li>
-<li class="nav-item"><a class="nav-link" href="#" onclick="openLogoutModal()">Logout</a></li>
-
-<% } %>
+    
+    <% if(role.equalsIgnoreCase("CUSTOMER")) { %>
+        <!-- ? CART (NEW - ADDED) -->
+        <li class="nav-item position-relative">
+            <a class="nav-link" href="cart.jsp?cartId=<%=cartId%>&uid=<%=userId%>" onclick="handleCartClick()" id="cart-Count">
+                <i class="bi bi-cart3" ></i><span class="notif-badge" id="cartCount"><%= ( (cartCount != 0) ? cartCount : 0 )%></span>
+            </a>
+        </li>
+        <li class="nav-item position-relative">
+            <a class="nav-link" href="orderDetails.jsp?userId=<%=userId%>&orderId=<%=session.getAttribute("orderId")%>">
+                <i class="bi bi-truck"></i>
+            </a>
+        </li>
+        <%}else if(role.equalsIgnoreCase("admin")){%>
+            <li class="nav-item"><a class="nav-link" href="shippedItems.jsp?uid=<%=userId%>">Orders</a></li>
+        <%}else{%>
+            <li class="nav-item"><a class="nav-link" href="assignOrder.jsp?uId=<%=userId%>">Assign Order</a></li>
+        <%}%>
+        <li class="nav-item"><a class="nav-link" href="<%=profile%>">Welcome <%=name%></a></li>
+        <li class="nav-item"><a class="nav-link" href="#" onclick="openLogoutModal()">Logout</a></li>
+    <% } %>
 
 </ul>
 </div>

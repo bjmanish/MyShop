@@ -7,13 +7,16 @@ import com.myshop.utility.idUtil;
 
 import java.sql.*;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class OrderServiceImpl implements OrderService {
 
     // ================= PAYMENT SUCCESS =================
     @Override
-    public String paymentSuccess(String paymentId, String userId,String cartId, double paidAmount) {
+    public String paymentSuccess(String paymentId, String orderId, String userId,String cartId, double paidAmount) {
 
         String status = "FAILED";
         Connection conn = null;
@@ -22,7 +25,7 @@ public class OrderServiceImpl implements OrderService {
             
             conn.setAutoCommit(false); // 🔥 transaction control
 
-            String orderId = idUtil.generateUUIDOrderId();
+//            String orderId = idUtil.generateUUIDOrderId();
 
             // 🔥 1. INSERT ORDER
             PreparedStatement ps1 = conn.prepareStatement(
@@ -36,7 +39,7 @@ public class OrderServiceImpl implements OrderService {
             ps1.setString(1, orderId);
             ps1.setString(2, userId);
             ps1.setDouble(3, paidAmount);
-            ps1.setString(4, "PLACED");
+            ps1.setString(4, "PENDING");
             ps1.setTimestamp(5, timestamp);
 
             ps1.executeUpdate();
@@ -79,21 +82,17 @@ public class OrderServiceImpl implements OrderService {
             );
             ps4.setString(1, cartId);
             ps4.executeUpdate();
-
-//            // 🔥 5. INSERT PAYMENT
-//            PreparedStatement ps5 = conn.prepareStatement(
-//                "INSERT INTO PAYMENTS(payment_id, order_id, user_id, amount, status) VALUES(?,?,?,?,?)"
-//            );
-//
-////            String paymentId = idUtil.generateTransactionId();
-//
-//            ps5.setString(1, paymentId);
-//            ps5.setString(2, orderId);
-//            ps5.setString(3, userId);
-//            ps5.setDouble(4, paidAmount);
-//            ps5.setString(5, "SUCCESS");
-//
-//            ps5.executeUpdate();
+            
+//            TransactionBean trans = new TransactionBean();
+//            
+//            trans.setOrderId(orderId);
+//            trans.setTransAmount(paidAmount);
+//            trans.setTransDateTime(timestamp);
+//            trans.setTransId(cartId);
+//            trans.setUserName(userId);
+//            
+//            
+//            new TransactionServiceImpl().addTransaction(trans);
 
             // 🔥 COMMIT
             conn.commit();
@@ -155,16 +154,22 @@ public class OrderServiceImpl implements OrderService {
 
             PreparedStatement ps = conn.prepareStatement(
                 "SELECT o.order_id, o.user_id, o.total_amount, o.status, o.order_date, " +
-                "oi.product_id, oi.quantity, oi.price " +
+                "oi.product_id, oi.quantity " +
                 "FROM ORDERS o JOIN ORDER_ITEMS oi ON o.order_id = oi.order_id"
             );
 
             ResultSet rs = ps.executeQuery();
-
+            
+            List<OrderItem> items = new ArrayList<>();
+            OrderItem item = null;
             while (rs.next()) {
-
+                item = new OrderItem();
+                    item.setProductId(rs.getString("product_id"));
+                    item.setQuantity(rs.getInt("quantity"));
+                    item.setProductName(rs.getString("order_id"));
+                    items.add(item);
                 OrderDetails order = new OrderDetails();
-
+                
                 order.setOrderId(rs.getString("order_id"));
                 order.setUserId(rs.getString("user_id"));
                 order.setAmount(rs.getDouble("total_amount"));
@@ -172,6 +177,7 @@ public class OrderServiceImpl implements OrderService {
                 order.setDatetime(rs.getTimestamp("order_date"));
                 order.setProdId(rs.getString("product_id"));
                 order.setQnty(rs.getInt("quantity"));
+                order.setItems(items);
 
                 list.add(order);
             }
@@ -199,7 +205,13 @@ public class OrderServiceImpl implements OrderService {
             ps.setString(2, orderId);
 
             updated = ps.executeUpdate() > 0;
-
+            if(updated){
+                PreparedStatement ps2 = conn.prepareStatement("INSERT INTO ORDER_STATUS_HISTORY VALUES(?,?,?)");
+                ps2.setString(1, orderId);
+                ps2.setString(2, status);
+                ps2.setTimestamp(3, new Timestamp(System.currentTimeMillis()));
+                ps2.executeUpdate();
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -223,14 +235,110 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public List<OrderDetails> getAllOrderDetails(String userEmailId) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+public List<OrderDetails> getAllOrderDetails(String userId) {
+
+    List<OrderDetails> list = new ArrayList<>();
+
+    try (Connection conn = dbUtil.provideConnection()) {
+
+        String query = "SELECT o.order_id, o.user_id, o.total_amount, o.status, o.order_date, o.order_date+7 as delivery_date, " +
+                       "oi.product_id, oi.quantity, " +
+                       "p.name " +
+                       "FROM ORDERS o " +
+                       "JOIN ORDER_ITEMS oi ON o.order_id = oi.order_id " +
+                       "JOIN PRODUCTS p ON oi.product_id = p.product_id " +
+                       "WHERE o.user_id = ? " +
+                       "ORDER BY o.order_date DESC";
+
+        PreparedStatement ps = conn.prepareStatement(query);
+        ps.setString(1, userId);
+
+        ResultSet rs = ps.executeQuery();
+
+        while (rs.next()) {
+
+            OrderDetails order = new OrderDetails();
+
+            order.setOrderId(rs.getString("order_id"));
+            order.setUserId(rs.getString("user_id"));
+            order.setAmount(rs.getDouble("total_amount"));
+            order.setStatus(rs.getString("status"));
+            order.setDatetime(rs.getTimestamp("order_date"));
+            order.setDeliveryDate(rs.getTimestamp("delivery_date"));
+
+            order.setProdId(rs.getString("product_id"));
+            order.setProdName(rs.getString("name"));
+            order.setQnty(rs.getInt("quantity"));
+
+            list.add(order);
+        }
+
+    } catch (Exception e) {
+        e.printStackTrace();
     }
 
+    return list;
+}
+
     @Override
-    public boolean outForDelivery(String userId, String orderId, String prodId, AssignOrder assignOrder) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+public boolean outForDelivery(String userId, String orderId, String prodId, AssignOrder assignOrder) {
+
+    boolean flag = false;
+
+    Connection con = null;
+    PreparedStatement psUpdate = null;
+    PreparedStatement psInsert = null;
+
+    try {
+        con = dbUtil.provideConnection(); // your DB connection class
+        con.setAutoCommit(false); // ✅ transaction start
+
+        // ✅ 1. Update order status
+        String updateQuery = "UPDATE ORDERS SET status=? WHERE user_id=? AND order_id=?";
+        psUpdate = con.prepareStatement(updateQuery);
+        psUpdate.setString(1, "OUT_FOR_DELIVERY");
+        psUpdate.setString(2, userId);
+        psUpdate.setString(3, orderId);
+//        psUpdate.setString(4, prodId);
+
+        int updated = psUpdate.executeUpdate();
+
+        // ✅ 2. Insert into ASSIGN_ORDER table
+        String insertQuery = "INSERT INTO DELIVERY_ASSIGNMENT(assign_id,order_id, staff_id) VALUES (?, ?, ?)";
+        psInsert = con.prepareStatement(insertQuery);
+        psInsert.setString(1, assignOrder.getAssignId());
+        psInsert.setString(2, assignOrder.getOrderId());
+        psInsert.setString(3, assignOrder.getStaffId());
+        
+        int inserted = psInsert.executeUpdate();
+
+        // ✅ Commit only if both succeed
+        if (updated > 0 && inserted > 0) {
+            con.commit();
+            flag = true;
+        } else {
+            con.rollback();
+        }
+
+    } catch (Exception e) {
+        try {
+            if (con != null) con.rollback(); // rollback on error
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        e.printStackTrace();
+    } finally {
+        try {
+            if (psUpdate != null) psUpdate.close();
+            if (psInsert != null) psInsert.close();
+            if (con != null) con.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
+
+    return flag;
+}
 
     @Override
     public boolean assignOrder(AssignOrder order) {
@@ -260,5 +368,25 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public OrderDetails getOrderDetailsByOrdId(String ordId) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public String getOrderId(String userId) {
+        String  orderId = null;
+        
+        try(Connection conn = dbUtil.provideConnection();
+                PreparedStatement ps = conn.prepareStatement("SELECT order_id from orders where user_id = ?");){
+            ps.setString(1, userId);
+            
+            ResultSet rs = ps.executeQuery();
+            
+            if(rs.next()){
+                orderId = rs.getString("order_id");
+            }
+            
+        } catch (SQLException ex) {
+            ex.getMessage();
+        }
+        return orderId;
     }
 }

@@ -17,56 +17,82 @@ import javax.servlet.http.*;
 public class OrderSrv extends HttpServlet {
 
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+protected void doPost(HttpServletRequest request, HttpServletResponse response)
+        throws ServletException, IOException {
 
-        HttpSession session = request.getSession();
+    response.setContentType("application/json");
+    PrintWriter out = response.getWriter();
 
-        String userId = (String) session.getAttribute("user_id");
+    HttpSession session = request.getSession();
+    String userId = (String) session.getAttribute("user_id");
 
-        if (userId == null) {
-            response.getWriter().write("{\"status\":\"error\",\"message\":\"Session expired\"}");
-            return;
+    if (userId == null) {
+        out.write("{\"status\":\"error\",\"message\":\"Session expired\"}");
+        return;
+    }
+
+    Connection con = null;
+
+    try {
+        con = dbUtil.provideConnection();
+        con.setAutoCommit(false); // 🔥 TRANSACTION START
+
+        // ✅ Get Data
+        String cartId = request.getParameter("cartId");
+        double amount = Double.parseDouble(request.getParameter("amount"));
+        String paymentId = request.getParameter("paymentId");
+        String orderId = request.getParameter("orderId");
+        
+        // ================= STEP 1: CREATE ORDER =================
+        OrderServiceImpl orderService = new OrderServiceImpl();
+
+        String orderStatus = orderService.paymentSuccess(
+                paymentId, orderId, userId, cartId, amount
+        );
+
+        if (orderStatus == null) {
+            throw new Exception("Order creation failed");
         }
 
-        try(Connection con = dbUtil.provideConnection();) {
+        // ================= STEP 2: INSERT PAYMENT =================
+        TransactionBean trans = new TransactionBean();
 
-            // ✅ Get Data
-            String cartId = request.getParameter("cartId");
-            double amount = Double.parseDouble(request.getParameter("amount"));
-            
-            String orderId = idUtil.generateUUIDOrderId();
-            String paymentId = idUtil.generateTransactionId();
-            String userId1 = (String)request.getAttribute("user_id");          
-            
-            TransactionBean trans = new TransactionBean();
-            
-            trans.setTransId(paymentId);
-            trans.setUserName(userId);
-            trans.setOrderId(orderId);
-            trans.setTransAmount(amount);
-            SimpleDateFormat sdf = new SimpleDateFormat("YYYY:MM:DD hh:mm:ss");
-            Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-            sdf.format(timestamp);
-            trans.setTransDateTime(timestamp);          
-            
-            // ✅ Generate Order ID
-//            String orderId = idUtil.generateTransactionId();
-            boolean addTrans = new TransactionServiceImpl().addTransaction(trans);
-                
-            if(addTrans == true){
-                String paymentStatus = new OrderServiceImpl().paymentSuccess(paymentId, userId, cartId, amount);
-            }
-            
-            // ✅ RESPONSE JSON (IMPORTANT)
-            response.setContentType("application/json");
+        trans.setTransId(paymentId);
+        trans.setUserName(userId);
+        trans.setOrderId(orderId);
+        trans.setTransAmount(amount);
+        trans.setTransDateTime(new Timestamp(System.currentTimeMillis()));
 
-            PrintWriter out = response.getWriter();
-            out.write("{\"status\":\"success\",\"orderId\":\"" + orderId + "\"}");
+        boolean addTrans = new TransactionServiceImpl().addTransaction(trans, con);
 
+        if (addTrans == true) {
+            String status = "PLACED";
+            orderService.updateOrderStatus(orderId, status);
+        }else{
+            throw new Exception("Transaction failed");
+        }
+        // ================= COMMIT =================
+        con.commit();
+
+        out.write("{\"status\":\"success\",\"orderId\":\"" + orderId + "\"}");
+
+    } catch (Exception e) {
+        e.printStackTrace();
+
+        try {
+            if (con != null) con.rollback(); // ❌ rollback on error
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+
+        out.write("{\"status\":\"error\",\"message\":\"Something went wrong\"}");
+
+    } finally {
+        try {
+            if (con != null) con.close();
         } catch (Exception e) {
             e.printStackTrace();
-            response.getWriter().write("{\"status\":\"error\"}");
         }
     }
+}
 }

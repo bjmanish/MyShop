@@ -13,7 +13,7 @@ public class OrderItem {
     private String productId;
     private String productName;
     private int quantity;
-    private double price;
+//    private double price;
 
     public String getProductId() {
         return productId;
@@ -39,17 +39,17 @@ public class OrderItem {
         this.quantity = quantity;
     }
 
-    public double getPrice() {
-        return price;
-    }
-
-    public void setPrice(double price) {
-        this.price = price;
-    }
+//    public double getPrice() {
+//        return price;
+//    }
+//
+//    public void setPrice(double price) {
+//        this.price = price;
+//    }
 
     @Override
     public String toString() {
-        return "OrderItem{" + "productId=" + productId + ", productName=" + productName + ", quantity=" + quantity + ", price=" + price + '}';
+        return "OrderItem{" + "productId=" + productId + ", productName=" + productName + ", quantity=" + quantity  + '}';
     }
 
     

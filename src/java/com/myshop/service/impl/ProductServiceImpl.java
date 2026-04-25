@@ -13,6 +13,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class ProductServiceImpl implements ProductService {
 
@@ -441,6 +443,50 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public boolean updateProductImage(String prodId) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public String getProductNameById(String prodId) {
+        String pName = null;
+        
+        try(Connection conn = dbUtil.provideConnection();
+                PreparedStatement ps = conn.prepareStatement("SELECT NAME FROM PRODUCTS WHERE PRODUCT_ID = ?");){
+            
+            ps.setString(1, prodId);
+            ResultSet rs = ps.executeQuery();
+            
+            while(rs.next()){
+                pName = rs.getString("NAME");
+            }
+            
+            System.out.println("Product name "+pName);
+            
+        } catch (SQLException ex) {
+            ex.getMessage();
+        }
+        
+        return pName;
+    }
+    
+    
+    public String getProdInfo(String prodId){
+        String pInfo = "";
+        
+        try(Connection conn = dbUtil.provideConnection();
+                PreparedStatement ps = conn.prepareStatement("Select * from products where product_id = ?");){
+            ps.setString(1, prodId);
+            
+            ResultSet rs = ps.executeQuery();
+            if(rs.next()){
+                pInfo = rs.getString("name");
+            }            
+        } catch (SQLException ex) {
+            System.out.println("Error in getting Product Info method.");
+            ex.getMessage();
+            ex.printStackTrace();
+        }
+        
+        return pInfo;
     }
     
 }

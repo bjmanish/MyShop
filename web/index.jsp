@@ -114,7 +114,7 @@
         <div class="col-md-3 col-sm-6 mb-4">
             <div class="product-card h-100 d-flex flex-column">
                 <!-- IMAGE (JS WILL LOAD) -->
-                <img data-src="<%=request.getContextPath()%>/ShowImage?pid=<%=product.getProdId()%>" class="product-img lazy-img mx-auto mb-2" 
+                <img data-src="<%=request.getContextPath()%>/ShowImage?pid=<%=product.getProdId()%>" class="product-img lazy-img mx-3 mb-2" 
                      src="images/loader.gif"
                      onerror="this.src='images/noimage.jpg'">
                 <h6 class="text-truncate"><%=product.getProdName()%></h6>
@@ -122,7 +122,7 @@
                     <span class="short-description"><%=shortDesc%></span>
                     <span class="full-description" style="display:none;"><%=desc%></span>
                     <% if(desc.length() > 80){ %>
-                        <a href="javascript:void(0);" onclick="toggleDescription(this)" style="color:#00ffcc; cursor:pointer;">Read More..</a>
+                        <a href="javascript:void(0);" onclick="toggleDescription(this)" style="color:#0ff; cursor:pointer;">Read More..</a>
                     <% } %>
                 </p>
 
@@ -148,7 +148,7 @@
                 <% } else { %>
 
                     <a href="<%=request.getContextPath()%>/AddtoCart?pid=<%=product.getProdId()%>&guest=true"
-                       class="btn btn-success btn-sm w-100 mb-2 btn-custom">
+                       class="btn btn-success btn-sm w-100 mb-2 btn-custom" onClick="showLoginAlert()">
                        Add To Cart
                     </a>
 

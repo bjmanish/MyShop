@@ -88,15 +88,15 @@ public String updateProductToCart(String userId, String cartId, String prodId, i
 
     String status = "Failed to update cart!";
 
-    try (Connection conn = dbUtil.provideConnection()) {
+    try (Connection conn = dbUtil.provideConnection();) {
 
         // ✅ DELETE if qty = 0
-        if (qty == 0) {
-            String deleteSql = "DELETE FROM CART WHERE user_id=? AND product_id=?";
+        if (qty <= 0) {
+            String deleteSql = "DELETE FROM CART_ITEMS WHERE cart_id=? AND quantity=?";
             PreparedStatement ps = conn.prepareStatement(deleteSql);
 
-            ps.setString(1, userId);
-            ps.setString(2, prodId);
+            ps.setString(1, cartId);
+            ps.setInt(2, qty);
 
             if (ps.executeUpdate() > 0) {
                 status = "Product removed from cart!";
@@ -105,26 +105,28 @@ public String updateProductToCart(String userId, String cartId, String prodId, i
             return status;
         }
 
+        
+
         // ✅ UPDATE
-        String updateSql = "UPDATE CART SET quantity=? WHERE cart_id=? AND user_id=? AND product_id=?";
+        String updateSql = "UPDATE CART_ITEMS SET quantity=? WHERE cart_id=? AND product_id=?";
         PreparedStatement ps = conn.prepareStatement(updateSql);
 
         ps.setInt(1, qty);
         ps.setString(2, cartId);
-        ps.setString(3, userId);
-        ps.setString(4, prodId);
+//        ps.setString(3, userId);
+        ps.setString(3, prodId);
 
         int rows = ps.executeUpdate();
 
         // ✅ If not exist → INSERT
         if (rows == 0) {
-            String insertSql = "INSERT INTO CART(cart_id, user_id, product_id, quantity) VALUES (?, ?, ?, ?)";
+            String insertSql = "INSERT INTO CART_ITEMS(cart_id, product_id, quantity) VALUES (?, ?, ?, ?)";
             PreparedStatement ps2 = conn.prepareStatement(insertSql);
 
             ps2.setString(1, cartId);
-            ps2.setString(2, userId);
-            ps2.setString(3, prodId);
-            ps2.setInt(4, qty);
+//            ps2.setString(2, userId);
+            ps2.setString(2, prodId);
+            ps2.setInt(3, qty);
 
             if (ps2.executeUpdate() > 0) {
                 status = "Product added to cart!";
@@ -201,23 +203,23 @@ public String updateProductToCart(String userId, String cartId, String prodId, i
         if(userId == null || itemId == null)
             return 0;
        
-        PreparedStatement ps = null;
+//        PreparedStatement ps = null;
         ResultSet rs = null;
-        try{
-             Connection conn = dbUtil.provideConnection();
-            ps = conn.prepareStatement("SELECT quantity FROM CART WHERE user_id=? AND product_id =?");
+        try(Connection conn = dbUtil.provideConnection();
+                PreparedStatement ps = conn.prepareStatement("SELECT quantity FROM CART_ITEMS WHERE cart_id=? AND product_id =?");){
+             
+//            ps = conn.prepareStatement("SELECT quantity FROM CART WHERE cart_id=? AND product_id =?");
             ps.setString(1, userId);
             ps.setString(2, itemId);
             rs = ps.executeQuery();
-            if(rs.next() && !rs.wasNull()){
+            if(rs.next()){
                 count = rs.getInt(1);
             }
         } catch (SQLException ex) {
+            System.out.println(" current cart QuantityQuantity :"+count);
           ex.printStackTrace();
         }
-        
-        
-        dbUtil.closeConnection(ps);
+//        System.out.println(" current cart Quantity count:"+count);
         dbUtil.closeConnection(rs);
         
         return count;
@@ -227,7 +229,7 @@ public String updateProductToCart(String userId, String cartId, String prodId, i
     @Override
     public String removeProductFromCart(String userId, String cartId, String prodId) {
 
-        String status = "Failed";
+        String status = "FAILED";
         try (Connection conn = dbUtil.provideConnection()) {
 
             String sql = "DELETE FROM CART_ITEMS WHERE cart_id=? AND product_id=?";
@@ -237,11 +239,12 @@ public String updateProductToCart(String userId, String cartId, String prodId, i
             int rows = ps.executeUpdate();
 
             if (rows > 0) {
-                status = "Product removed!";
+                status = "SUCCESS";
             }
         } catch (Exception e) {
             status = "Error: " + e.getMessage();
         }
+//        System.out.println("Status of remove item from cart "+status);
 
         return status;
     }
@@ -252,7 +255,7 @@ public String updateProductToCart(String userId, String cartId, String prodId, i
         
         try{
             Connection conn = dbUtil.provideConnection();
-            PreparedStatement ps = conn.prepareStatement("DELETE FROM CART WHERE name=? AND prodid=? ");
+            PreparedStatement ps = conn.prepareStatement("DELETE FROM CART WHERE user_id=? AND product_id=? ");
             ps.setString(1, userId);
             ps.setString(2, prodId);
             int k = ps.executeUpdate();

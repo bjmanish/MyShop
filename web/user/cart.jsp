@@ -1,5 +1,4 @@
-<%@ page language="java"%>
-<%@page import="com.myshop.utility.idUtil"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" %>
 <%@page import="java.util.*"%>
 <%@page import="com.myshop.service.impl.*"%>
 <%@page import="com.myshop.beans.*"%>
@@ -10,17 +9,15 @@
 <title>MyShop Cart</title>
 
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta charset="UTF-8">
 
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <style>
 body { background:#f5f5f5; }
-
 .container { max-width:1100px; }
 
-/* LEFT CART */
-.cart-card {
+.cart-card{
     background:white;
     border-radius:10px;
     padding:10px;
@@ -30,34 +27,23 @@ body { background:#f5f5f5; }
     gap:10px;
 }
 
-/* IMAGE */
-.cart-img {
+.cart-img{
     width:60px;
     height:60px;
     object-fit:contain;
-    border-radius:8px;
-    background:#fff;
 }
 
-/* QTY BUTTON */
-.qty-btn {
+.qty-btn{
     border:none;
     padding:3px 8px;
     background:#ddd;
     cursor:pointer;
-    font-size:12px;
 }
 
-/* RIGHT PANEL */
-.card {
-    border-radius:10px;
-}
-
-/* REMOVE ANIMATION */
-.remove-anim {
-    transition:0.4s;
+.remove-anim{
+    transition: all 0.4s ease;
     opacity:0;
-    transform:translateX(50px);
+    transform: translateX(100px);
 }
 </style>
 </head>
@@ -67,178 +53,241 @@ body { background:#f5f5f5; }
 <jsp:include page="/header.jsp" />
 
 <%
-String userId = request.getParameter("uid");
 String cartId = request.getParameter("cartId");
-
+String prodId = "";
 CartServiceImpl carts = new CartServiceImpl();
 List<CartBean> cartItems = carts.getAllCartItems(cartId);
 
 double totalAmount = 0;
 double discount = 0;
+
+// ✅ CALCULATE TOTAL ONLY ONCE
+if(cartItems != null){
+    for(CartBean item : cartItems){
+        ProductBean product = new ProductServiceImpl().getProductDetails(item.getProdId());
+        totalAmount += item.getQuantity() * product.getProdPrice();
+    }
+}
+discount = totalAmount * 0.02;
 %>
 
 <div class="container mt-5">
-
 <div class="row mt-5">
 
-<!-- ================= LEFT SIDE ================= -->
+<!-- LEFT -->
 <div class="col-md-8">
 
-<h5 class="mb-3 mt-5">? My Cart</h5>
+<div class="mt-4 fs-4 fw-bold text-warning mb-4">🛒 My Cart</div>
 
-<%
-for(CartBean item : cartItems){
+<% if(cartItems == null || cartItems.size() == 0){ %>
 
-    String prodId = item.getProdId();
+    <!-- ✅ EMPTY CART -->
+    <div class="text-center mt-5">
+        <h3 class="text-success">No items in cart 🛒</h3>
+        <!--<a href="userHome.jsp" class="btn btn-dark mt-3">Continue Shopping</a>-->
+    </div>
 
-    ProductServiceImpl products = new ProductServiceImpl();
-    ProductBean product = products.getProductDetails(prodId);
+<% } else { 
 
-    int qty = item.getQuantity();
-    double amount = qty * product.getProdPrice();
-    totalAmount += amount;
-    
-//    double oldPrice = amount + 500;
-    discount = (totalAmount*0.02);
-    
-    
+    for(CartBean item : cartItems){
+
+        String pid = item.getProdId();
+        prodId= pid;
+        ProductBean product = new ProductServiceImpl().getProductDetails(pid);
+
+        int qty = item.getQuantity();
+        double amount = qty * product.getProdPrice();
 %>
 
-<div class="cart-card" id="row_<%=prodId%>">
+<div class="cart-card" id="row_<%=pid%>">
 
-    <!-- IMAGE FIXED -->
-    <img src="<%=request.getContextPath()%>/ShowImage?pid=<%=prodId%>" 
-         class="cart-img"
-         onerror="this.src='<%=request.getContextPath()%>/images/noimage.jpg'">
+<img src="<%=request.getContextPath()%>/ShowImage?pid=<%=pid%>"
+     class="cart-img"
+     onerror="this.src='<%=request.getContextPath()%>/images/noimage.jpg'">
 
-    <!-- DETAILS -->
-    <div style="flex:1;">
-        <h6><%=product.getProdName()%></h6>
-        <p>&#x20B9; <%=product.getProdPrice()%></p>
-    </div>
+<div style="flex:1;">
+    <h6><%=product.getProdName()%></h6>
+    <p>₹ <%=product.getProdPrice()%></p>
+</div>
 
-    <!-- QTY -->
-    <div>
-        <button class="qty-btn" onclick="updateQty('<%=prodId%>', -1)">-</button>
-        <span id="qty_<%=prodId%>"><%=qty%></span>
-        <button class="qty-btn" onclick="updateQty('<%=prodId%>', 1)">+</button>
-    </div>
+<div>
+    <button class="qty-btn" onclick="updateQty('<%=pid%>', -1)">-</button>
+    <span id="qty_<%=pid%>"><%=qty%></span>
+    <button class="qty-btn" onclick="updateQty('<%=pid%>', 1)">+</button>
+</div>
 
-    <!-- AMOUNT -->
-    <div style="min-width:80px;">
-        &#x20B9; <span id="amount_<%=prodId%>"><%=amount%></span>
-    </div>
+<div>
+    ₹ <span id="amount_<%=pid%>"><%=amount%></span>
+</div>
 
-    <!-- REMOVE -->
-    <button class="btn btn-danger btn-sm" onclick="removeItem('<%=prodId%>', this)">&#10060; </button>
+<button class="btn btn-danger btn-sm" onclick="removeItem('<%=pid%>')">❌</button>
 
 </div>
 
-<% } %>
+<% } } %>
 
 </div>
 
-<!-- ================= RIGHT SIDE ================= -->
-<div class="col-md-3 mt-5">
+<!-- RIGHT -->
+<% if(cartItems != null && cartItems.size() > 0){ %>
+<div class="col-md-4 mt-4">
 
-<!-- PRICE DETAILS -->
 <div class="card p-3 mb-3">
-    <h6><i class="bi bi-cash"></i> Price Details</h6>
-    <hr>
+<h6>Price Details</h6>
+<hr>
 
-    <p>Total Items: <%=cartItems.size()%></p>
-    <p>Total Price: &#x20B9; <span id="cartTotal"><%=totalAmount%></span></p>
+<p>Total Price: ₹ <span id="cartTotal"><%=totalAmount%></span></p>
+<p class="text-success">Discount: ₹ <span id="discount"><%=discount%></span></p>
 
-    <p class="text-success">Discount: &#x20B9; <span id="finalTotal"><%=discount%></span></p>
+<hr>
 
-    <hr>
-
-    <h5>Total Payable: &#x20B9; <span id="finalTotal"><%=totalAmount - discount %></span></h5>
+<h5>Payable: ₹ <span id="payable"><%=totalAmount-discount%></span></h5>
 </div>
 
-<!-- COUPON -->
-<div class="card p-3 mb-3">
-    <h6><i class="bi bi-ticket-alt"></i> Apply Coupon</h6>
-
-    <input type="text" id="coupon" class="form-control form-control-sm" placeholder="Enter Code">
-    <button class="btn btn-primary btn-sm mt-2 w-100" onclick="applyCoupon()">Apply</button>
-</div>
-
-<!-- ACTION -->
 <div class="card p-3">
+    <form id="checkoutForm" method="post" action="<%=request.getContextPath()%>/PaymentServlet?pid=<%=prodId%>&cartId="<%=cartId%>>
+    
+    <input type="hidden" name="amount" id="hiddenAmount" value="<%=totalAmount-discount%>">
+    <input type="hidden" name="pid" id="hiddenProdId" value="<%=prodId%>">
+    <button class="btn btn-success w-100" onclick="handleCheckout()">Checkout</button>
 
-    <a href="payment.jsp?userId=<%=userId%>&cartId=<%=cartId%>&amount=<%=totalAmount%>" 
-       class="btn btn-success w-100 mb-2">
-        <i class="bi bi-cash"></i> Checkout
-    </a>
+</form>
 
-    <a href="userHome.jsp" class="btn btn-dark w-100">
-        Continue Shopping
-    </a>
+<!--<button class="btn btn-success w-100" onclick="handleCheckout()">Checkout</button>-->
+
+<a href="userHome.jsp" class="btn btn-dark w-100 mt-2">Continue</a>
 
 </div>
 
 </div>
+<% } %>
 
 </div>
 </div>
 
 <jsp:include page="/footer.html" />
 
-<!-- JS -->
+<!-- ================= JS ================= -->
 <script>
 
-// ? UPDATE QTY
+// 🔥 RECALCULATE TOTAL
+function recalculateCart(){
+    let total = 0;
+
+    document.querySelectorAll("[id^='amount_']").forEach(el=>{
+        total += parseFloat(el.innerText);
+    });
+
+    let discount = total * 0.02;
+    let payable = total - discount;
+
+    document.getElementById("cartTotal").innerText = total.toFixed(2);
+    document.getElementById("discount").innerText = discount.toFixed(2);
+    document.getElementById("payable").innerText = payable.toFixed(2);
+
+    document.getElementById("hiddenAmount").value = payable.toFixed(2);
+}
+
+
+// ➕➖ UPDATE QTY
 function updateQty(pid, change){
-fetch("UpdateCartQtySrv",{
-method:"POST",
-headers:{"Content-Type":"application/x-www-form-urlencoded"},
-body:"pid="+pid+"&change="+change
+
+fetch("<%=request.getContextPath()%>/UpdateToCart",{
+    method:"POST",
+    headers:{"Content-Type":"application/x-www-form-urlencoded"},
+    body:"pid="+pid+"&change="+change+"&cartId=<%=cartId%>"
 })
 .then(res=>res.json())
 .then(data=>{
-document.getElementById("qty_"+pid).innerText = data.qty;
-document.getElementById("amount_"+pid).innerText = data.amount;
-document.getElementById("cartTotal").innerText = data.total;
-document.getElementById("finalTotal").innerText = data.total;
+
+    if(data.status==="success"){
+
+        document.getElementById("qty_"+pid).innerText = data.qty;
+        document.getElementById("amount_"+pid).innerText = data.amount;
+
+        recalculateCart();
+
+    }else{
+        Swal.fire("Error","Qty update failed","error");
+    }
 });
 }
 
-// ? REMOVE ITEM
-function removeItem(pid, btn){
+
+// ❌ REMOVE ITEM
+function removeItem(pid){
 
 let row = document.getElementById("row_"+pid);
-row.classList.add("remove-anim");
 
-setTimeout(()=>{ row.remove(); },400);
-
-fetch("RemoveCartSrv",{
-method:"POST",
-headers:{"Content-Type":"application/x-www-form-urlencoded"},
-body:"pid="+pid
-});
-}
-
-// ? COUPON
-function applyCoupon(){
-
-let code = document.getElementById("coupon").value;
-
-fetch("CouponSrv",{
-method:"POST",
-headers:{"Content-Type":"application/x-www-form-urlencoded"},
-body:"code="+code
+fetch("<%=request.getContextPath()%>/RemoveCartSrv",{
+    method:"POST",
+    headers:{"Content-Type":"application/x-www-form-urlencoded"},
+    body:"pid="+pid+"&cartId=<%=cartId%>"
 })
 .then(res=>res.json())
-.then(data=>{
-if(data.success){
-document.getElementById("cartTotal").innerText = data.newTotal;
-document.getElementById("finalTotal").innerText = data.newTotal;
-alert("Coupon Applied ?");
-}else{
-alert("Invalid Coupon ?");
-}
+.then(res=>{
+
+    if(res.status==="success"){
+
+        row.classList.add("remove-anim");
+
+        setTimeout(()=>{
+            row.remove();
+            recalculateCart();
+
+            if(document.querySelectorAll(".cart-card").length===0){
+                document.querySelector(".container").innerHTML =
+                    "<h3 class='text-center mt-5 text-success'>Cart Empty 🛒</h3>";
+            }
+
+        },400);
+
+        Swal.fire("Removed","Item removed","success");
+
+    }else{
+        Swal.fire("Error","Remove failed","error");
+    }
 });
+}
+
+function handleCheckout(){
+
+    let totalItems = document.querySelectorAll(".cart-card").length;
+
+    // ❌ Empty cart check
+    if(totalItems === 0){
+        Swal.fire({
+            icon: "warning",
+            title: "Cart Empty",
+            text: "Please add items before checkout"
+        });
+        return;
+    }
+
+    // 💰 Get payable amount
+    let amount = document.getElementById("payable").innerText;
+
+    if(!amount || parseFloat(amount) <= 0){
+        Swal.fire({
+            icon: "error",
+            title: "Invalid Amount",
+            text: "Something went wrong with total calculation"
+        });
+        return;
+    }
+
+    // 🔄 Disable button to prevent double click
+    let btn = event.target;
+    btn.disabled = true;
+    btn.innerHTML = "Processing... ⏳";
+
+    // 🔥 Update hidden field
+    document.getElementById("hiddenAmount").value = amount;
+
+    // ✅ Submit form
+    setTimeout(()=>{
+        btn.closest("form").submit();
+    }, 500);
 }
 
 </script>

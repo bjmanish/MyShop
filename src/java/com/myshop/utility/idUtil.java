@@ -42,11 +42,19 @@ public class idUtil {
         return "ORD" + UUID.randomUUID().toString().replace("-", "").substring(0,10).toUpperCase();
     }
     
-//    public static void main(String[] args) {
-//        System.out.println("cart Id: "+generateUUIDCartId());
-//        System.out.println("cart_Items Id: "+generateCartItemId());
-//        System.out.println("cart_Items Id: "+generateCartItemId()); 
+    public static String generateOrderItemId() {
+        return "ORDIT" + getRandomNumber();
+    }
+    
+//    public static void main(String[] args) {  
+//    
+//        System.out.println("Order_item_id:"+generateOrderItemId());
+//        
 //    }
+
+    public static String generateAssignId() {
+        return "ASG" + UUID.randomUUID().toString().replace("-", "").substring(0,10).toUpperCase();
+    }
     
     
 }

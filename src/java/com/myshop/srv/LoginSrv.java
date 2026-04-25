@@ -1,6 +1,7 @@
 package com.myshop.srv;
 
 import com.myshop.beans.UserBean;
+import com.myshop.service.impl.CartServiceImpl;
 import com.myshop.service.impl.UserServiceImpl;
 
 import java.io.IOException;
@@ -37,7 +38,9 @@ public class LoginSrv extends HttpServlet {
         session.setAttribute("role", user.getRoleName());
         session.setAttribute("name", user.getName());
         session.setAttribute("sessionId", session.getId());
-
+        String cartId = new CartServiceImpl().getOrCreateCart(user.getId());
+        session.setAttribute("cartId", cartId);
+//        session.setAttribute("cartCount", cartCount);
         // ✅ RETURN ROLE INSTEAD OF REDIRECT
         response.getWriter().write(user.getRoleName());
 //        System.out.println("data for staff:"+user.getRoleName());

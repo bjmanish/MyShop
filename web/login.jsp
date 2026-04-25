@@ -115,7 +115,7 @@ body {
 
             <!-- Button -->
             <div class="d-grid mb-3">
-                <button type="submit" class="btn btn-login">Login</button>
+                <button type="submit" id="loginBtn" class="btn btn-login">Login</button>
             </div>
             <!-- Google Signup button-->
             <div class="text-center mb-3">

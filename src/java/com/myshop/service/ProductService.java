@@ -38,5 +38,6 @@ public interface ProductService {
     
     public boolean updateProductImage(String prodId);
     
+    String getProductNameById(String prodId);
 }
 

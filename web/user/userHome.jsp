@@ -10,7 +10,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <!-- Bootstrap 5 -->
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<!--<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">-->
 
 <!-- SweetAlert -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -75,14 +75,14 @@ body {
 <jsp:include page="/header.jsp" />
 
 <%
-String userName = (String) session.getAttribute("user_Id");
+String userName = (String) session.getAttribute("user_id");
 boolean isLoggedIn = (userName != null);
 
 ProductServiceImpl prodDao = new ProductServiceImpl();
 List<ProductBean> products = prodDao.getAllProducts();
 %>
 
-<div class="container mt-5 pt-5">
+<div class="container mt-5 pt-5 home" id="home">
 
 <h3 class="text-center text-white fw-bold mb-4">Explore Products</h3>
 
@@ -115,28 +115,28 @@ List<ProductBean> products = prodDao.getAllProducts();
     <span class="old-price">&#x20B9; <%=oldPrice%></span>
 </p>
 
-<div class="mt-auto">
+<div class="mt-auto home" id="home">
 
 <% if(isLoggedIn){ %>
 
-<button class="btn btn-success w-100 mb-2 btn-custom"
+<button class="btn btn-success w-100 mb-2 btn-custom" id="addToCartBtn"
         onclick="addToCart('<%=product.getProdId()%>', this)">
     Add to Cart
 </button>
 
-<button class="btn btn-warning w-100 btn-custom"
-        onclick="buyNow('<%=product.getProdId()%>')">
+<button class="btn btn-warning w-100 btn-custom" id="buyNow"
+        onclick="buyNow('<%=product.getProdId()%>', '<%=price%>')">
     Buy Now
 </button>
 
 <% } else { %>
 
-<button onclick="showLoginAlert()" 
+<button onclick="showLoginAlert()"  id="addToCartBtn"
         class="btn btn-success w-100 mb-2 btn-custom">
     Add to Cart
 </button>
 
-<button onclick="showLoginAlert()" 
+<button onclick="showLoginAlert()"  id="buyNowBtn"
         class="btn btn-warning w-100 btn-custom">
     Buy Now
 </button>
@@ -173,17 +173,24 @@ function addToCart(pid, btn){
     .then(()=>{
         btn.innerText = "Added";
         showToast("Added to Cart ");
-
+        loadCartCount();
         setTimeout(()=>{
             btn.disabled = false;
             btn.innerText = "Add to Cart";
         },1500);
+        console.log("res at that Add to crt :",res);
     });
 }
 
 // ? Buy Now
-function buyNow(pid){
-    window.location.href = "<%=request.getContextPath()%>/AddtoCart?pid="+pid+"&pqty=1&buyNow=true";
+function buyNow(pid, price){
+   <%-- window.location.href = "<%=request.getContextPath()%>/PaymentServlet?pid="+pid+"&pqty="+1+"&amount="+price+"&buyNow=true"; --%>
+        fetch("<%=request.getContextPath()%>/PaymentServlet", {
+        method:"POST",
+        headers:{"Content-Type":"application/x-www-form-urlencoded"},
+        body:"pid="+pid+"&pqty="+1+"&amount="+price+"&buyNow=true"
+    })
+//    console.log(buyNow)
 }
 
 // ? Toast
@@ -205,7 +212,7 @@ function showLoginAlert(){
         text: 'Please login first',
         confirmButtonText: 'Login'
     }).then(()=>{
-        window.location.href="login.jsp";
+        window.location.href="<%=request.getContextPath()%>/login.jsp";
     });
 }
 </script>

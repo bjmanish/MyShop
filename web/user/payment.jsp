@@ -2,12 +2,15 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" %>
 <%
 String userId = (String) session.getAttribute("user_id");
+String email = (String) session.getAttribute("username");
+String name = (String) session.getAttribute("name");
 if (userId == null) {
     response.sendRedirect("login.jsp");
 }
 double amount = Double.parseDouble(request.getParameter("amount"));
-String paymentId = idUtil.generateTransactionId();
-String orderId = idUtil.generateUUIDOrderId();
+String pid = request.getParameter("pid");
+//String paymentId = idUtil.generateTransactionId();
+//String orderId = idUtil.generateUUIDOrderId();
 %>
 <!DOCTYPE html>
 <html lang="en">
@@ -20,7 +23,7 @@ String orderId = idUtil.generateUUIDOrderId();
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
 <!-- Bootstrap 5 JS (Required for modal) -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-
+ <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <style>
 body {
     min-height: 100vh;
@@ -116,221 +119,25 @@ input:valid { border: 1px solid green; }
 <i class="bi bi-wallet2"></i> Secure Payment
 </h4>
 
-<form>
+    <form method="post" action="<%=request.getContextPath()%>/PaymentServlet">
 
 <input type="hidden" name="user_id" value="<%=userId%>">
-<input type="hidden" name="payment_id" value="<%=paymentId%>">
+<input type="hidden" name="productinfo" value="<%=pid%>">
+<input type="hidden" name="firstname" value="<%=name%>">
+<input type="hidden" name="email" value="<%=email%>">
 <input type="hidden" name="amount" value="<%=amount%>">
-<input type="hidden" name="order_id" value="<%=orderId%>">
-
-<div class="mb-3 input-group">
-<span class="input-group-text"><i class="bi bi-person"></i></span>
-<input type="text" class="form-control required-field" placeholder="Card Holder Name">
-</div>
-
-<div class="mb-3 input-group">
-<span class="input-group-text"><i class="bi bi-credit-card"></i></span>
-<input type="text" class="form-control required-field" placeholder="Card Number">
-</div>
-
-<div class="row">
-<div class="col-6 mb-3 input-group">
-<span class="input-group-text"><i class="bi bi-calendar"></i></span>
-<input type="number" class="form-control required-field" placeholder="MM">
-</div>
-
-<div class="col-6 mb-3 input-group">
-<span class="input-group-text"><i class="bi bi-calendar2"></i></span>
-<input type="number" class="form-control required-field" placeholder="YYYY">
-</div>
-</div>
-
-<div class="mb-3 input-group">
-<span class="input-group-text"><i class="bi bi-shield-lock"></i></span>
-<input type="password" class="form-control required-field" placeholder="CVV">
-</div>
 
 <!-- Pay Button -->
-<button type="button" id="payBtn" class="btn btn-pay w-100 text-white" onclick="openOtpModal()" disabled>
-<span id="btnText">🚫 Fill Details</span>
+<button type="submit" id="payBtn" class="btn btn-pay w-100 text-white">
+<span id="btnText">Fill Details</span>
 </button>
 
 </form>
 </div>
 
-<!-- OTP Modal -->
-<div class="modal fade" id="otpModal">
-<div class="modal-dialog modal-dialog-centered">
-<div class="modal-content text-center p-4">
-
-<h5><i class="bi bi-key"></i> OTP Verification</h5>
-
-<div class="d-flex justify-content-center mb-3">
-<input class="otp-box form-control mx-1">
-<input class="otp-box form-control mx-1">
-<input class="otp-box form-control mx-1">
-<input class="otp-box form-control mx-1">
-</div>
-
-<p id="timer">00:30</p>
-<!--<p class="otp-error"></p>-->
-<div id="loader" style="display:none;">
-<div class="spinner-border text-primary"></div>
-<p>Verifying...</p>
-</div>
-
-<button class="btn btn-success w-100 mb-2" onclick="verifyOtp()">Verify & Pay</button>
-<button class="btn btn-link" onclick="resendOtp()">Resend OTP</button>
-
 </div>
 </div>
 </div>
-
-<script>
-let timeLeft = 30, timerInterval;
-
-// 👉 Static test number (you can replace with dynamic user phone later)
-const phone = "9999999999";
-const countryCode = "+91";
-
-// ================= OPEN OTP MODAL =================
-function openOtpModal(){
-
-    fetch("<%=request.getContextPath()%>/OtpServlet", {
-        method:"POST",
-        headers: {"Content-Type":"application/x-www-form-urlencoded"},
-        body: "action=send&phone="+phone+"&countryCode="+countryCode
-    })
-    .then(res => res.json())
-    .then(data => {
-        if(data.status === "success"){
-            console.log("OTP:", data.otp); // 🔥 check console
-            // alert("TEST OTP: " + data.otp); // optional
-        } else {
-            alert("Failed to send OTP");
-        }
-    });
-
-    new bootstrap.Modal(document.getElementById('otpModal')).show();
-    startTimer();
-}
-
-// ================= TIMER =================
-function startTimer(){
-    timeLeft = 30;
-    clearInterval(timerInterval);
-
-    timerInterval = setInterval(()=>{
-        timeLeft--;
-
-        document.getElementById("timer").innerText =
-            "00:" + (timeLeft < 10 ? "0" : "") + timeLeft;
-
-        if(timeLeft <= 0){
-            clearInterval(timerInterval);
-            document.getElementById("timer").innerText = "Expired ❌";
-        }
-    },1000);
-}
-
-// ================= OTP AUTO FOCUS =================
-document.querySelectorAll(".otp-box").forEach((input,i,arr)=>{
-    input.addEventListener("keyup",(e)=>{
-        if(input.value && i < 3) arr[i+1].focus();
-        if(e.key==="Backspace" && i>0) arr[i-1].focus();
-    });
-});
-
-// ================= VERIFY OTP =================
-function verifyOtp(){
-
-    let otp = "";
-    document.querySelectorAll(".otp-box").forEach(i => otp += i.value);
-
-    if(otp.length !== 4){
-        alert("Enter valid OTP");
-        return;
-    }
-
-    // ❌ Prevent verify if expired
-    if(timeLeft <= 0){
-        alert("OTP Expired ❌");
-        return;
-    }
-
-    document.getElementById("loader").style.display = "block";
-
-    fetch("<%=request.getContextPath()%>/OtpServlet", {
-        method:"POST",
-        headers: {"Content-Type":"application/x-www-form-urlencoded"},
-        body:"action=verify&otp="+otp+"&phone="+phone+"&countryCode="+countryCode
-    })
-    .then(res => res.json())
-    .then(data => {
-
-        document.getElementById("loader").style.display = "none";
-
-        if(data.status === "success"){
-            alert("Payment Successful ✅");
-            fetch("<%=request.getContextPath()%>/OrderSrv", {
-                method:"POST",
-                headers:{"Content-Type":"application/x-www-form-urlencoded"},
-                body:"cartId=<%=request.getParameter("cartId")%>&amount=<%=request.getParameter("amount")%>&userId=<%=request.getParameter("uid")%>"
-            })
-            .then(res=>res.json())
-            .then(data=>{
-                if(data.status==="success"){
-                    window.location.href="orderSuccess.jsp?orderId="+data.orderId;
-                }
-            });
-        } else {
-            inputs.forEach(input => {
-                input.classList.add("otp-error");
-                input.value = "";
-            });
-            setTimeout(() => {
-                inputs.forEach(input => input.classList.remove("otp-error"));
-            }, 300);
-//            inputs[0].focus();
-
-        }
-    });
-}
-
-// ================= RESEND OTP =================
-function resendOtp(){
-
-    fetch("<%=request.getContextPath()%>/OtpServlet", {
-        method:"POST",
-        headers: {"Content-Type":"application/x-www-form-urlencoded"},
-        body: "action=send&phone="+phone+"&countryCode="+countryCode
-    })
-    .then(res => res.json())
-    .then(data => {
-        if(data.status === "success"){
-            console.log("New OTP:", data.otp);
-            alert("OTP Resent ✅");
-        }
-    });
-
-    startTimer();
-}
-
-// Enable/Disable Button
-const inputs=document.querySelectorAll(".required-field");
-const btn=document.getElementById("payBtn");
-
-function checkInputs(){
-let ok=true;
-inputs.forEach(i=>{ if(!i.value.trim()) ok=false; });
-
-btn.disabled=!ok;
-document.getElementById("btnText").innerHTML=
-ok ? 'Pay <i class="bi bi-currency-rupee"></i> <%=amount%>' : '🚫 Fill Details';
-}
-
-inputs.forEach(i=>i.addEventListener("input",checkInputs));
-</script>
 
 </body>
 </html>

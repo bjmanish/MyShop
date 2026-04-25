@@ -3,16 +3,17 @@
 
 <%
     // Session validation
-    String staffEmail = (String) session.getAttribute("username");
     String userType = (String) session.getAttribute("role");
-
-    if (staffEmail == null || !"staff".equalsIgnoreCase(userType)) {
+    String userName = (String) session.getAttribute("username");
+    String userId = (String) session.getAttribute("sessionId");
+    
+    if (userName == null || !"staff".equalsIgnoreCase(userType)) {
         response.sendRedirect("login.jsp?message=Please login as staff to access deliveries");
         return;
     }
 
     // Fetch assigned orders
-    List<AssignOrder> assignedList = new OrderServiceImpl().getAssignedOrdersByStaff(staffEmail);
+    List<AssignOrder> assignedList = new OrderServiceImpl().getAssignedOrdersByStaff(userName);
 
     // OTP error handling
     String otpError = (String) request.getAttribute("otpError");
@@ -26,7 +27,7 @@
     <title>Assigned Deliveries - MyShop</title>
 
     <!-- ✅ Bootstrap 4 (FIXED) -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
+    <!--<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">-->
 
     <!-- jQuery + Bootstrap JS -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>

@@ -186,6 +186,8 @@ if (userName == null || userType == null || !userType.equalsIgnoreCase("admin") 
 <h6 class="mt-2">View Staff</h6>
 </div>
 </a>
+
+<div id="networkInfo" onload="loadNetworkInfo()"></div>
 </div>
 
 </div>
@@ -245,6 +247,25 @@ document.addEventListener("touchend", (e) => {
     if(diff > 70) openSidebar();     // swipe right
     if(diff < -70) closeSidebar();   // swipe left
 });
+
+function loadNetworkInfo() {
+    try {
+        const response = await fetch('<%=request.getContextPath()%>/networkInfo');
+        const data = await response.json();
+
+        document.getElementById("networkInfo").innerHTML = `
+            <h3>Network Info</h3>
+            <p><b>IP Address:</b> ${data.ip}</p>
+            <p><b>Host:</b> ${data.host}</p>
+            <p><b>Browser:</b> ${data.userAgent}</p>
+        `;
+    } catch (error) {
+        console.error("Error fetching network info:", error);
+    }
+}
+console.log(loadNetworkInfo());
+window.onload() = loadNetworkInfo();
+
 
 </script>
 

@@ -149,9 +149,7 @@ public class OrderDetails implements Serializable {
 
     @Override
     public String toString() {
-        return "OrderDetails{" + "orderId=" + orderId + ", prodId=" + prodId + ", userId=" + userId + ", prodName=" + prodName + ", qnty=" + qnty + ", amount=" + amount + ", shipped=" + shipped + ", datetime=" + datetime + ", deliveryDate=" + deliveryDate + ", prodImage=" + prodImage + ", status=" + status + ", items=" + items.toString() + ", userName=" + userName + '}';
-    }
-
-   
+        return "OrderDetails{" + "orderId=" + orderId + ", prodId=" + prodId + ", userId=" + userId + ", prodName=" + prodName + ", qnty=" + qnty + ", amount=" + amount + ", shipped=" + shipped + ", datetime=" + datetime + ", deliveryDate=" + deliveryDate + ", prodImage=" + prodImage + ", status=" + status + ", items=" + items + ", userName=" + userName + '}';
+    }  
     
 }

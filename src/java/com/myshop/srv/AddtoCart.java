@@ -30,13 +30,15 @@ public class AddtoCart extends HttpServlet {
         // ✅ Get parameters
         String userId = request.getParameter("uid");
         String prodId = request.getParameter("pid");
+        
+        String qtyStr = request.getParameter("pqty");
 
-        int pQty;
+        int pQty = 1; // default
+
         try {
-            pQty = Integer.parseInt(request.getParameter("pqty"));
-        } catch (Exception e) {
-            response.sendRedirect("user/userHome.jsp?message=Invalid Quantity!");
-            return;
+            pQty = Integer.parseInt(qtyStr);
+        } catch(NumberFormatException e) {
+            pQty = 1; // fallback
         }
 
         if (pQty <= 0) {

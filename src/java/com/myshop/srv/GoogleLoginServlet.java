@@ -2,6 +2,7 @@ package com.myshop.srv;
 
 import com.myshop.beans.UserBean;
 import com.myshop.service.impl.CartServiceImpl;
+import com.myshop.service.impl.OrderServiceImpl;
 import com.myshop.service.impl.UserServiceImpl;
 import com.myshop.utility.idUtil;
 import java.io.*;
@@ -47,7 +48,7 @@ public class GoogleLoginServlet extends HttpServlet {
 
             // 🔥 Main logic
             UserBean user = userDao.loginOrRegisterGoogleUser(name, email);
-            System.out.println("User :"+user.toString());
+//            System.out.println("User :"+user.toString());
             int cartCount = new CartServiceImpl().getCartCount(user.getId());
 //            System.out.println("UserId: "+user.getId());
             String userId = user.getId();
@@ -65,7 +66,7 @@ public class GoogleLoginServlet extends HttpServlet {
             session.setAttribute("cartId", cartId);
             session.setAttribute("cartCount", cartCount);
 //            System.out.println("Cart Id from Login servlet "+cartId);
-
+            session.setAttribute("orderId", new OrderServiceImpl().getOrderId(userId));
             // ✅ RETURN ROLE INSTEAD OF REDIRECT
                 response.getWriter().write(user.getRoleName());
 //              System.out.println("data for staff:"+user.getRoleName());

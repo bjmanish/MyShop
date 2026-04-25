@@ -82,8 +82,8 @@
             %>
             <tr>
                 <td>
-                    <img src="<%=request.getContextPath()%>/StaffImage?sid=<%= staff.getStaffId() %>"
-                         alt="Profile"
+                    <img src="<%=request.getContextPath()%>/showProfileImg?uid=<%= staff.getStaffId() %>"
+                         alt="ProfileImage<%= staff.getStaffId() %>"
                          class="profile-img">
                 </td>
                 <td><%= staff.getStaffId() %></td>

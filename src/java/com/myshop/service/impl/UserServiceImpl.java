@@ -215,8 +215,34 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserBean getUserDetailsById(int userId) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public UserBean getUserDetailsById(String userId) {
+        UserBean user = null;
+         try (Connection conn = dbUtil.provideConnection();
+             PreparedStatement ps = conn.prepareStatement(
+                     "SELECT * FROM USERS WHERE user_id = ?")) {
+
+            ps.setString(1, userId);
+
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                user = new UserBean();
+
+                user.setName(rs.getString("name"));
+                user.setMobile(rs.getString("mobile"));
+                user.setEmail(rs.getString("email"));
+                user.setAddress(rs.getString("address"));
+                user.setPincode(rs.getInt("pincode"));
+                user.setImage(rs.getBinaryStream("image"));
+                user.setId(rs.getString("user_id"));
+            }
+//            System.out.println("USER details: "+user);
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return user;
     }
     
     @Override

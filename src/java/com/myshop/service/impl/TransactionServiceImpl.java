@@ -31,31 +31,29 @@ public class TransactionServiceImpl implements TransactionService {
     
     
     @Override
-    public boolean addTransaction(TransactionBean transaction) {
+    public boolean addTransaction(TransactionBean transaction, Connection conn) {
 
-        boolean flag = false;
+    boolean flag = false;
 
-        try {
-            Connection conn = dbUtil.provideConnection();
+    try {
+        PreparedStatement ps = conn.prepareStatement(
+            "INSERT INTO PAYMENTS (payment_id, order_id, user_id, amount, payment_status, created_at) VALUES (?, ?, ?, ?, ?, ?)"
+        );
 
-            PreparedStatement ps = conn.prepareStatement(
-                "INSERT INTO PAYMENTS VALUES(?,?,?,?,?,?)"
-            );
+        ps.setString(1, transaction.getTransId());
+        ps.setString(2, transaction.getOrderId());
+        ps.setString(3, transaction.getUserName());
+        ps.setDouble(4, transaction.getTransAmount());
+        ps.setString(5, "SUCCESS");
+        ps.setTimestamp(6, transaction.getTransDateTime());
 
-            ps.setString(1, transaction.getTransId());
-            ps.setString(2, transaction.getOrderId());
-            ps.setString(3, transaction.getUserName());
-            ps.setDouble(4, transaction.getTransAmount());
-            ps.setString(5, "SUCCESS");
-            ps.setTimestamp(6, transaction.getTransDateTime());
-//            ps.setTimestamp(6, new java.util.DateTime());
-            flag = ps.executeUpdate() > 0;
+        flag = ps.executeUpdate() > 0;
 
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        return flag;
+    } catch (Exception e) {
+        e.printStackTrace();
     }
+
+    return flag;
+}
     
 }
