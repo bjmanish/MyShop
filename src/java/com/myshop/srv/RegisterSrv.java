@@ -52,7 +52,7 @@ public class RegisterSrv extends HttpServlet {
             }
 
             // 🔹 Pincode validation
-            int pinCode = 0;
+            int pinCode = 000000;
             try {
                 pinCode = Integer.parseInt(pinStr);
             } catch (Exception e) {

@@ -8,6 +8,8 @@ public interface CartService {
         
     public String addProductToCart(String userID, String cartId, String prodId, int prodQty);
     
+    public String addProductToCart(String userID, String cartId, String prodId, String status);
+    
     public String updateProductToCart(String userID, String cartId, String prodId, int prodQty);
     
     public List<CartBean> getAllCartItems(String userId);

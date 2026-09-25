@@ -81,8 +81,8 @@ public class AddStaffSrv extends HttpServlet {
             user.setAddress(address);
             user.setPincode(pincode);
             user.setPassword(password);
-            user.setRoleId("R002");
-            user.setRoleName("DELIVERY");
+            user.setRoleId(3);
+            user.setRoleName("STAFF");
             
             // 🚚 STAFF BEAN
             StaffBean staff = new StaffBean();

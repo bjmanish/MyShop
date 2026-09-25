@@ -29,7 +29,7 @@ public class UserServiceImpl implements UserService {
 
         try (Connection conn = dbUtil.provideConnection();
              PreparedStatement ps = conn.prepareStatement(
-                     "INSERT INTO USERS(image, email, name, mobile, address, pincode, password, role_id, email_verified, mobile_verified, user_id) " +
+                     "INSERT INTO [USER](image, email, name, mobile, address, pincode, password, role_id, email_verified, mobile_verified, user_id) " +
                      "VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")) {
 
             ps.setBinaryStream(1, imageInputStream);
@@ -40,7 +40,7 @@ public class UserServiceImpl implements UserService {
             ps.setInt(6, user.getPincode());
             ps.setString(7, encryptedPassword);
 
-            ps.setString(8, "R003"); // 👉 default role = customer
+            ps.setInt(8, 1); // 👉 default role = customer
 
             ps.setInt(9, user.getEmailVerified());
             ps.setInt(10, user.getMobileVerified());
@@ -66,7 +66,7 @@ public class UserServiceImpl implements UserService {
     public boolean isRegistered(String emailId) {
 
         try (Connection conn = dbUtil.provideConnection();
-             PreparedStatement ps = conn.prepareStatement("SELECT 1 FROM USERS WHERE email = ?")) {
+             PreparedStatement ps = conn.prepareStatement("SELECT 1 FROM [USER] WHERE email = ?")) {
 
             ps.setString(1, emailId);
             ResultSet rs = ps.executeQuery();
@@ -89,7 +89,7 @@ public class UserServiceImpl implements UserService {
         String encryptedPassword = PasswordEncryption.getEncryptedPassword(password);
 //        System.out.println("Encrypted Password from Service :"+encryptedPassword);
         
-        String query = "SELECT u.*, r.role_name FROM USERS u " +
+        String query = "SELECT u.*, r.role_name FROM [USER] u " +
                        "JOIN ROLES r ON u.role_id = r.role_id " +
                        "WHERE u.email = ? AND u.password = ?";
 
@@ -118,10 +118,10 @@ public class UserServiceImpl implements UserService {
                 user.setPincode(rs.getInt("pincode"));
                 
                 String role = rs.getString("role_name");
-                String roleId = rs.getString("role_id");
+                int roleId = rs.getInt("role_id");
                 if(role == null ){
                     role = "CUSTOMER";
-                    roleId = "R003";
+                    roleId = 3;
                 }                        
                 user.setRoleId(roleId);
                 user.setRoleName(role);
@@ -146,7 +146,7 @@ public class UserServiceImpl implements UserService {
 
         try (Connection conn = dbUtil.provideConnection();
              PreparedStatement ps = conn.prepareStatement(
-                     "SELECT * FROM USERS WHERE email = ?")) {
+                     "SELECT * FROM [USER] WHERE email = ?")) {
 
             ps.setString(1, emailId);
 //            ps.setString(2, encryptedPassword);
@@ -193,7 +193,7 @@ public class UserServiceImpl implements UserService {
         
         byte[] image = null;
         
-        String sql = "SELECT IMAGE FROM USERS WHERE USER_ID = ?";
+        String sql = "SELECT IMAGE FROM [USER] WHERE USER_ID = ?";
         
         try(Connection conn = dbUtil.provideConnection();
                 PreparedStatement ps = conn.prepareStatement(sql);){
@@ -219,7 +219,7 @@ public class UserServiceImpl implements UserService {
         UserBean user = null;
          try (Connection conn = dbUtil.provideConnection();
              PreparedStatement ps = conn.prepareStatement(
-                     "SELECT * FROM USERS WHERE user_id = ?")) {
+                     "SELECT * FROM [USER] WHERE user_id = ?")) {
 
             ps.setString(1, userId);
 
@@ -250,7 +250,7 @@ public class UserServiceImpl implements UserService {
         String baseId = null;
         // Add random suffix to avoid collision
     String random = UUID.randomUUID().toString().substring(0, 3).toUpperCase();
-    String sql = "SELECT TOP 1 user_id FROM USERS ORDER BY user_id DESC";
+    String sql = "SELECT TOP 1 user_id FROM [USER] ORDER BY user_id DESC";
     try(Connection conn = dbUtil.provideConnection();
              PreparedStatement ps = conn.prepareStatement(sql)){
 //    PreparedStatement ps = conn.prepareStatement(sql);
@@ -284,7 +284,7 @@ public class UserServiceImpl implements UserService {
                 "(SELECT s.vehicle_type FROM STAFF_DETAILS s WHERE s.staff_id = u.user_id) AS vehicle_type,\n" +
                 "(SELECT s.availability_status FROM STAFF_DETAILS s WHERE s.staff_id = u.user_id) AS availability_status,\n" +
                 "(SELECT s.license_number FROM STAFF_DETAILS s WHERE s.staff_id = u.user_id) AS license_number\n" +
-                "FROM USERS u ORDER BY u.created_at";
+                "FROM [USER] u ORDER BY u.created_at";
 
             PreparedStatement ps = con.prepareStatement(query);
             ResultSet rs = ps.executeQuery();
@@ -321,9 +321,9 @@ public class UserServiceImpl implements UserService {
 
     try (Connection con = dbUtil.provideConnection()) {
         // ✅ 1. Check if user exists
-        String query = "SELECT u.*, r.role_name, c.cart_id FROM USERS u " +
+        String query = "SELECT u.*, r.role_name, c.cart_id FROM [USER] u " +
                        "JOIN ROLES r ON u.role_id = r.role_id " +
-                       "LEFT JOIN CART c ON u.user_id = c.user_id " +
+                       "LEFT JOIN CARTS c ON u.user_id = c.user_id " +
                        "WHERE u.email = ?";
         PreparedStatement ps = con.prepareStatement(query);
         ps.setString(1, email);
@@ -340,20 +340,15 @@ public class UserServiceImpl implements UserService {
                 user.setImage(rs.getBinaryStream("image"));
                 user.setId(rs.getString("user_id"));
                 user.setCartId(rs.getString("cart_id"));
-                String roleId = rs.getString("role_id");
+                int roleId = rs.getInt("role_id");
                 String roleName = rs.getString("role_name");
-                
-                if(roleId == null ){
-                    roleId = "R003";
-                    roleName = "CUSTOMER";
-                }
                 
                 user.setRoleId(roleId);
                 user.setRoleName(roleName);
                 
             } else {
             // ✅ 2. Insert new user
-            String insertQuery = "INSERT INTO users (user_id, name, email, password, role_id) VALUES (?, ?, ?, ?, ?)";
+            String insertQuery = "INSERT INTO [USER] (user_id, name, email, password, role_id) VALUES (?, ?, ?, ?, ?)";
             PreparedStatement insertPs = con.prepareStatement(insertQuery);
             String id = generateUserId();
             insertPs.setString(1, id);
@@ -361,7 +356,7 @@ public class UserServiceImpl implements UserService {
             insertPs.setString(2, name);
             insertPs.setString(3, email);
             insertPs.setString(4, "GOOGLE_AUTH"); // or NULL
-            insertPs.setString(5, "R003"); // default role
+            insertPs.setInt(5, 1); // default role
 
             insertPs.executeUpdate();
 

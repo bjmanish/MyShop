@@ -1,76 +1,963 @@
-
- <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"> 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
-<footer class="mt-5">
-   
+<!-- Font Awesome -->
+<link rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 <style>
-footer {
-    background: rgba(0,0,0,0.6);
-    backdrop-filter: blur(10px);
-    color: white;
-    padding: 40px 0;
-}
+    /* =========================
+       FOOTER VARIABLES
+       ========================= */
 
-footer a {
-    color: #ddd;
-    text-decoration: none;
-}
+    :root {
+        --footer-bg: #f8fafc;
+        --footer-card: #ffffff;
+        --footer-text: #475569;
+        --footer-heading: #0f172a;
+        --footer-muted: #64748b;
+        --footer-border: rgba(15, 23, 42, 0.08);
+        --footer-primary: #2563eb;
+        --footer-primary-hover: #1d4ed8;
+        --footer-icon-bg: #eff6ff;
+        --footer-bottom: #f1f5f9;
+    }
 
-footer a:hover {
-    color: #ffd700;
-}
+    body.dark-mode {
+        --footer-bg: #080d18;
+        --footer-card: #111827;
+        --footer-text: #cbd5e1;
+        --footer-heading: #f8fafc;
+        --footer-muted: #94a3b8;
+        --footer-border: rgba(255, 255, 255, 0.08);
+        --footer-primary: #60a5fa;
+        --footer-primary-hover: #93c5fd;
+        --footer-icon-bg: rgba(96, 165, 250, 0.12);
+        --footer-bottom: #060b14;
+    }
 
-.social a {
-    font-size: 20px;
-    margin: 0 10px;
-}
-.contact p{
-    font-size: 15px;
-    padding: 0 5px;
-}
+    /* =========================
+       FOOTER
+       ========================= */
+
+    .myshop-footer {
+        position: relative;
+        margin-top: 70px;
+        background: var(--footer-bg);
+        color: var(--footer-text);
+        border-top: 1px solid var(--footer-border);
+        overflow: hidden;
+    }
+
+    .myshop-footer::before {
+        content: "";
+        position: absolute;
+        width: 450px;
+        height: 450px;
+        top: -250px;
+        left: -180px;
+        border-radius: 50%;
+        background: rgba(37, 99, 235, 0.05);
+        pointer-events: none;
+    }
+
+    .myshop-footer::after {
+        content: "";
+        position: absolute;
+        width: 400px;
+        height: 400px;
+        bottom: -250px;
+        right: -150px;
+        border-radius: 50%;
+        background: rgba(124, 58, 237, 0.05);
+        pointer-events: none;
+    }
+
+    .footer-container {
+        position: relative;
+        z-index: 2;
+        max-width: 1250px;
+        margin: auto;
+        padding: 70px 25px 30px;
+    }
+
+    /* =========================
+       TOP BRAND SECTION
+       ========================= */
+
+    .footer-brand-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 30px;
+        padding-bottom: 45px;
+        margin-bottom: 45px;
+        border-bottom: 1px solid var(--footer-border);
+    }
+
+    .footer-brand {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .footer-logo {
+        width: 55px;
+        height: 55px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 16px;
+        background: linear-gradient(135deg, #2563eb, #7c3aed);
+        color: #ffffff;
+        font-size: 24px;
+        box-shadow: 0 10px 25px rgba(37, 99, 235, 0.22);
+    }
+
+    .footer-brand-name {
+        margin: 0;
+        color: var(--footer-heading);
+        font-size: 24px;
+        font-weight: 800;
+        letter-spacing: -0.5px;
+    }
+
+    .footer-brand-tagline {
+        margin: 3px 0 0;
+        color: var(--footer-muted);
+        font-size: 13px;
+    }
+
+    .footer-social-top {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .footer-social-top a {
+        width: 42px;
+        height: 42px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 12px;
+        color: var(--footer-text);
+        background: var(--footer-card);
+        border: 1px solid var(--footer-border);
+        text-decoration: none;
+        transition: all 0.25s ease;
+    }
+
+    .footer-social-top a:hover {
+        color: #ffffff;
+        background: var(--footer-primary);
+        border-color: var(--footer-primary);
+        transform: translateY(-4px);
+        box-shadow: 0 8px 20px rgba(37, 99, 235, 0.20);
+    }
+
+    /* =========================
+       MAIN FOOTER GRID
+       ========================= */
+
+    .footer-grid {
+        display: grid;
+        grid-template-columns: 1.5fr 1fr 1fr 1.35fr;
+        gap: 45px;
+    }
+
+    .footer-column h5 {
+        position: relative;
+        display: inline-block;
+        margin: 0 0 22px;
+        color: var(--footer-heading);
+        font-size: 16px;
+        font-weight: 700;
+    }
+
+    .footer-column h5::after {
+        content: "";
+        position: absolute;
+        left: 0;
+        bottom: -8px;
+        width: 28px;
+        height: 3px;
+        border-radius: 5px;
+        background: var(--footer-primary);
+    }
+
+    .footer-about {
+        max-width: 300px;
+        line-height: 1.8;
+        font-size: 14px;
+        color: var(--footer-muted);
+    }
+
+    /* =========================
+       CONTACT
+       ========================= */
+
+    .footer-contact-list {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        margin-top: 20px;
+    }
+
+    .footer-contact-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        color: var(--footer-text);
+        font-size: 14px;
+    }
+
+    .footer-contact-icon {
+        min-width: 38px;
+        width: 38px;
+        height: 38px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 11px;
+        background: var(--footer-icon-bg);
+        color: var(--footer-primary);
+    }
+
+    .footer-contact-item a {
+        color: inherit;
+        text-decoration: none;
+        transition: color 0.2s ease;
+    }
+
+    .footer-contact-item a:hover {
+        color: var(--footer-primary);
+    }
+
+    /* =========================
+       LINKS
+       ========================= */
+
+    .footer-links {
+        padding: 0;
+        margin: 0;
+        list-style: none;
+    }
+
+    .footer-links li {
+        margin-bottom: 13px;
+    }
+
+    .footer-links a {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        color: var(--footer-muted);
+        text-decoration: none;
+        font-size: 14px;
+        transition: all 0.25s ease;
+    }
+
+    .footer-links a i {
+        font-size: 10px;
+        transition: transform 0.25s ease;
+    }
+
+    .footer-links a:hover {
+        color: var(--footer-primary);
+        transform: translateX(4px);
+    }
+
+    .footer-links a:hover i {
+        transform: translateX(3px);
+    }
+
+    /* =========================
+       NEWSLETTER
+       ========================= */
+
+    .footer-newsletter-text {
+        color: var(--footer-muted);
+        font-size: 14px;
+        line-height: 1.7;
+        margin-bottom: 18px;
+    }
+
+    .footer-newsletter {
+        position: relative;
+    }
+
+    .footer-newsletter-input {
+        width: 100%;
+        height: 50px;
+        padding: 0 55px 0 17px;
+        border-radius: 13px;
+        border: 1px solid var(--footer-border);
+        outline: none;
+        background: var(--footer-card);
+        color: var(--footer-heading);
+        font-size: 14px;
+        transition: border 0.25s ease, box-shadow 0.25s ease;
+    }
+
+    .footer-newsletter-input::placeholder {
+        color: var(--footer-muted);
+    }
+
+    .footer-newsletter-input:focus {
+        border-color: var(--footer-primary);
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.10);
+    }
+
+    .footer-newsletter button {
+        position: absolute;
+        top: 5px;
+        right: 5px;
+        width: 40px;
+        height: 40px;
+        border: none;
+        border-radius: 10px;
+        background: var(--footer-primary);
+        color: #ffffff;
+        cursor: pointer;
+        transition: all 0.25s ease;
+    }
+
+    .footer-newsletter button:hover {
+        background: var(--footer-primary-hover);
+        transform: scale(1.04);
+    }
+
+    .footer-newsletter-note {
+        display: block;
+        margin-top: 10px;
+        color: var(--footer-muted);
+        font-size: 11px;
+    }
+
+    /* =========================
+       FEATURES
+       ========================= */
+
+    .footer-features {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 18px;
+        margin-top: 50px;
+        padding: 25px 0;
+        border-top: 1px solid var(--footer-border);
+        border-bottom: 1px solid var(--footer-border);
+    }
+
+    .footer-feature {
+        display: flex;
+        align-items: center;
+        gap: 13px;
+        padding: 10px;
+    }
+
+    .footer-feature-icon {
+        min-width: 45px;
+        width: 45px;
+        height: 45px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 13px;
+        background: var(--footer-icon-bg);
+        color: var(--footer-primary);
+        font-size: 18px;
+    }
+
+    .footer-feature strong {
+        display: block;
+        color: var(--footer-heading);
+        font-size: 13px;
+        margin-bottom: 3px;
+    }
+
+    .footer-feature span {
+        color: var(--footer-muted);
+        font-size: 11px;
+    }
+
+    /* =========================
+       BOTTOM BAR
+       ========================= */
+
+    .footer-bottom {
+        position: relative;
+        z-index: 2;
+        background: var(--footer-bottom);
+    }
+
+    .footer-bottom-container {
+        max-width: 1250px;
+        margin: auto;
+        padding: 20px 25px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 20px;
+    }
+
+    .footer-copyright {
+        margin: 0;
+        color: var(--footer-muted);
+        font-size: 12px;
+    }
+
+    .footer-copyright strong {
+        color: var(--footer-heading);
+    }
+
+    .footer-bottom-links {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+    }
+
+    .footer-bottom-links a {
+        color: var(--footer-muted);
+        font-size: 12px;
+        text-decoration: none;
+        transition: color 0.2s ease;
+    }
+
+    .footer-bottom-links a:hover {
+        color: var(--footer-primary);
+    }
+
+    /* =========================
+       RESPONSIVE
+       ========================= */
+
+    @media (max-width: 992px) {
+
+        .footer-grid {
+            grid-template-columns: 1fr 1fr;
+            gap: 40px 30px;
+        }
+
+        .footer-brand-row {
+            align-items: flex-start;
+            flex-direction: column;
+        }
+
+        .footer-social-top {
+            margin-top: -10px;
+        }
+    }
+
+    @media (max-width: 768px) {
+
+        .myshop-footer {
+            margin-top: 45px;
+        }
+
+        .footer-container {
+            padding: 50px 20px 25px;
+        }
+
+        .footer-grid {
+            grid-template-columns: 1fr;
+            gap: 35px;
+        }
+
+        .footer-about {
+            max-width: 100%;
+        }
+
+        .footer-features {
+            grid-template-columns: 1fr;
+            gap: 8px;
+        }
+
+        .footer-feature {
+            padding: 8px 0;
+        }
+
+        .footer-bottom-container {
+            flex-direction: column;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .footer-bottom-links {
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+    }
+
+    @media (max-width: 480px) {
+
+        .footer-brand {
+            align-items: flex-start;
+        }
+
+        .footer-logo {
+            width: 48px;
+            height: 48px;
+            font-size: 20px;
+        }
+
+        .footer-brand-name {
+            font-size: 21px;
+        }
+
+        .footer-social-top {
+            width: 100%;
+        }
+
+        .footer-social-top a {
+            width: 40px;
+            height: 40px;
+        }
+
+        .footer-newsletter-input {
+            height: 48px;
+        }
+    }
 </style>
 
-<div class="container">
-<div class="row">
 
-<!-- Contact Info --> 
-<div class="col-md-4 mb-4 contact"> 
-    <h5>Contact Us</h5> 
-    <p><i class="bi bi-geo-alt-fill"></i> THE MYSHOP</p> 
-    <p><i class="bi bi-telephone-fill"></i> +91 1515151515</p> 
-    <p> <a href="mailto:themyshop2025@gmail.com"> <i class="bi bi-envelope-fill"></i> themyshop2025@gmail.com </a> </p> 
-</div>
-<div class="col-md-4">
-<h5>Quick Links</h5>
-<p><a href="#">Home</a></p>
-<p><a href="#">Products</a></p>
-<p><a href="#">Contact</a></p>
-</div>
+<footer class="myshop-footer">
 
-<div class="col-md-4">
-<h5>Message</h5>
-<form>
-<input class="form-control mb-2" placeholder="Email">
-<textarea class="form-control mb-2" placeholder="Message"></textarea>
-<button class="btn btn-warning w-100">Send</button>
-</form>
-</div>
+    <div class="footer-container">
 
-</div>
+        <!-- =========================
+             BRAND + SOCIAL
+             ========================= -->
 
-<!-- Social Media --> 
-<div class="text-center mt-4 social"> 
-    <a href="#"><i class="bi bi-facebook"></i></a> 
-    <a href="#"><i class="bi bi-twitter"></i></a> 
-    <a href="#"><i class="bi bi-instagram"></i></a> 
-    <a href="#"><i class="bi bi-linkedin"></i></a> 
-    <a href="#"><i class="bi bi-youtube"></i></a> 
-</div>
+        <div class="footer-brand-row">
 
-<!-- Copyright --> 
-<div class="copyright text-center mt-3"> <p>&copy; <span id="year"> </span> MYSHOP - All Rights Reserved</p> </div>
+            <div class="footer-brand">
 
-</div>
+                <div class="footer-logo">
+                    <i class="fa-solid fa-bag-shopping"></i>
+                </div>
 
-<script>document.getElementById("year").textContent = `2024 - ${new Date().getFullYear()}`; </script>
+                <div>
+                    <h3 class="footer-brand-name">THE MYSHOP</h3>
+
+                    <p class="footer-brand-tagline">
+                        Shop smart. Live better.
+                    </p>
+                </div>
+
+            </div>
+
+
+            <div class="footer-social-top">
+
+                <a href="#" aria-label="Facebook">
+                    <i class="fa-brands fa-facebook-f"></i>
+                </a>
+
+                <a href="#" aria-label="Instagram">
+                    <i class="fa-brands fa-instagram"></i>
+                </a>
+
+                <a href="#" aria-label="Twitter">
+                    <i class="fa-brands fa-x-twitter"></i>
+                </a>
+
+                <a href="#" aria-label="YouTube">
+                    <i class="fa-brands fa-youtube"></i>
+                </a>
+
+                <a href="#" aria-label="LinkedIn">
+                    <i class="fa-brands fa-linkedin-in"></i>
+                </a>
+
+            </div>
+
+        </div>
+
+
+        <!-- =========================
+             MAIN FOOTER
+             ========================= -->
+
+        <div class="footer-grid">
+
+
+            <!-- ABOUT -->
+
+            <div class="footer-column">
+
+                <h5>About MYSHOP</h5>
+
+                <p class="footer-about">
+                    Welcome to THE MYSHOP, your trusted destination
+                    for quality products at great prices. Discover
+                    products you love and enjoy a simple, secure and
+                    convenient shopping experience.
+                </p>
+
+
+                <div class="footer-contact-list">
+
+                    <div class="footer-contact-item">
+
+                        <div class="footer-contact-icon">
+                            <i class="fa-solid fa-phone"></i>
+                        </div>
+
+                        <div>
+                            <a href="tel:+911515151515">
+                                +91 1515151515
+                            </a>
+                        </div>
+
+                    </div>
+
+
+                    <div class="footer-contact-item">
+
+                        <div class="footer-contact-icon">
+                            <i class="fa-solid fa-envelope"></i>
+                        </div>
+
+                        <div>
+                            <a href="mailto:themyshop2025@gmail.com">
+                                themyshop2025@gmail.com
+                            </a>
+                        </div>
+
+                    </div>
+
+
+                    <div class="footer-contact-item">
+
+                        <div class="footer-contact-icon">
+                            <i class="fa-solid fa-location-dot"></i>
+                        </div>
+
+                        <div>
+                            India
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- QUICK LINKS -->
+
+            <div class="footer-column">
+
+                <h5>Quick Links</h5>
+
+                <ul class="footer-links">
+
+                    <li>
+                        <a href="index.jsp">
+                            <i class="fa-solid fa-chevron-right"></i>
+                            Home
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="index.jsp">
+                            <i class="fa-solid fa-chevron-right"></i>
+                            Products
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="login.jsp">
+                            <i class="fa-solid fa-chevron-right"></i>
+                            Login
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="register.jsp">
+                            <i class="fa-solid fa-chevron-right"></i>
+                            Create Account
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="#">
+                            <i class="fa-solid fa-chevron-right"></i>
+                            Contact Us
+                        </a>
+                    </li>
+
+                </ul>
+
+            </div>
+
+
+            <!-- CUSTOMER SERVICE -->
+
+            <div class="footer-column">
+
+                <h5>Customer Service</h5>
+
+                <ul class="footer-links">
+
+                    <li>
+                        <a href="#">
+                            <i class="fa-solid fa-chevron-right"></i>
+                            Help Center
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="#">
+                            <i class="fa-solid fa-chevron-right"></i>
+                            Track Order
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="#">
+                            <i class="fa-solid fa-chevron-right"></i>
+                            Shipping Information
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="#">
+                            <i class="fa-solid fa-chevron-right"></i>
+                            Returns & Refunds
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="#">
+                            <i class="fa-solid fa-chevron-right"></i>
+                            FAQ
+                        </a>
+                    </li>
+
+                </ul>
+
+            </div>
+
+
+            <!-- NEWSLETTER -->
+
+            <div class="footer-column">
+
+                <h5>Stay Connected</h5>
+
+                <p class="footer-newsletter-text">
+                    Subscribe to receive the latest products,
+                    offers and updates from MYSHOP.
+                </p>
+
+
+                <form class="footer-newsletter"
+                      onsubmit="subscribeMyShop(event)">
+
+                    <input
+                        type="email"
+                        class="footer-newsletter-input"
+                        placeholder="Enter your email"
+                        required
+                    >
+
+                    <button type="submit" aria-label="Subscribe">
+
+                        <i class="fa-solid fa-paper-plane"></i>
+
+                    </button>
+
+                </form>
+
+                <span class="footer-newsletter-note">
+                    We respect your privacy. No spam.
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <!-- =========================
+             FEATURES
+             ========================= -->
+
+        <div class="footer-features">
+
+            <div class="footer-feature">
+
+                <div class="footer-feature-icon">
+                    <i class="fa-solid fa-shield-halved"></i>
+                </div>
+
+                <div>
+                    <strong>Secure Shopping</strong>
+                    <span>Safe & protected checkout</span>
+                </div>
+
+            </div>
+
+
+            <div class="footer-feature">
+
+                <div class="footer-feature-icon">
+                    <i class="fa-solid fa-truck-fast"></i>
+                </div>
+
+                <div>
+                    <strong>Fast Delivery</strong>
+                    <span>Reliable doorstep delivery</span>
+                </div>
+
+            </div>
+
+
+            <div class="footer-feature">
+
+                <div class="footer-feature-icon">
+                    <i class="fa-solid fa-headset"></i>
+                </div>
+
+                <div>
+                    <strong>Customer Support</strong>
+                    <span>We're here to help you</span>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =========================
+         COPYRIGHT
+         ========================= -->
+
+    <div class="footer-bottom">
+
+        <div class="footer-bottom-container">
+
+            <p class="footer-copyright">
+
+                © <span id="footerYear"></span>
+
+                <strong>THE MYSHOP</strong>.
+
+                All Rights Reserved.
+
+            </p>
+
+
+            <div class="footer-bottom-links">
+
+                <a href="#">
+                    Privacy Policy
+                </a>
+
+                <a href="#">
+                    Terms & Conditions
+                </a>
+
+                <a href="#">
+                    Cookie Policy
+                </a>
+
+            </div>
+
+        </div>
+
+    </div>
+
 </footer>
+
+
+<script>
+
+    /* =========================
+       CURRENT YEAR
+       ========================= */
+
+    document.getElementById("footerYear").textContent =
+        new Date().getFullYear();
+
+
+    /* =========================
+       NEWSLETTER
+       ========================= */
+
+    function subscribeMyShop(event) {
+
+        event.preventDefault();
+
+        const email =
+            event.target.querySelector("input").value.trim();
+
+        if (!email) {
+            return;
+        }
+
+        /*
+         * Currently this is UI only.
+         * Connect this form to your servlet later
+         * if you want to store subscribers.
+         */
+
+        if (typeof Swal !== "undefined") {
+
+            Swal.fire({
+                icon: "success",
+                title: "Subscribed!",
+                text: "Thank you for subscribing to MYSHOP.",
+                confirmButtonText: "OK",
+                confirmButtonColor: "#2563eb"
+            });
+
+        } else {
+
+            alert("Thank you for subscribing to MYSHOP.");
+
+        }
+
+        event.target.reset();
+    }
+
+
+    /* =========================
+       THEME SUPPORT
+       ========================= */
+
+    function applyFooterTheme() {
+
+        const theme =
+            localStorage.getItem("myshop-theme");
+
+        if (theme === "dark") {
+
+            document.body.classList.add("dark-mode");
+
+        } else {
+
+            document.body.classList.remove("dark-mode");
+
+        }
+    }
+
+
+    applyFooterTheme();
+
+
+    /*
+     * If your header/theme toggle changes
+     * localStorage, this keeps the footer synchronized.
+     */
+
+    window.addEventListener("storage", function(event) {
+
+        if (event.key === "myshop-theme") {
+
+            applyFooterTheme();
+
+        }
+
+    });
+
+</script>

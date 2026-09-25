@@ -2,124 +2,525 @@
 <%@page import="com.myshop.beans.StaffBean"%>
 <%@page import="com.myshop.service.impl.StaffServiceImpl"%>
 
+<%@ page language="java"
+         contentType="text/html; charset=UTF-8"
+         pageEncoding="UTF-8"%>
+
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>MYSHOP - STAFF PROFILE PAGE</title>
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
-        <link rel="stylesheet" href="./css/main.css">
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 
-    </head>
-    <body style="background-color: #E6F9E6"> 
-        
-        <%
-//            Checking the User crendentials
-            String userName = (String)session.getAttribute("username");
-            String password = (String)session.getAttribute("role");
-            System.out.println("userName: "+userName);
-            if(userName == null|| password == null){
-                response.sendRedirect("login.jsp?message= Session Expired! Please Login Again!!");
-            }
-            
-            StaffService dao = new StaffServiceImpl();
-            StaffBean staff = dao.getStaffDetails(userName, password);
-            System.out.println(staff.getStaffId());
-        %>
+<head>
 
-        <jsp:include page="/header.jsp"/>
-        <div class="container bg-secondary">
-            
-            <div class="row">
-                <div class="col">
-                    <nav class="bg-light rounded-3 p-3 mb-4" aria-label="breadcrumb" >
-                        <ol class="breadcrumb mb-0">
-                            <li class="breadcrumb-item"><a href="index.jsp">Home</a></li>
-                            <li class="breadcrumb-item active" aria-current="page">Staff Profile</li>
-                        </ol>
-                    </nav>
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>MYSHOP - Staff Profile</title>
+
+
+    <!-- =====================================================
+         FAVICON
+         ===================================================== -->
+
+    <link rel="icon"
+          type="image/x-icon"
+          href="<%=request.getContextPath()%>/favicon.ico">
+
+
+    <!-- =====================================================
+         BOOTSTRAP 5
+         ===================================================== -->
+
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+        rel="stylesheet">
+
+
+    <!-- =====================================================
+         FONT AWESOME
+         ===================================================== -->
+
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+
+    <!-- =====================================================
+         GOOGLE FONT
+         ===================================================== -->
+
+    <link rel="preconnect"
+          href="https://fonts.googleapis.com">
+
+    <link rel="preconnect"
+          href="https://fonts.gstatic.com">
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
+
+    <link rel="stylesheet" href="<%=request.getContextPath()%>/css/staffp.css"/>
+
+</head>
+
+
+<body>
+
+
+<%
+    /* =========================================================
+       SESSION VALIDATION
+       ========================================================= */
+
+    String userName =
+        (String) session.getAttribute("username");
+
+    String userType =
+        (String) session.getAttribute("role");
+
+    String userId =
+        (String) session.getAttribute("user_id");
+
+
+    if (userName == null
+            || userType == null
+            || userId == null
+            || userId.trim().isEmpty()
+            || (
+                !"STAFF".equalsIgnoreCase(userType)
+                &&
+                !"DELIVERY".equalsIgnoreCase(userType)
+            )) {
+
+        response.sendRedirect(
+            request.getContextPath()
+            + "/login.jsp?message=Session Expired! Please Login Again!!"
+        );
+
+        return;
+
+    }
+
+
+    /* =========================================================
+       FETCH STAFF
+       ========================================================= */
+
+    StaffService dao =
+        new StaffServiceImpl();
+
+
+    StaffBean staff = dao.getStaffDetails(userName);
+
+    if (staff == null) {
+
+        response.sendRedirect(
+            request.getContextPath()
+            + "/login.jsp?message=Staff profile not found"
+        );
+
+        return;
+
+    }
+
+%>
+
+
+<!-- =========================================================
+     HEADER
+     ========================================================= -->
+
+<jsp:include page="/header.jsp"/>
+
+
+<!-- =========================================================
+     MAIN
+     ========================================================= -->
+
+<div class="profile-page">
+
+
+    <!-- =====================================================
+         BREADCRUMB
+         ===================================================== -->
+
+    <div class="breadcrumb-card">
+
+        <nav aria-label="breadcrumb">
+
+            <ol class="breadcrumb">
+
+                <li class="breadcrumb-item">
+
+                    <a href="<%=request.getContextPath()%>/index.jsp">
+
+                        <i class="fa-solid fa-house me-1"></i>
+
+                        Home
+
+                    </a>
+
+                </li>
+
+
+                <li class="breadcrumb-item active"
+                    aria-current="page">
+
+                    Staff Profile
+
+                </li>
+
+            </ol>
+
+        </nav>
+
+    </div>
+
+
+    <!-- =====================================================
+         PROFILE GRID
+         ===================================================== -->
+
+    <div class="profile-grid">
+
+
+        <!-- =================================================
+             LEFT SIDE
+             ================================================= -->
+
+        <div>
+
+
+            <!-- PROFILE -->
+
+            <div class="glass-card profile-card">
+
+
+                <div class="profile-icon">
+
+                    <i class="fa-solid fa-user"></i>
+
                 </div>
+
+
+                <div class="profile-image-wrapper">
+
+                    <img
+                        class="profile-image"
+                        src="<%=request.getContextPath()%>/showProfileImg?uid=<%=staff.getStaffId()%>"
+                        alt="<%=staff.getName() %>"
+                        onerror="this.src='<%=request.getContextPath()%>/images/noimage.jpg';"
+                    >
+
+                </div>
+
+
+                <div class="hello-text">
+
+                    Hello
+
+                </div>
+
+
+                <div class="staff-name">
+
+                    <%=staff.getName()%>
+
+                </div>
+
+
+                <div class="staff-role">
+
+                    <i class="fa-solid fa-id-badge"></i>
+
+                    <%=userType%>
+
+                </div>
+
+
             </div>
-            
-            <div class="row">
-                <div class="col-lg-4">
-                    <div class="card mb-4">
-                        
-                        <div class="card-header">
-                            <i class="fa fa-user" style="margin-right: 10px; "></i>
-                            <span style="margin-left: -5px; justify-content: center; align-items: center; font-size:larger; font-weight: bold;">Staff Profile</span>
-                        </div>
-                        
-                        <div class="card-body text-center">
-                            <img src="./showProfileImg?uid=<%=staff.getStaffId() %>" alt="<%=staff.getStaffName()%>" style="height: 150px; max-width: 180px;" >
-                            <p class="username"><span style="color: crimson; font-size: 14px; font-weight: 700;">Hello</span>&nbsp;<%=staff.getStaffName()%></p>
-                        </div>                        
-                    </div>
 
-                    <div class="card mb-4 mb-lg-0">
-                        <div class="card-body p-0">
-                            <ul class="list-group list-group-flush rounded-3">
-                                <li class="list-group-item d-flex justify-content-between align-items-center p-3">
-                                   
-                                    <a href="#">My Profile</a> | 
-                                    <a href="./orderDetails.jsp?uerId=<%=staff.getStaffId()%>">Orders</a> | 
-                                    <a href="./orderDetails.jsp?uerId=<%=staff.getStaffId()%>">Transactions</a> | 
-                                    <a href="#">Wallet</a> | 
-                                    <a href="#">CashBack</a>
-                                
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
+
+            <!-- QUICK LINKS -->
+
+            <div class="glass-card quick-links">
+
+
+                <div class="quick-title">
+
+                    <i class="fa-solid fa-bars me-1"></i>
+
+                    Quick Links
 
                 </div>
 
-                <div class="col-lg-8">
-                    <div class="card mb-4">
-                        <div class="card-body">
 
-                            <div class="row">
-                                <div class="col-sm-3">
-                                    <p class="mb-0">Full Name</p>
-                                </div>
-                                <div class="col-sm-9">
-                                    <p class="text-muted mb-0"><%= staff.getStaffName() %></p>
-                                </div>
-                            </div>
-                            
-                            <hr>
+                <a
+                    href="<%=request.getContextPath()%>/staff/staffProfile.jsp"
+                    class="quick-link"
+                >
 
-                            <div class="row">
-                                <div class="col-sm-3">
-                                    <p class="mb-0">Email</p>
-                                </div>
-                                <div class="col-sm-9">
-                                    <p class="mb-0"><%= staff.getStaffId()%></p>
-                                </div>
-                            </div>
-                            <hr>
-                            
-                            <div class="row">
-                                <div class="col-sm-3">
-                                    <p class="mb-0">Phone</p>
-                                </div>
-                                <div class="col-sm-9">
-                                    <p class="mb-0"><%= staff.getMobile() %></p>
-                                </div>
-                            </div>
-                            <hr>
-                            
-                            
-                        </div>
-                    </div>
-                </div>
-            </div>        
+                    <i class="fa-solid fa-user"></i>
+
+                    My Profile
+
+                </a>
+
+
+                <a
+                    href="<%=request.getContextPath()%>/staff/pendingDeliveries.jsp?id=<%=userId%>"
+                    class="quick-link"
+                >
+
+                    <i class="fa-solid fa-truck"></i>
+
+                    Pending Deliveries
+
+                </a>
+
+
+                <a
+                    href="<%=request.getContextPath()%>/staff/deliveryHistory.jsp"
+                    class="quick-link"
+                >
+
+                    <i class="fa-solid fa-clock-rotate-left"></i>
+
+                    Delivery History
+
+                </a>
+
+
+                <a
+                    href="<%=request.getContextPath()%>/staff/updateDelivery.jsp"
+                    class="quick-link"
+                >
+
+                    <i class="fa-solid fa-pen-to-square"></i>
+
+                    Update Delivery
+
+                </a>
+
+
+                <a
+                    href="<%=request.getContextPath()%>/LogoutSrv"
+                    class="quick-link"
+                >
+
+                    <i class="fa-solid fa-right-from-bracket"></i>
+
+                    Logout
+
+                </a>
+
+
+            </div>
+
+
         </div>
-        <br><br><br>
-        <jsp:include page="/footer.html"></jsp:include>
-    </body>
+
+
+        <!-- =================================================
+             RIGHT SIDE
+             ================================================= -->
+
+        <div class="glass-card details-card">
+
+
+            <div class="details-title">
+
+
+                <div class="details-title-icon">
+
+                    <i class="fa-solid fa-address-card"></i>
+
+                </div>
+
+
+                <div>
+
+                    <h2>
+                        Staff Information
+                    </h2>
+
+                    <p>
+                        Your registered staff account details
+                    </p>
+
+                </div>
+
+
+            </div>
+
+
+            <!-- FULL NAME -->
+
+            <div class="info-row">
+
+                <div class="info-label">
+
+                    <i class="fa-solid fa-user"></i>
+
+                    Full Name
+
+                </div>
+
+
+                <div class="info-value">
+
+                    <%=staff.getName()%>
+
+                </div>
+
+            </div>
+
+
+            <!-- STAFF ID -->
+
+            <div class="info-row">
+
+                <div class="info-label">
+
+                    <i class="fa-solid fa-id-card"></i>
+
+                    Staff ID
+
+                </div>
+
+
+                <div class="info-value">
+
+                    <span class="staff-id">
+
+                        <%=staff.getStaffId()%>
+
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <!-- MOBILE -->
+
+            <div class="info-row">
+
+                <div class="info-label">
+
+                    <i class="fa-solid fa-phone"></i>
+
+                    Phone
+
+                </div>
+
+
+                <div class="info-value">
+
+                    <%=staff.getMobile()%>
+
+                </div>
+
+            </div>
+
+
+            <!-- EMAIL -->
+
+            <div class="info-row">
+
+                <div class="info-label">
+
+                    <i class="fa-solid fa-envelope"></i>
+
+                    Email
+
+                </div>
+
+
+                <div class="info-value">
+
+                    <%=userName%>
+
+                </div>
+
+            </div>
+
+
+            <!-- ROLE -->
+
+            <div class="info-row">
+
+                <div class="info-label">
+
+                    <i class="fa-solid fa-user-shield"></i>
+
+                    Role
+
+                </div>
+
+
+                <div class="info-value">
+
+                    <%=userType%>
+
+                </div>
+
+            </div>
+
+
+        </div>
+
+
+    </div>
+
+
+</div>
+
+
+<!-- =========================================================
+     FOOTER
+     ========================================================= -->
+
+<jsp:include page="/footer.html"/>
+
+
+<!-- =========================================================
+     BOOTSTRAP JS
+     ========================================================= -->
+
+<script
+    src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js">
+</script>
+
+
+<!-- =========================================================
+     THEME
+     ========================================================= -->
+
+<script>
+
+    function applyTheme() {
+
+        const theme =
+            localStorage.getItem("myshop-theme");
+
+        if (theme === "dark") {
+
+            document.body.classList.add(
+                "dark-mode"
+            );
+
+        }
+
+    }
+
+
+    applyTheme();
+
+</script>
+
+
+</body>
+
 </html>

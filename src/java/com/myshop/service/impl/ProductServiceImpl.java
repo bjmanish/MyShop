@@ -3,490 +3,1265 @@ package com.myshop.service.impl;
 import com.myshop.beans.DemandBean;
 import com.myshop.beans.ProductBean;
 import com.myshop.service.ProductService;
-//import com.myshop.utility.MailMessage;
 import com.myshop.utility.dbUtil;
 import com.myshop.utility.idUtil;
+
 import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class ProductServiceImpl implements ProductService {
 
+    // =========================================================
+    // ADD PRODUCT
+    // =========================================================
+
     @Override
-    public String addProduct(String prodName, String prodType, String prodInfo,double prodPrice, int prodQuantity, InputStream prodImage) {
+    public String addProduct(
+            String prodName,
+            String prodType,
+            String prodInfo,
+            double prodPrice,
+            int prodQuantity,
+            InputStream prodImage) {
 
         String status;
-        String prodId = idUtil.generateProductId();
-        ProductBean product = new ProductBean(prodId, prodName, prodType, prodInfo,prodPrice, prodQuantity, prodImage);
+
+        String prodId =
+                idUtil.generateProductId();
+
+        ProductBean product =
+                new ProductBean(
+                        prodId,
+                        prodName,
+                        prodType,
+                        prodInfo,
+                        prodPrice,
+                        prodQuantity,
+                        prodImage
+                );
+
         status = addProduct(product);
+
         return status;
     }
+
+
+    // =========================================================
+    // ADD PRODUCT
+    // =========================================================
 
     @Override
     public String addProduct(ProductBean product) {
 
-        String status = "Product Registration Failed!";
-        if (product.getProdId() == null) {
-            product.setProdId(idUtil.generateProductId());
-        }   
+        String status =
+                "Product Registration Failed!";
 
-        
-        String query = "INSERT INTO PRODUCTS "
-                + "(product_id, name, category, description, price, stock, image) "
-                + "VALUES (?,?,?,?,?,?,?)";
-        try(Connection conn = dbUtil.provideConnection();
-            PreparedStatement ps = conn.prepareStatement(query);) {
-            
-            ps.setString(1, product.getProdId());
-            ps.setString(2, product.getProdName());
-            ps.setString(3, product.getProdType());
-            ps.setString(4, product.getProdInfo());
-            ps.setDouble(5, product.getProdPrice());
-            ps.setInt(6, product.getProdQuantity());
-            ps.setBlob(7, product.getProdImage());
-            
-            int k = ps.executeUpdate();
+        if (product == null) {
+            return "Product Registration Failed: Product is null!";
+        }
+
+        if (product.getProdId() == null
+                || product.getProdId().trim().isEmpty()) {
+
+            product.setProdId(
+                    idUtil.generateProductId()
+            );
+        }
+
+        String query =
+                "INSERT INTO PRODUCTS "
+                + "(pId, pName, pType, pInfo, "
+                + "pPrice, pQuantity, image) "
+                + "VALUES (?, ?, ?, ?, ?, ?, ?)";
+
+        try (
+                Connection conn =
+                        dbUtil.provideConnection();
+
+                PreparedStatement ps =
+                        conn.prepareStatement(query)
+        ) {
+
+            ps.setString(
+                    1,
+                    product.getProdId()
+            );
+
+            ps.setString(
+                    2,
+                    product.getProdName()
+            );
+
+            ps.setString(
+                    3,
+                    product.getProdType()
+            );
+
+            ps.setString(
+                    4,
+                    product.getProdInfo()
+            );
+
+            ps.setDouble(
+                    5,
+                    product.getProdPrice()
+            );
+
+            ps.setInt(
+                    6,
+                    product.getProdQuantity()
+            );
+
+            if (product.getProdImage() != null) {
+
+                ps.setBlob(
+                        7,
+                        product.getProdImage()
+                );
+
+            } else {
+
+                ps.setNull(
+                        7,
+                        java.sql.Types.BLOB
+                );
+            }
+
+            int k =
+                    ps.executeUpdate();
 
             if (k > 0) {
-                status = "Product Added Successfully! ID: " + product.getProdId();
+
+                status =
+                        "Product Added Successfully! ID: "
+                        + product.getProdId();
+
             } else {
-                status = "Product Insertion Failed!";
+
+                status =
+                        "Product Insertion Failed!";
             }
 
         } catch (SQLException ex) {
-            status = "Error: While insert data ";
-            System.out.println("Error While iserting product :"+ex.getMessage());
+
+            status =
+                    "Error: While inserting product";
+
+            System.err.println(
+                    "Error while inserting product: "
+                    + ex.getMessage()
+            );
+
             ex.printStackTrace();
         }
+
         return status;
     }
-    
+
+
+    // =========================================================
+    // UPDATE PRODUCT PRICE
+    // =========================================================
+
     @Override
-    public String updateProductPrice(String prodId, double updatePrice) {
-        String status = "Price Updation Failed!";
-        String query = "UPDATE PRODUCTS SET price = ? WHERE product_id = ?";
-        try{
-            Connection conn = dbUtil.provideConnection();
-            PreparedStatement ps = conn.prepareStatement(query);
-            ps.setDouble(1, updatePrice);
-            ps.setString(2, prodId);
-            
-            int k = ps.executeUpdate();
-            
-            if(k>0){
-                status = "Price Updation Successfully.";
+    public String updateProductPrice(
+            String prodId,
+            double updatePrice) {
+
+        String status =
+                "Price Updation Failed!";
+
+        String query =
+                "UPDATE PRODUCTS "
+                + "SET pPrice = ? "
+                + "WHERE pId = ?";
+
+        try (
+                Connection conn =
+                        dbUtil.provideConnection();
+
+                PreparedStatement ps =
+                        conn.prepareStatement(query)
+        ) {
+
+            ps.setDouble(
+                    1,
+                    updatePrice
+            );
+
+            ps.setString(
+                    2,
+                    prodId
+            );
+
+            int k =
+                    ps.executeUpdate();
+
+            if (k > 0) {
+
+                status =
+                        "Price Updation Successfully.";
             }
-        }catch(SQLException ex){
-            status = "Status="+status+"&Error: "+ ex.getMessage();
+
+        } catch (SQLException ex) {
+
+            status =
+                    "Status=" + status
+                    + "&Error=" + ex.getMessage();
+
             ex.printStackTrace();
         }
+
         return status;
     }
+
+
+    // =========================================================
+    // GET ALL PRODUCTS
+    // =========================================================
 
     @Override
     public List<ProductBean> getAllProducts() {
 
-        List<ProductBean> products = new ArrayList<>();
+        List<ProductBean> products =
+                new ArrayList<>();
 
-        String query = "SELECT * FROM PRODUCTS";
+        String query =
+                "SELECT pId, pName, pType, pInfo, "
+                + "pPrice, pQuantity, image "
+                + "FROM PRODUCTS";
 
         try (
-            Connection conn = dbUtil.provideConnection();
-            PreparedStatement ps = conn.prepareStatement(query);
-            ResultSet rs = ps.executeQuery();
+                Connection conn =
+                        dbUtil.provideConnection();
+
+                PreparedStatement ps =
+                        conn.prepareStatement(query);
+
+                ResultSet rs =
+                        ps.executeQuery()
         ) {
 
             while (rs.next()) {
-                ProductBean product = new ProductBean();
 
-                product.setProdId(rs.getString("product_id"));
-                product.setProdName(rs.getString("name"));
-                product.setProdPrice(rs.getDouble("price"));
-                product.setProdQuantity(rs.getInt("stock"));
-                product.setProdType(rs.getString("category"));
-                product.setProdInfo(rs.getString("description"));
-                product.setProdImage(rs.getBinaryStream("image"));
+                ProductBean product =
+                        new ProductBean();
+
+                product.setProdId(
+                        rs.getString("pId")
+                );
+
+                product.setProdName(
+                        rs.getString("pName")
+                );
+
+                product.setProdPrice(
+                        rs.getDouble("pPrice")
+                );
+
+                product.setProdQuantity(
+                        rs.getInt("pQuantity")
+                );
+
+                product.setProdType(
+                        rs.getString("pType")
+                );
+
+                product.setProdInfo(
+                        rs.getString("pInfo")
+                );
+
+                product.setProdImage(
+                        rs.getBinaryStream("image")
+                );
 
                 products.add(product);
             }
 
         } catch (SQLException ex) {
+
+            System.err.println(
+                    "Error while fetching all products: "
+                    + ex.getMessage()
+            );
+
             ex.printStackTrace();
         }
 
         return products;
     }
-    @Override
-    public List<ProductBean> getAllProductsByType(String category) {
-        List<ProductBean> products = new ArrayList<>();
-        
-        
-        PreparedStatement ps = null;
-        ResultSet rs = null;
-        String query = "SELECT * FROM PRODUCTS WHERE lower(category) like ?";
-        try{
-            Connection conn = dbUtil.provideConnection();
-            ps = conn.prepareStatement(query);
-            ps.setString(1, category);
-            rs = ps.executeQuery();
-            if(rs.next()){
-                ProductBean product = new ProductBean();
-                product.setProdId(rs.getString(1));
-                product.setProdName(rs.getString(2));
-                product.setProdType(rs.getString(3));
-                product.setProdInfo(rs.getString(4));
-                product.setProdPrice(rs.getDouble(5));
-                product.setProdQuantity(rs.getInt(6));
-                product.setProdImage(rs.getAsciiStream(7));
-                
-                products.add(product);
-            }
-        }catch(SQLException ex){
-            ex.printStackTrace();
-        }
-        
-        return products;
-    }
+
+
+    // =========================================================
+    // GET PRODUCTS BY TYPE
+    // =========================================================
 
     @Override
-    public List<ProductBean> searchAllProducts(String search) {
-        List<ProductBean> products = new ArrayList<>();
-        String query = "SELECT * FROM PRODUCTS WHERE LOWER(category) LIKE ? OR LOWER(name) LIKE ? OR LOWER(description) LIKE ?";
-        search = "%" + search + "%";
-        try{
-            Connection conn = dbUtil.provideConnection();
-            PreparedStatement ps = conn.prepareStatement(query);
-            ps.setString(1, search);
-            ps.setString(2, search);
-            ps.setString(3, search);
-            ResultSet rs = ps.executeQuery();
-            if(rs.next()){
-                ProductBean product = new ProductBean();
-                product.setProdId(rs.getString(1));
-                product.setProdName(rs.getString(2));
-                product.setProdType(rs.getString(3));
-                product.setProdInfo(rs.getString(4));
-                product.setProdPrice(rs.getDouble(5));
-                product.setProdQuantity(rs.getInt(6));
-                product.setProdImage(rs.getAsciiStream(7));
-                
-                products.add(product);
-            }
-        }catch(SQLException ex){
-            ex.printStackTrace();
-        }
-        
-        return products;
-    }
+    public List<ProductBean> getAllProductsByType(
+            String pType) {
 
-    @Override
-    public byte[] getProductImage(String prodId) {
-        byte[] image = null;
-//        ResultSet rs = null;
-        try(Connection conn = dbUtil.provideConnection();
-            PreparedStatement ps = conn.prepareStatement(
-                 "SELECT image FROM PRODUCTS WHERE product_id=?")){
-            ps.setString(1, prodId);
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    image = rs.getBytes("image");
-//                    System.out.println("Image size: " + (image != null ? image.length : "NULL"));
-                } else {
-                    System.out.println("No record found for product_id: " + prodId);
+        List<ProductBean> products =
+                new ArrayList<>();
+
+        String query =
+                "SELECT pId, pName, pType, pInfo, "
+                + "pPrice, pQuantity, image "
+                + "FROM PRODUCTS "
+                + "WHERE LOWER(pType) LIKE ?";
+
+        try (
+                Connection conn =
+                        dbUtil.provideConnection();
+
+                PreparedStatement ps =
+                        conn.prepareStatement(query)
+        ) {
+
+            ps.setString(
+                    1,
+                    "%" + pType.toLowerCase() + "%"
+            );
+
+            try (
+                    ResultSet rs =
+                            ps.executeQuery()
+            ) {
+
+                while (rs.next()) {
+
+                    ProductBean product =
+                            new ProductBean();
+
+                    product.setProdId(
+                            rs.getString("pId")
+                    );
+
+                    product.setProdName(
+                            rs.getString("pName")
+                    );
+
+                    product.setProdType(
+                            rs.getString("pType")
+                    );
+
+                    product.setProdInfo(
+                            rs.getString("pInfo")
+                    );
+
+                    product.setProdPrice(
+                            rs.getDouble("pPrice")
+                    );
+
+                    product.setProdQuantity(
+                            rs.getInt("pQuantity")
+                    );
+
+                    product.setProdImage(
+                            rs.getBinaryStream("image")
+                    );
+
+                    products.add(product);
                 }
             }
+
         } catch (SQLException ex) {
-            System.out.println("Error to fetching image of Product image methods :"+ex.getMessage());
+
+            System.err.println(
+                    "Error while fetching products by type: "
+                    + ex.getMessage()
+            );
+
             ex.printStackTrace();
         }
+
+        return products;
+    }
+
+
+    // =========================================================
+    // SEARCH PRODUCTS
+    // =========================================================
+
+    @Override
+    public List<ProductBean> searchAllProducts(
+            String search) {
+
+        List<ProductBean> products =
+                new ArrayList<>();
+
+        String query =
+                "SELECT pId, pName, pType, pInfo, "
+                + "pPrice, pQuantity, image "
+                + "FROM PRODUCTS "
+                + "WHERE LOWER(pType) LIKE ? "
+                + "OR LOWER(pName) LIKE ? "
+                + "OR LOWER(pInfo) LIKE ?";
+
+        if (search == null) {
+            search = "";
+        }
+
+        String searchValue =
+                "%" + search.toLowerCase() + "%";
+
+        try (
+                Connection conn =
+                        dbUtil.provideConnection();
+
+                PreparedStatement ps =
+                        conn.prepareStatement(query)
+        ) {
+
+            ps.setString(
+                    1,
+                    searchValue
+            );
+
+            ps.setString(
+                    2,
+                    searchValue
+            );
+
+            ps.setString(
+                    3,
+                    searchValue
+            );
+
+            try (
+                    ResultSet rs =
+                            ps.executeQuery()
+            ) {
+
+                while (rs.next()) {
+
+                    ProductBean product =
+                            new ProductBean();
+
+                    product.setProdId(
+                            rs.getString("pId")
+                    );
+
+                    product.setProdName(
+                            rs.getString("pName")
+                    );
+
+                    product.setProdType(
+                            rs.getString("pType")
+                    );
+
+                    product.setProdInfo(
+                            rs.getString("pInfo")
+                    );
+
+                    product.setProdPrice(
+                            rs.getDouble("pPrice")
+                    );
+
+                    product.setProdQuantity(
+                            rs.getInt("pQuantity")
+                    );
+
+                    product.setProdImage(
+                            rs.getBinaryStream("image")
+                    );
+
+                    products.add(product);
+                }
+            }
+
+        } catch (SQLException ex) {
+
+            System.err.println(
+                    "Error while searching products: "
+                    + ex.getMessage()
+            );
+
+            ex.printStackTrace();
+        }
+
+        return products;
+    }
+
+
+    // =========================================================
+    // GET PRODUCT IMAGE
+    // =========================================================
+
+    @Override
+    public byte[] getProductImage(
+            String prodId) {
+
+        byte[] image = null;
+
+        String query =
+                "SELECT image "
+                + "FROM PRODUCTS "
+                + "WHERE pId = ?";
+
+        try (
+                Connection conn =
+                        dbUtil.provideConnection();
+
+                PreparedStatement ps =
+                        conn.prepareStatement(query)
+        ) {
+
+            ps.setString(
+                    1,
+                    prodId
+            );
+
+            try (
+                    ResultSet rs =
+                            ps.executeQuery()
+            ) {
+
+                if (rs.next()) {
+
+                    image =
+                            rs.getBytes("image");
+                }
+            }
+
+        } catch (SQLException ex) {
+
+            System.err.println(
+                    "Error fetching product image: "
+                    + ex.getMessage()
+            );
+
+            ex.printStackTrace();
+        }
+
         return image;
     }
 
+
+    // =========================================================
+    // GET PRODUCT DETAILS
+    // =========================================================
+
     @Override
-    public ProductBean getProductDetails(String prodId) {
-        //List<ProductBean> products = new ArrayList<>();
+    public ProductBean getProductDetails(
+            String prodId) {
+
         ProductBean product = null;
-        
-        PreparedStatement ps = null;
-        ResultSet rs = null;
-        
-        try{
-            Connection conn = dbUtil.provideConnection();
-            ps = conn.prepareStatement("SELECT * FROM PRODUCTS WHERE product_id=?");
-            ps.setString(1, prodId);
-            rs = ps.executeQuery();
-            if(rs.next()){
-                product = new ProductBean();
-                product.setProdId(rs.getString("product_id"));
-                product.setProdName(rs.getString("name"));
-                product.setProdType(rs.getString("category"));
-                product.setProdInfo(rs.getString("description"));
-                product.setProdPrice(rs.getDouble("price"));
-                product.setProdQuantity(rs.getInt("stock"));
-                product.setProdImage(rs.getBinaryStream("image"));
+
+        String query =
+                "SELECT pId, pName, pType, pInfo, "
+                + "pPrice, pQuantity, image "
+                + "FROM PRODUCTS "
+                + "WHERE pId = ?";
+
+        try (
+                Connection conn =
+                        dbUtil.provideConnection();
+
+                PreparedStatement ps =
+                        conn.prepareStatement(query)
+        ) {
+
+            ps.setString(
+                    1,
+                    prodId
+            );
+
+            try (
+                    ResultSet rs =
+                            ps.executeQuery()
+            ) {
+
+                if (rs.next()) {
+
+                    product =
+                            new ProductBean();
+
+                    product.setProdId(
+                            rs.getString("pId")
+                    );
+
+                    product.setProdName(
+                            rs.getString("pName")
+                    );
+
+                    product.setProdType(
+                            rs.getString("pType")
+                    );
+
+                    product.setProdInfo(
+                            rs.getString("pInfo")
+                    );
+
+                    product.setProdPrice(
+                            rs.getDouble("pPrice")
+                    );
+
+                    product.setProdQuantity(
+                            rs.getInt("pQuantity")
+                    );
+
+                    product.setProdImage(
+                            rs.getBinaryStream("image")
+                    );
+                }
             }
-            //System.out.println("Product Details:"+product.toString());
-        }catch(SQLException ex){
-            System.out.println("Errro in fetching product details from db:"+ex.getMessage());
+
+        } catch (SQLException ex) {
+
+            System.err.println(
+                    "Error fetching product details: "
+                    + ex.getMessage()
+            );
+
             ex.printStackTrace();
         }
-        
+
         return product;
     }
 
+
+    // =========================================================
+    // UPDATE PRODUCT WITHOUT IMAGE
+    // =========================================================
+
     @Override
-    public String updateProductWithoutImage(String prevProductId, ProductBean updatedProduct) {
-        String status = "Product Updation Failed!";
-        
-        if(!prevProductId.equals(updatedProduct.getProdId())){
-            status = "Both Products are Different, Updation Failed!";
-            System.out.println("prev ID:"+prevProductId+" &ProductBean ID:"+updatedProduct.getProdId());
+    public String updateProductWithoutImage(
+            String prevProductId,
+            ProductBean updatedProduct) {
+
+        String status =
+                "Product Updation Failed!";
+
+        if (prevProductId == null
+                || updatedProduct == null) {
+
             return status;
         }
-        int prevQuantity = new ProductServiceImpl().getProductQuantity(prevProductId);
-        
-        PreparedStatement ps = null;
-        String query = "UPDATE PRODUCTS SET name=?, category=?, description=?, price=?, stock =? WHERE product_id=?";
-        try{
-            Connection conn = dbUtil.provideConnection();
-            ps = conn.prepareStatement(query);
-            ps.setString(1, updatedProduct.getProdName());
-            ps.setString(2, updatedProduct.getProdType());
-            ps.setString(3, updatedProduct.getProdInfo());
-            ps.setDouble(4, updatedProduct.getProdPrice());
-            ps.setInt(5, updatedProduct.getProdQuantity());
-            ps.setString(6, updatedProduct.getProdId());
-            
-            int k = ps.executeUpdate();
-            if((k > 0 ) && (prevQuantity < updatedProduct.getProdQuantity())){
-                status = "Product update Successfully.";
-                
-                //below this code the demand list for customers demanded
-                
-                List<DemandBean> demandList = new DemandServiceImpl().haveDemanded(prevProductId);
-                for(DemandBean demand : demandList){
-                    String userFName = new UserServiceImpl().getFirstName(demand.getUserName());
-                    try{
-//                        MailMessage.productAvailableNow(demand.getUserName(), userFName, updatedProduct.getProdName(), prevProductId);
-                    }catch(Exception ex){
-                        System.out.println("Mail sending Failed Error:"+ex.getMessage());
-                    }
-                    boolean flag = new DemandServiceImpl().removeProduct(demand.getUserName(), prevProductId );
-                    
-                    if(flag)
-                        status += "And Mail Send to the customers who were waiting for this products.";
-                }
-                
-            }else if(k>0){
-                status = "Product update Successfully.";
-            }else{
-                status = "Product is not available in this store.";
-            }
-            
-        } catch (SQLException ex) {
-            ex.printStackTrace();
+
+        if (!prevProductId.equals(
+                updatedProduct.getProdId())) {
+
+            return "Both Products are Different, "
+                    + "Updation Failed!";
         }
-        
+
+        int prevQuantity =
+                getProductQuantity(prevProductId);
+
+        String query =
+                "UPDATE PRODUCTS SET "
+                + "pName=?, "
+                + "pType=?, "
+                + "pInfo=?, "
+                + "pPrice=?, "
+                + "pQuantity=? "
+                + "WHERE pId=?";
+
+        try (
+                Connection conn =
+                        dbUtil.provideConnection();
+
+                PreparedStatement ps =
+                        conn.prepareStatement(query)
+        ) {
+
+            ps.setString(
+                    1,
+                    updatedProduct.getProdName()
+            );
+
+            ps.setString(
+                    2,
+                    updatedProduct.getProdType()
+            );
+
+            ps.setString(
+                    3,
+                    updatedProduct.getProdInfo()
+            );
+
+            ps.setDouble(
+                    4,
+                    updatedProduct.getProdPrice()
+            );
+
+            ps.setInt(
+                    5,
+                    updatedProduct.getProdQuantity()
+            );
+
+            ps.setString(
+                    6,
+                    updatedProduct.getProdId()
+            );
+
+            int k =
+                    ps.executeUpdate();
+
+            if (k > 0) {
+
+                status =
+                        "Product update Successfully.";
+
+                /*
+                 * Product became available again.
+                 */
+                if (prevQuantity
+                        < updatedProduct.getProdQuantity()) {
+
+                    List<DemandBean> demandList =
+                            new DemandServiceImpl()
+                                    .haveDemanded(
+                                            prevProductId
+                                    );
+
+                    for (
+                            DemandBean demand
+                            : demandList
+                    ) {
+
+                        try {
+
+                            String userFName =
+                                    new UserServiceImpl()
+                                            .getFirstName(
+                                                    demand.getUserName()
+                                            );
+
+                            /*
+                             * Mail sending was disabled
+                             * in the original code.
+                             *
+                             * MailMessage.productAvailableNow(...)
+                             */
+
+                        } catch (Exception ex) {
+
+                            System.out.println(
+                                    "Mail sending failed: "
+                                    + ex.getMessage()
+                            );
+                        }
+
+                        boolean flag =
+                                new DemandServiceImpl()
+                                        .removeProduct(
+                                                demand.getUserName(),
+                                                prevProductId
+                                        );
+
+                        if (flag) {
+
+                            status +=
+                                    " And Mail Send to the "
+                                    + "customers who were waiting "
+                                    + "for this product.";
+                        }
+                    }
+                }
+
+            } else {
+
+                status =
+                        "Product is not available "
+                        + "in this store.";
+            }
+
+        } catch (SQLException ex) {
+
+            System.err.println(
+                    "Error updating product: "
+                    + ex.getMessage()
+            );
+
+            ex.printStackTrace();
+
+            status =
+                    "Error: " + ex.getMessage();
+        }
+
         return status;
     }
 
+
+    // =========================================================
+    // GET PRODUCT PRICE
+    // =========================================================
+
     @Override
-    public double getProductPrice(String prodId) {
+    public double getProductPrice(
+            String prodId) {
+
         double prodPrice = 0;
-        String query = "SELECT price FROM PRODUCTS WHERE product_id=?";
-        
-        try{
-            Connection conn = dbUtil.provideConnection();
-            PreparedStatement ps = conn.prepareStatement(query);
-            ps.setString(1, prodId);
-            ResultSet rs = ps.executeQuery();
-            if(rs.next()){
-                prodPrice = rs.getDouble("price");
+
+        String query =
+                "SELECT pPrice "
+                + "FROM PRODUCTS "
+                + "WHERE pId = ?";
+
+        try (
+                Connection conn =
+                        dbUtil.provideConnection();
+
+                PreparedStatement ps =
+                        conn.prepareStatement(query)
+        ) {
+
+            ps.setString(
+                    1,
+                    prodId
+            );
+
+            try (
+                    ResultSet rs =
+                            ps.executeQuery()
+            ) {
+
+                if (rs.next()) {
+
+                    prodPrice =
+                            rs.getDouble("pPrice");
+                }
             }
+
         } catch (SQLException ex) {
+
             ex.printStackTrace();
         }
-        
+
         return prodPrice;
     }
 
+
+    // =========================================================
+    // SELL PRODUCT
+    // =========================================================
+
     @Override
-    public boolean sellNoProduct(String prodId, int n) {
+    public boolean sellNoProduct(
+            String prodId,
+            int n) {
+
         boolean flag = false;
-        String query = "UPDATE PRODUCTS SET stock = (stock - ?) WHERE product_id = ?";
-        try{
-            Connection conn = dbUtil.provideConnection();
-            PreparedStatement ps = conn.prepareStatement(query);
-            ps.setInt(1, n);
-            ps.setString(2, prodId);
-            
-            int k = ps.executeUpdate();
-            
-            if(k>0){
+
+        String query =
+                "UPDATE PRODUCTS "
+                + "SET pQuantity = pQuantity - ? "
+                + "WHERE pId = ?";
+
+        try (
+                Connection conn =
+                        dbUtil.provideConnection();
+
+                PreparedStatement ps =
+                        conn.prepareStatement(query)
+        ) {
+
+            ps.setInt(
+                    1,
+                    n
+            );
+
+            ps.setString(
+                    2,
+                    prodId
+            );
+
+            int k =
+                    ps.executeUpdate();
+
+            if (k > 0) {
                 flag = true;
             }
-        }catch(SQLException ex){
-            flag = false;
+
+        } catch (SQLException ex) {
+
             ex.printStackTrace();
         }
-        System.out.println("sell No of product: "+flag);
+
+        System.out.println(
+                "sell No of product: "
+                + flag
+        );
+
         return flag;
     }
 
+
+    // =========================================================
+    // GET PRODUCT QUANTITY
+    // =========================================================
+
     @Override
-    public int getProductQuantity(String prodId) {
+    public int getProductQuantity(
+            String prodId) {
+
         int prodQuantity = 0;
-        String query = "SELECT stock FROM PRODUCTS WHERE product_id=?";
-        
-        try{
-            Connection conn = dbUtil.provideConnection();
-            PreparedStatement ps = conn.prepareStatement(query);
-            ps.setString(1, prodId);
-            ResultSet rs = ps.executeQuery();
-            if(rs.next()){
-                prodQuantity = rs.getInt("stock");
+
+        String query =
+                "SELECT pQuantity "
+                + "FROM PRODUCTS "
+                + "WHERE pId = ?";
+
+        try (
+                Connection conn =
+                        dbUtil.provideConnection();
+
+                PreparedStatement ps =
+                        conn.prepareStatement(query)
+        ) {
+
+            ps.setString(
+                    1,
+                    prodId
+            );
+
+            try (
+                    ResultSet rs =
+                            ps.executeQuery()
+            ) {
+
+                if (rs.next()) {
+
+                    prodQuantity =
+                            rs.getInt("pQuantity");
+                }
             }
-            //System.out.println("productQuantity:"+prodQuantity);
+
         } catch (SQLException ex) {
-            System.out.println("Eror in fetching prod quantity:"+ex.getMessage());
+
+            System.err.println(
+                    "Error fetching product quantity: "
+                    + ex.getMessage()
+            );
+
             ex.printStackTrace();
         }
-        
+
         return prodQuantity;
     }
 
-    @Override
-    public List <String> getAllProductId() {
-        List<String> productIds = new ArrayList<>();
 
-        try{
-            Connection conn = dbUtil.provideConnection();
-            PreparedStatement ps  = conn.prepareStatement("SELECT product_id FROM PRODUCTS");
-            ResultSet rs  = ps.executeQuery();
-            if(rs.next()){                
-                productIds.add(rs.getString("product_id"));
+    // =========================================================
+    // GET ALL PRODUCT IDS
+    // =========================================================
+
+    @Override
+    public List<String> getAllProductId() {
+
+        List<String> productIds =
+                new ArrayList<>();
+
+        String query =
+                "SELECT pId FROM PRODUCTS";
+
+        try (
+                Connection conn =
+                        dbUtil.provideConnection();
+
+                PreparedStatement ps =
+                        conn.prepareStatement(query);
+
+                ResultSet rs =
+                        ps.executeQuery()
+        ) {
+
+            while (rs.next()) {
+
+                productIds.add(
+                        rs.getString("pId")
+                );
             }
+
         } catch (SQLException ex) {
-            System.out.println("Error in fetching productId "+ex.getMessage());
+
+            System.err.println(
+                    "Error fetching product IDs: "
+                    + ex.getMessage()
+            );
+
             ex.printStackTrace();
         }
+
         return productIds;
     }
 
+
+    // =========================================================
+    // REMOVE PRODUCT
+    // =========================================================
+
     @Override
-    public String removeProduct(String prodId) {
+    public String removeProduct(
+            String prodId) {
 
-    String query = "DELETE FROM PRODUCTS WHERE product_id=?";
-    String status = "Product Deletion Failed!";
+        String query =
+                "DELETE FROM PRODUCTS "
+                + "WHERE pId = ?";
 
-    try (Connection conn = dbUtil.provideConnection();
-         PreparedStatement ps = conn.prepareStatement(query)) {
+        String status =
+                "Product Deletion Failed!";
 
-        ps.setString(1, prodId);
-        int k = ps.executeUpdate();
+        try (
+                Connection conn =
+                        dbUtil.provideConnection();
 
-        if (k > 0) {
-            status = "Product Deleted Successfully!";
+                PreparedStatement ps =
+                        conn.prepareStatement(query)
+        ) {
 
-            // optional cleanup
-            PreparedStatement ps2 = conn.prepareStatement(
-                "DELETE FROM CART WHERE product_id=?"
+            ps.setString(
+                    1,
+                    prodId
             );
-            ps2.setString(1, prodId);
-            ps2.executeUpdate();
-        }
 
-    } catch (SQLException ex) {
-        status = "Error: " + ex.getMessage();
-        ex.printStackTrace();
-    }
+            int k =
+                    ps.executeUpdate();
 
-    return status;
-}
+            if (k > 0) {
 
-    @Override
-    public String updateProduct(ProductBean product) {
+                status =
+                        "Product Deleted Successfully!";
 
-    String query = "UPDATE PRODUCTS SET name=?, category=?, description=?, price=?, stock=? WHERE product_id=?";
-    String status = "Product Updation Failed!";
+                /*
+                 * Optional cart cleanup.
+                 */
+                try (
+                        PreparedStatement ps2 =
+                                conn.prepareStatement(
+                                        "DELETE FROM CARTS "
+                                        + "WHERE pId = ?"
+                                )
+                ) {
 
-    try (Connection conn = dbUtil.provideConnection();
-         PreparedStatement ps = conn.prepareStatement(query)) {
+                    ps2.setString(
+                            1,
+                            prodId
+                    );
 
-        ps.setString(1, product.getProdName());
-        ps.setString(2, product.getProdType());
-        ps.setString(3, product.getProdInfo());
-        ps.setDouble(4, product.getProdPrice());
-        ps.setInt(5, product.getProdQuantity());
-        ps.setString(6, product.getProdId());
-
-        int k = ps.executeUpdate();
-
-        if (k > 0) {
-            status = "✅ Product Updated Successfully!";
-        }
-
-    } catch (SQLException ex) {
-        ex.printStackTrace();
-        status = "Error: " + ex.getMessage();
-    }
-
-    return status;
-}
-
-    @Override
-    public boolean updateProductImage(String prodId) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
-    public String getProductNameById(String prodId) {
-        String pName = null;
-        
-        try(Connection conn = dbUtil.provideConnection();
-                PreparedStatement ps = conn.prepareStatement("SELECT NAME FROM PRODUCTS WHERE PRODUCT_ID = ?");){
-            
-            ps.setString(1, prodId);
-            ResultSet rs = ps.executeQuery();
-            
-            while(rs.next()){
-                pName = rs.getString("NAME");
+                    ps2.executeUpdate();
+                }
             }
-            
-            System.out.println("Product name "+pName);
-            
+
         } catch (SQLException ex) {
-            ex.getMessage();
-        }
-        
-        return pName;
-    }
-    
-    
-    public String getProdInfo(String prodId){
-        String pInfo = "";
-        
-        try(Connection conn = dbUtil.provideConnection();
-                PreparedStatement ps = conn.prepareStatement("Select * from products where product_id = ?");){
-            ps.setString(1, prodId);
-            
-            ResultSet rs = ps.executeQuery();
-            if(rs.next()){
-                pInfo = rs.getString("name");
-            }            
-        } catch (SQLException ex) {
-            System.out.println("Error in getting Product Info method.");
-            ex.getMessage();
+
+            status =
+                    "Error: " + ex.getMessage();
+
             ex.printStackTrace();
         }
-        
+
+        return status;
+    }
+
+
+    // =========================================================
+    // UPDATE PRODUCT
+    // =========================================================
+
+    @Override
+    public String updateProduct(
+            ProductBean product) {
+
+        String query =
+                "UPDATE PRODUCTS SET "
+                + "pName=?, "
+                + "pType=?, "
+                + "pInfo=?, "
+                + "pPrice=?, "
+                + "pQuantity=? "
+                + "WHERE pId=?";
+
+        String status =
+                "Product Updation Failed!";
+
+        if (product == null) {
+
+            return status;
+        }
+
+        try (
+                Connection conn =
+                        dbUtil.provideConnection();
+
+                PreparedStatement ps =
+                        conn.prepareStatement(query)
+        ) {
+
+            ps.setString(
+                    1,
+                    product.getProdName()
+            );
+
+            ps.setString(
+                    2,
+                    product.getProdType()
+            );
+
+            ps.setString(
+                    3,
+                    product.getProdInfo()
+            );
+
+            ps.setDouble(
+                    4,
+                    product.getProdPrice()
+            );
+
+            ps.setInt(
+                    5,
+                    product.getProdQuantity()
+            );
+
+            ps.setString(
+                    6,
+                    product.getProdId()
+            );
+
+            int k =
+                    ps.executeUpdate();
+
+            if (k > 0) {
+
+                status =
+                        "Product Updated Successfully!";
+            }
+
+        } catch (SQLException ex) {
+
+            ex.printStackTrace();
+
+            status =
+                    "Error: " + ex.getMessage();
+        }
+
+        return status;
+    }
+
+
+    // =========================================================
+    // UPDATE PRODUCT IMAGE
+    // =========================================================
+
+    @Override
+    public boolean updateProductImage(
+            String prodId) {
+
+        throw new UnsupportedOperationException(
+                "Product image update is not supported yet."
+        );
+    }
+
+
+    // =========================================================
+    // GET PRODUCT NAME BY ID
+    // =========================================================
+
+    @Override
+    public String getProductNameById(
+            String prodId) {
+
+        String pName = null;
+
+        String query =
+                "SELECT pName "
+                + "FROM PRODUCTS "
+                + "WHERE pId = ?";
+
+        try (
+                Connection conn =
+                        dbUtil.provideConnection();
+
+                PreparedStatement ps =
+                        conn.prepareStatement(query)
+        ) {
+
+            ps.setString(
+                    1,
+                    prodId
+            );
+
+            try (
+                    ResultSet rs =
+                            ps.executeQuery()
+            ) {
+
+                if (rs.next()) {
+
+                    pName =
+                            rs.getString("pName");
+                }
+            }
+
+        } catch (SQLException ex) {
+
+            System.err.println(
+                    "Error getting product name: "
+                    + ex.getMessage()
+            );
+
+            ex.printStackTrace();
+        }
+
+        return pName;
+    }
+
+
+    // =========================================================
+    // GET PRODUCT INFO
+    // =========================================================
+
+    public String getProdInfo(
+            String prodId) {
+
+        String pInfo = "";
+
+        String query =
+                "SELECT pInfo "
+                + "FROM PRODUCTS "
+                + "WHERE pId = ?";
+
+        try (
+                Connection conn =
+                        dbUtil.provideConnection();
+
+                PreparedStatement ps =
+                        conn.prepareStatement(query)
+        ) {
+
+            ps.setString(
+                    1,
+                    prodId
+            );
+
+            try (
+                    ResultSet rs =
+                            ps.executeQuery()
+            ) {
+
+                if (rs.next()) {
+
+                    pInfo =
+                            rs.getString("pInfo");
+                }
+            }
+
+        } catch (SQLException ex) {
+
+            System.err.println(
+                    "Error getting product info: "
+                    + ex.getMessage()
+            );
+
+            ex.printStackTrace();
+        }
+
         return pInfo;
     }
-    
 }

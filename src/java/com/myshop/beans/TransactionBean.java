@@ -15,7 +15,16 @@ public class TransactionBean implements Serializable{
     private Timestamp transDateTime;
     private double transAmount;
     
+    private String transType;
 //    private DateTime created_at;
+
+    public String getTransType() {
+        return transType;
+    }
+
+    public void setTransType(String transType) {
+        this.transType = transType;
+    }
 
     public TransactionBean() {
         super();
@@ -60,12 +69,13 @@ public class TransactionBean implements Serializable{
     
     
 
-    public TransactionBean(String transId, String userName, Timestamp transDateTime, double transAmount) {
+    public TransactionBean(String transId, String userName, Timestamp transDateTime, double transAmount, String transType) {
         super();
         this.transId = transId;
         this.userName = userName;
         this.transDateTime = transDateTime;
         this.transAmount = transAmount;
+        this.transType = transType;
     }
 
     public String getTransId() {
@@ -112,8 +122,5 @@ public class TransactionBean implements Serializable{
     public String toString() {
         return "TransactionBean{" + "transId=" + transId + ", userName=" + userName + ", orderId=" + orderId + ", transDateTime=" + transDateTime + ", transAmount=" + transAmount + '}';
     }
-
-    
-    
     
 }

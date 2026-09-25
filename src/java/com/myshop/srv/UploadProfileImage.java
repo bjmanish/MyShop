@@ -33,7 +33,7 @@ public class UploadProfileImage extends HttpServlet {
 
         try (Connection con = dbUtil.provideConnection()) {
 
-            String sql = "UPDATE USERS SET image = ? WHERE user_id = ?";
+            String sql = "UPDATE dbo.[USER] SET image = ? WHERE user_id = ?";
             PreparedStatement ps = con.prepareStatement(sql);
 
             ps.setBinaryStream(1, inputStream, (int) filePart.getSize());

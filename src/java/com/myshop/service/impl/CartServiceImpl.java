@@ -21,7 +21,7 @@ public String addProductToCart(String userId, String cartId, String prodId, int 
 
     try (Connection conn = dbUtil.provideConnection()) {
 
-        // ✅ STEP 1: Get/Create Cart
+        // ✅ STEP 1: Get/Create CARTS
         if (cartId == null || cartId.isEmpty()) {
             cartId = getOrCreateCart(userId);
         }
@@ -61,7 +61,7 @@ public String addProductToCart(String userId, String cartId, String prodId, int 
             ps2.setString(3, prodId);
 
             ps2.executeUpdate();
-            status = "Cart updated!";
+            status = "CARTS updated!";
         } else {
             String insertSql = "INSERT INTO CART_ITEMS(cart_item_id, cart_id, product_id, quantity) VALUES (?, ?, ?, ?)";
             PreparedStatement ps2 = conn.prepareStatement(insertSql);
@@ -72,7 +72,7 @@ public String addProductToCart(String userId, String cartId, String prodId, int 
             ps2.setInt(4, qtyToAdd);
 
             ps2.executeUpdate();
-            status = "Product added to cart!";
+            status = "Product added to CARTS!";
         }
 
     } catch (Exception e) {
@@ -86,7 +86,7 @@ public String addProductToCart(String userId, String cartId, String prodId, int 
 @Override
 public String updateProductToCart(String userId, String cartId, String prodId, int qty) {
 
-    String status = "Failed to update cart!";
+    String status = "Failed to update CARTS!";
 
     try (Connection conn = dbUtil.provideConnection();) {
 
@@ -99,7 +99,7 @@ public String updateProductToCart(String userId, String cartId, String prodId, i
             ps.setInt(2, qty);
 
             if (ps.executeUpdate() > 0) {
-                status = "Product removed from cart!";
+                status = "Product removed from CARTS!";
             }
 
             return status;
@@ -129,10 +129,10 @@ public String updateProductToCart(String userId, String cartId, String prodId, i
             ps2.setInt(3, qty);
 
             if (ps2.executeUpdate() > 0) {
-                status = "Product added to cart!";
+                status = "Product added to CARTS!";
             }
         } else {
-            status = "Cart updated successfully!";
+            status = "CARTS updated successfully!";
         }
 
     } catch (Exception e) {
@@ -150,7 +150,7 @@ public String updateProductToCart(String userId, String cartId, String prodId, i
 
         try (Connection conn = dbUtil.provideConnection()) {
 
-            String sql = "SELECT ci.*, c.user_id FROM CART c " +
+            String sql = "SELECT ci.*, c.user_id FROM CARTS c " +
                      "JOIN CART_ITEMS ci ON c.cart_id = ci.cart_id " +
                      "WHERE c.cart_id=?";
 
@@ -160,13 +160,13 @@ public String updateProductToCart(String userId, String cartId, String prodId, i
             ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
-                CartBean cart = new CartBean();
-                cart.setCartId(rs.getString("cart_id"));
-                cart.setUserId(rs.getString("user_id"));
-                cart.setProdId(rs.getString("product_id"));
-                cart.setQuantity(rs.getInt("quantity"));
-                cart.setCartItemId(rs.getString("cart_item_id"));
-                items.add(cart);
+                CartBean CARTS = new CartBean();
+                CARTS.setCartId(rs.getString("cart_id"));
+                CARTS.setUserId(rs.getString("user_id"));
+                CARTS.setProdId(rs.getString("product_id"));
+                CARTS.setQuantity(rs.getInt("quantity"));
+                CARTS.setCartItemId(rs.getString("cart_item_id"));
+                items.add(CARTS);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -180,7 +180,7 @@ public String updateProductToCart(String userId, String cartId, String prodId, i
         int count = 0;
         try (Connection conn = dbUtil.provideConnection()) {
 
-            String sql = "SELECT SUM(ci.quantity) FROM CART c " +
+            String sql = "SELECT SUM(ci.quantity) FROM CARTS c " +
                      "JOIN CART_ITEMS ci ON c.cart_id = ci.cart_id " +
                      "WHERE c.user_id=?";
 
@@ -208,7 +208,7 @@ public String updateProductToCart(String userId, String cartId, String prodId, i
         try(Connection conn = dbUtil.provideConnection();
                 PreparedStatement ps = conn.prepareStatement("SELECT quantity FROM CART_ITEMS WHERE cart_id=? AND product_id =?");){
              
-//            ps = conn.prepareStatement("SELECT quantity FROM CART WHERE cart_id=? AND product_id =?");
+//            ps = conn.prepareStatement("SELECT quantity FROM CARTS WHERE cart_id=? AND product_id =?");
             ps.setString(1, userId);
             ps.setString(2, itemId);
             rs = ps.executeQuery();
@@ -216,10 +216,10 @@ public String updateProductToCart(String userId, String cartId, String prodId, i
                 count = rs.getInt(1);
             }
         } catch (SQLException ex) {
-            System.out.println(" current cart QuantityQuantity :"+count);
+            System.out.println(" current CARTS QuantityQuantity :"+count);
           ex.printStackTrace();
         }
-//        System.out.println(" current cart Quantity count:"+count);
+//        System.out.println(" current CARTS Quantity count:"+count);
         dbUtil.closeConnection(rs);
         
         return count;
@@ -244,7 +244,7 @@ public String updateProductToCart(String userId, String cartId, String prodId, i
         } catch (Exception e) {
             status = "Error: " + e.getMessage();
         }
-//        System.out.println("Status of remove item from cart "+status);
+//        System.out.println("Status of remove item from CARTS "+status);
 
         return status;
     }
@@ -255,7 +255,7 @@ public String updateProductToCart(String userId, String cartId, String prodId, i
         
         try{
             Connection conn = dbUtil.provideConnection();
-            PreparedStatement ps = conn.prepareStatement("DELETE FROM CART WHERE user_id=? AND product_id=? ");
+            PreparedStatement ps = conn.prepareStatement("DELETE FROM CARTS WHERE user_id=? AND product_id=? ");
             ps.setString(1, userId);
             ps.setString(2, prodId);
             int k = ps.executeUpdate();
@@ -265,7 +265,7 @@ public String updateProductToCart(String userId, String cartId, String prodId, i
             flag = false;
             System.out.println("Error in db for remove product from userCart db: "+ex.getMessage());
         }
-        System.out.println("remove product from cart :"+flag);
+        System.out.println("remove product from CARTS :"+flag);
         return flag;
     }
 
@@ -274,7 +274,7 @@ public String updateProductToCart(String userId, String cartId, String prodId, i
         int count = 0;
         
 //	ResultSet rs = null;
-        String query = "SELECT SUM(quantity) FROM CART WHERE user_id=? AND product_id = ?";
+        String query = "SELECT SUM(quantity) FROM CARTS WHERE user_id=? AND product_id = ?";
         try(Connection conn = dbUtil.provideConnection(); 
                 PreparedStatement ps = conn.prepareStatement(query);) {
             ps.setString(1, userId);
@@ -294,8 +294,8 @@ public String updateProductToCart(String userId, String cartId, String prodId, i
     public String getOrCreateCart(String userId){
 
         String cartId = null;
-        // ✅ Check existing cart
-        String sql = "SELECT cart_id FROM CART WHERE user_id=?";
+        // ✅ Check existing CARTS
+        String sql = "SELECT cart_id FROM CARTS WHERE user_id=?";
    
         try( Connection conn = dbUtil.provideConnection();
                 PreparedStatement ps = conn.prepareStatement(sql);){
@@ -306,12 +306,13 @@ public String updateProductToCart(String userId, String cartId, String prodId, i
             if (rs.next()) {
                 cartId = rs.getString("cart_id");
             } else {
-                // ✅ Create new cart
+                // ✅ Create new CARTS
                 cartId = idUtil.generateUUIDCartId();
-                String insertSql = "INSERT INTO CART(cart_id, user_id) VALUES (?, ?)";
+                String insertSql = "INSERT INTO CARTS(cart_id, user_id, status) VALUES (?, ?, ?)";
                 PreparedStatement ps2 = conn.prepareStatement(insertSql);
                 ps2.setString(1, cartId);
                 ps2.setString(2, userId);
+                ps2.setString(3, "ACTIVE");
                 ps2.executeUpdate();
             }            
         }catch (SQLException ex) {
@@ -320,5 +321,9 @@ public String updateProductToCart(String userId, String cartId, String prodId, i
         }
         return cartId;
     }
-    
+
+    @Override
+    public String addProductToCart(String userID, String cartId, String prodId, String status) {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
 }

@@ -1,0 +1,1530 @@
+/* =====================================================
+           GLOBAL
+           ===================================================== */
+
+        * {
+            box-sizing: border-box;
+        }
+
+
+        html,
+        body {
+
+            margin: 0;
+
+            padding: 0;
+
+            width: 100%;
+
+            min-width: 320px;
+
+            overflow-x: hidden;
+        }
+
+
+        body {
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #f4f7fb,
+                    #eef8f2
+                );
+
+            font-family:
+                "Segoe UI",
+                Arial,
+                sans-serif;
+
+            color: #333;
+
+            padding-top: 85px;
+
+            min-height: 100vh;
+        }
+
+
+        /* =====================================================
+           MAIN CONTAINER
+           ===================================================== */
+
+        .staff-container {
+
+            width: 100%;
+
+            max-width: 1250px;
+
+            margin: 0 auto;
+
+            padding:
+                25px
+                15px
+                50px;
+        }
+
+
+        /* =====================================================
+           PAGE HEADER
+           ===================================================== */
+
+        .page-header {
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #198754,
+                    #28a745
+                );
+
+            color: white;
+
+            border-radius: 15px;
+
+            padding:
+                25px
+                30px;
+
+            margin-bottom: 25px;
+
+            box-shadow:
+                0 6px 20px
+                rgba(0, 0, 0, 0.10);
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: space-between;
+
+            gap: 15px;
+        }
+
+
+        .page-header h2 {
+
+            margin: 0 0 7px;
+
+            font-size: 28px;
+
+            font-weight: 700;
+        }
+
+
+        .page-header p {
+
+            margin: 0;
+
+            font-size: 14px;
+
+            opacity: 0.9;
+        }
+
+
+        .header-icon {
+
+            width: 62px;
+
+            height: 62px;
+
+            border-radius: 50%;
+
+            background:
+                rgba(255, 255, 255, 0.15);
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            font-size: 27px;
+
+            flex-shrink: 0;
+        }
+
+
+        /* =====================================================
+           SEARCH CARD
+           ===================================================== */
+
+        .search-card {
+
+            background: white;
+
+            padding: 18px;
+
+            border-radius: 12px;
+
+            margin-bottom: 20px;
+
+            box-shadow:
+                0 3px 15px
+                rgba(0, 0, 0, 0.06);
+        }
+
+
+        .search-wrapper {
+
+            position: relative;
+
+            width: 100%;
+        }
+
+
+        .search-wrapper i {
+
+            position: absolute;
+
+            left: 15px;
+
+            top: 50%;
+
+            transform:
+                translateY(-50%);
+
+            color: #888;
+
+            z-index: 2;
+        }
+
+
+        #searchInput {
+
+            width: 100%;
+
+            height: 46px;
+
+            padding:
+                10px
+                15px
+                10px
+                43px;
+
+            border:
+                1px solid
+                #d7dce2;
+
+            border-radius: 9px;
+
+            outline: none;
+
+            font-size: 14px;
+
+            transition:
+                all 0.2s ease;
+        }
+
+
+        #searchInput:focus {
+
+            border-color: #28a745;
+
+            box-shadow:
+                0 0 0 3px
+                rgba(40, 167, 69, 0.10);
+        }
+
+
+        /* =====================================================
+           STAFF SUMMARY
+           ===================================================== */
+
+        .staff-summary {
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: space-between;
+
+            margin-bottom: 15px;
+
+            gap: 10px;
+        }
+
+
+        .staff-summary h3 {
+
+            margin: 0;
+
+            font-size: 20px;
+
+            font-weight: 600;
+
+            color: #222;
+        }
+
+
+        .staff-count {
+
+            background: #e8f5e9;
+
+            color: #198754;
+
+            padding:
+                6px
+                12px;
+
+            border-radius: 20px;
+
+            font-size: 12px;
+
+            font-weight: 600;
+
+            white-space: nowrap;
+        }
+
+
+        /* =====================================================
+           TABLE CARD
+           ===================================================== */
+
+        .table-card {
+
+            background: white;
+
+            border-radius: 14px;
+
+            padding: 15px;
+
+            box-shadow:
+                0 4px 18px
+                rgba(0, 0, 0, 0.07);
+
+            overflow: hidden;
+        }
+
+
+        .table-responsive {
+
+            border-radius: 10px;
+
+            overflow-x: auto;
+
+            -webkit-overflow-scrolling: touch;
+        }
+
+
+        /* =====================================================
+           TABLE
+           ===================================================== */
+
+        .staff-table {
+
+            margin-bottom: 0;
+
+            min-width: 850px;
+
+            vertical-align: middle;
+        }
+
+
+        .staff-table thead th {
+
+            background:
+                #212529;
+
+            color: white;
+
+            border: none;
+
+            padding:
+                13px
+                10px;
+
+            font-size: 12px;
+
+            font-weight: 600;
+
+            text-transform: uppercase;
+
+            white-space: nowrap;
+        }
+
+
+        .staff-table tbody td {
+
+            padding:
+                12px
+                10px;
+
+            font-size: 13px;
+
+            vertical-align: middle;
+
+            border-color: #eeeeee;
+        }
+
+
+        .staff-table tbody tr {
+
+            transition:
+                background 0.2s ease;
+        }
+
+
+        .staff-table tbody tr:hover {
+
+            background:
+                #f5faf6;
+        }
+
+
+        /* =====================================================
+           PROFILE IMAGE
+           ===================================================== */
+
+        .profile-img {
+
+            width: 65px;
+
+            height: 65px;
+
+            object-fit: cover;
+
+            border-radius: 50%;
+
+            border:
+                3px solid
+                #e8f5e9;
+
+            background: #f5f5f5;
+
+            display: block;
+
+            margin: auto;
+        }
+
+
+        .profile-placeholder {
+
+            width: 65px;
+
+            height: 65px;
+
+            border-radius: 50%;
+
+            background:
+                #e8f5e9;
+
+            color: #198754;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            margin: auto;
+
+            font-size: 25px;
+        }
+
+
+        /* =====================================================
+           STAFF ID
+           ===================================================== */
+
+        .staff-id {
+
+            font-weight: 700;
+
+            color: #198754;
+
+            white-space: nowrap;
+        }
+
+
+        /* =====================================================
+           NAME
+           ===================================================== */
+
+        .staff-name {
+
+            font-weight: 600;
+
+            color: #222;
+
+            max-width: 180px;
+
+            word-break: break-word;
+        }
+
+
+        /* =====================================================
+           EMAIL
+           ===================================================== */
+
+        .staff-email {
+
+            color: #555;
+
+            word-break: break-word;
+        }
+
+
+        /* =====================================================
+           MOBILE
+           ===================================================== */
+
+        .staff-mobile {
+
+            white-space: nowrap;
+        }
+
+
+        /* =====================================================
+           STATUS BADGE
+           ===================================================== */
+
+        .availability-badge {
+
+            display: inline-flex;
+
+            align-items: center;
+
+            gap: 5px;
+
+            padding:
+                5px
+                9px;
+
+            border-radius: 20px;
+
+            background:
+                #e8f5e9;
+
+            color:
+                #198754;
+
+            font-size: 11px;
+
+            font-weight: 600;
+
+            white-space: nowrap;
+        }
+
+
+        .availability-badge.unavailable {
+
+            background: #f8d7da;
+
+            color: #842029;
+        }
+
+
+        /* =====================================================
+           LICENSE
+           ===================================================== */
+
+        .license-number {
+
+            font-size: 12px;
+
+            font-weight: 600;
+
+            color: #555;
+
+            word-break: break-word;
+        }
+
+
+        /* =====================================================
+           ACTIONS
+           ===================================================== */
+
+        .action-buttons {
+
+            display: flex;
+
+            justify-content: center;
+
+            gap: 6px;
+
+            flex-wrap: wrap;
+        }
+
+
+        .btn-action {
+
+            border-radius: 7px;
+
+            font-size: 12px;
+
+            font-weight: 600;
+
+            padding:
+                7px
+                10px;
+
+            white-space: nowrap;
+        }
+
+
+        /* =====================================================
+           NO DATA
+           ===================================================== */
+
+        #noDataRow td {
+
+            padding:
+                40px
+                15px;
+
+            color: #dc3545;
+
+            font-weight: 600;
+
+            font-size: 14px;
+        }
+
+
+        .no-data-icon {
+
+            display: block;
+
+            font-size: 32px;
+
+            color: #bbb;
+
+            margin-bottom: 10px;
+        }
+
+
+        /* =====================================================
+           MOBILE CARD VIEW
+           ===================================================== */
+
+        .mobile-staff-list {
+
+            display: none;
+        }
+
+
+        .mobile-staff-card {
+
+            background: white;
+
+            border-radius: 13px;
+
+            padding: 16px;
+
+            margin-bottom: 14px;
+
+            box-shadow:
+                0 4px 15px
+                rgba(0, 0, 0, 0.07);
+
+            border:
+                1px solid
+                #e8ece9;
+        }
+
+
+        .mobile-staff-top {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 13px;
+
+            margin-bottom: 14px;
+        }
+
+
+        .mobile-staff-image {
+
+            width: 65px;
+
+            height: 65px;
+
+            border-radius: 50%;
+
+            object-fit: cover;
+
+            border:
+                3px solid
+                #e8f5e9;
+
+            flex-shrink: 0;
+        }
+
+
+        .mobile-staff-main {
+
+            min-width: 0;
+
+            flex: 1;
+        }
+
+
+        .mobile-staff-name {
+
+            font-size: 16px;
+
+            font-weight: 700;
+
+            color: #222;
+
+            margin-bottom: 4px;
+
+            word-break: break-word;
+        }
+
+
+        .mobile-staff-id {
+
+            color: #198754;
+
+            font-size: 11px;
+
+            font-weight: 600;
+        }
+
+
+        .mobile-info {
+
+            display: grid;
+
+            grid-template-columns:
+                repeat(
+                    1,
+                    minmax(0, 1fr)
+                );
+
+            gap: 8px;
+
+            padding-top: 12px;
+
+            border-top:
+                1px solid
+                #eeeeee;
+        }
+
+
+        .mobile-info-row {
+
+            display: flex;
+
+            align-items: flex-start;
+
+            gap: 8px;
+
+            font-size: 12px;
+
+            color: #555;
+
+            word-break: break-word;
+        }
+
+
+        .mobile-info-row i {
+
+            color: #198754;
+
+            width: 16px;
+
+            margin-top: 2px;
+
+            flex-shrink: 0;
+        }
+
+
+        .mobile-actions {
+
+            display: flex;
+
+            gap: 8px;
+
+            margin-top: 14px;
+
+            padding-top: 12px;
+
+            border-top:
+                1px solid
+                #eeeeee;
+        }
+
+
+        .mobile-actions .btn {
+
+            flex: 1;
+
+            min-height: 40px;
+        }
+
+
+        /* =====================================================
+           TABLET
+           ===================================================== */
+
+        @media (max-width: 991px) {
+
+            body {
+
+                padding-top: 75px;
+            }
+
+
+            .staff-container {
+
+                padding:
+                    20px
+                    12px
+                    40px;
+            }
+
+
+            .page-header {
+
+                padding:
+                    20px
+                    22px;
+            }
+
+
+            .page-header h2 {
+
+                font-size: 24px;
+            }
+
+
+            .header-icon {
+
+                width: 52px;
+
+                height: 52px;
+
+                font-size: 23px;
+            }
+        }
+
+
+        /* =====================================================
+           MOBILE
+           ===================================================== */
+
+        @media (max-width: 767px) {
+
+            body {
+
+                padding-top: 65px;
+            }
+
+
+            .staff-container {
+
+                padding:
+                    15px
+                    8px
+                    30px;
+            }
+
+
+            .page-header {
+
+                padding:
+                    18px;
+
+                border-radius: 12px;
+
+                margin-bottom: 15px;
+            }
+
+
+            .page-header h2 {
+
+                font-size: 21px;
+
+                line-height: 1.3;
+            }
+
+
+            .page-header p {
+
+                font-size: 11px;
+
+                line-height: 1.5;
+            }
+
+
+            .header-icon {
+
+                width: 45px;
+
+                height: 45px;
+
+                font-size: 20px;
+            }
+
+
+            .search-card {
+
+                padding: 12px;
+
+                margin-bottom: 15px;
+
+                border-radius: 10px;
+            }
+
+
+            #searchInput {
+
+                height: 44px;
+
+                font-size: 13px;
+            }
+
+
+            .staff-summary {
+
+                margin-bottom: 12px;
+            }
+
+
+            .staff-summary h3 {
+
+                font-size: 18px;
+            }
+
+
+            .staff-count {
+
+                font-size: 10px;
+
+                padding:
+                    5px
+                    9px;
+            }
+
+
+            /*
+             * Hide desktop table.
+             */
+
+            .table-card {
+
+                display: none;
+            }
+
+
+            /*
+             * Show mobile cards.
+             */
+
+            .mobile-staff-list {
+
+                display: block;
+            }
+        }
+
+
+        /* =====================================================
+           SMALL MOBILE
+           ===================================================== */
+
+        @media (max-width: 380px) {
+
+            .staff-container {
+
+                padding-left: 6px;
+
+                padding-right: 6px;
+            }
+
+
+            .page-header {
+
+                padding: 15px;
+            }
+
+
+            .page-header h2 {
+
+                font-size: 19px;
+            }
+
+
+            .page-header p {
+
+                font-size: 10px;
+            }
+
+
+            .header-icon {
+
+                width: 40px;
+
+                height: 40px;
+
+                font-size: 18px;
+            }
+
+
+            .mobile-staff-card {
+
+                padding: 13px;
+
+                border-radius: 11px;
+            }
+
+
+            .mobile-staff-image {
+
+                width: 58px;
+
+                height: 58px;
+            }
+
+
+            .mobile-staff-name {
+
+                font-size: 14px;
+            }
+
+
+            .mobile-info-row {
+
+                font-size: 11px;
+            }
+
+
+            .mobile-actions .btn {
+
+                font-size: 11px;
+
+                padding:
+                    7px
+                    5px;
+            }
+        }
+
+
+        /* =====================================================
+           VERY SMALL
+           ===================================================== */
+
+        @media (max-width: 320px) {
+
+            .header-icon {
+
+                display: none;
+            }
+
+
+            .mobile-staff-card {
+
+                padding: 11px;
+            }
+
+
+            .mobile-staff-image {
+
+                width: 52px;
+
+                height: 52px;
+            }
+
+
+            .mobile-actions {
+
+                flex-direction: column;
+            }
+
+
+            .mobile-actions .btn {
+
+                width: 100%;
+            }
+        }
+        
+        /* =========================================================
+   EDIT STAFF GLASSMORPHISM MODAL
+   ========================================================= */
+
+.glass-edit-modal {
+
+    border: 1px solid rgba(255, 255, 255, 0.35);
+
+    border-radius: 24px;
+
+    overflow: hidden;
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(255, 255, 255, 0.82),
+            rgba(255, 255, 255, 0.60)
+        );
+
+    backdrop-filter: blur(25px);
+
+    -webkit-backdrop-filter: blur(25px);
+
+    box-shadow:
+        0 25px 70px rgba(0, 0, 0, 0.25);
+
+}
+
+
+/* =========================================================
+   HEADER
+   ========================================================= */
+
+.glass-modal-header {
+
+    padding: 22px 25px;
+
+    border-bottom:
+        1px solid rgba(255, 255, 255, 0.35);
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(255, 255, 255, 0.35),
+            rgba(255, 255, 255, 0.15)
+        );
+
+}
+
+
+.edit-modal-title {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 14px;
+
+}
+
+
+.edit-modal-icon {
+
+    width: 48px;
+
+    height: 48px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    border-radius: 14px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #0d6efd,
+            #6f42c1
+        );
+
+    color: white;
+
+    font-size: 20px;
+
+    box-shadow:
+        0 8px 20px rgba(13, 110, 253, 0.25);
+
+}
+
+
+.edit-modal-title h5 {
+
+    margin: 0;
+
+    font-size: 20px;
+
+    font-weight: 700;
+
+}
+
+
+.edit-modal-title small {
+
+    color: #777;
+
+    font-size: 12px;
+
+}
+
+
+/* =========================================================
+   BODY
+   ========================================================= */
+
+.glass-modal-body {
+
+    padding: 25px;
+
+}
+
+
+/* =========================================================
+   STAFF ID
+   ========================================================= */
+
+.staff-id-display {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 12px;
+
+    margin-bottom: 22px;
+
+    padding: 12px 15px;
+
+    border-radius: 14px;
+
+    background:
+        rgba(13, 110, 253, 0.08);
+
+    border:
+        1px solid rgba(13, 110, 253, 0.12);
+
+}
+
+
+.staff-id-icon {
+
+    width: 38px;
+
+    height: 38px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    border-radius: 10px;
+
+    background: #0d6efd;
+
+    color: white;
+
+}
+
+
+.staff-id-display small {
+
+    display: block;
+
+    color: #777;
+
+    font-size: 11px;
+
+}
+
+
+.staff-id-display strong {
+
+    display: block;
+
+    color: #222;
+
+    font-size: 14px;
+
+}
+
+
+/* =========================================================
+   LABEL
+   ========================================================= */
+
+.glass-modal-body .form-label {
+
+    font-weight: 600;
+
+    color: #333;
+
+    font-size: 13px;
+
+    margin-bottom: 7px;
+
+}
+
+
+.glass-modal-body .form-label i {
+
+    margin-right: 5px;
+
+    color: #0d6efd;
+
+}
+
+
+/* =========================================================
+   INPUT
+   ========================================================= */
+
+.glass-input {
+
+    min-height: 45px;
+
+    border-radius: 12px !important;
+
+    border:
+        1px solid rgba(0, 0, 0, 0.10) !important;
+
+    background:
+        rgba(255, 255, 255, 0.65) !important;
+
+    backdrop-filter: blur(10px);
+
+    -webkit-backdrop-filter: blur(10px);
+
+    box-shadow:
+        inset 0 1px 2px rgba(0, 0, 0, 0.03);
+
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease,
+        background 0.2s ease;
+
+}
+
+
+.glass-input:focus {
+
+    border-color: #0d6efd !important;
+
+    background:
+        rgba(255, 255, 255, 0.9) !important;
+
+    box-shadow:
+        0 0 0 4px rgba(13, 110, 253, 0.10) !important;
+
+}
+
+
+/* =========================================================
+   FOOTER
+   ========================================================= */
+
+.glass-modal-footer {
+
+    padding: 18px 25px;
+
+    border-top:
+        1px solid rgba(255, 255, 255, 0.35);
+
+    background:
+        rgba(255, 255, 255, 0.20);
+
+}
+
+
+.glass-modal-footer .btn {
+
+    border-radius: 10px;
+
+    padding: 9px 18px;
+
+    font-weight: 600;
+
+}
+
+
+.save-staff-btn {
+
+    background:
+        linear-gradient(
+            135deg,
+            #198754,
+            #20c997
+        );
+
+    border: none;
+
+    box-shadow:
+        0 7px 18px rgba(25, 135, 84, 0.20);
+
+}
+
+
+/* =========================================================
+   MODAL BACKDROP
+   ========================================================= */
+
+.modal-backdrop.show {
+
+    opacity: 0.72;
+
+    backdrop-filter: blur(5px);
+
+    -webkit-backdrop-filter: blur(5px);
+
+}
+
+
+/* =========================================================
+   DARK MODE
+   ========================================================= */
+
+body.dark-mode .glass-edit-modal {
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(30, 30, 35, 0.90),
+            rgba(20, 20, 25, 0.82)
+        );
+
+    border-color:
+        rgba(255, 255, 255, 0.12);
+
+    color: #ffffff;
+
+}
+
+
+body.dark-mode .glass-modal-header {
+
+    background:
+        rgba(255, 255, 255, 0.04);
+
+    border-color:
+        rgba(255, 255, 255, 0.10);
+
+}
+
+
+body.dark-mode .edit-modal-title h5 {
+
+    color: #ffffff;
+
+}
+
+
+body.dark-mode .edit-modal-title small {
+
+    color: #aaa;
+
+}
+
+
+body.dark-mode .staff-id-display {
+
+    background:
+        rgba(13, 110, 253, 0.12);
+
+    border-color:
+        rgba(13, 110, 253, 0.20);
+
+}
+
+
+body.dark-mode .staff-id-display strong {
+
+    color: #ffffff;
+
+}
+
+
+body.dark-mode .staff-id-display small {
+
+    color: #aaa;
+
+}
+
+
+body.dark-mode .glass-modal-body .form-label {
+
+    color: #ddd;
+
+}
+
+
+body.dark-mode .glass-input {
+
+    color: #ffffff !important;
+
+    background:
+        rgba(255, 255, 255, 0.08) !important;
+
+    border-color:
+        rgba(255, 255, 255, 0.15) !important;
+
+}
+
+
+body.dark-mode .glass-input:focus {
+
+    background:
+        rgba(255, 255, 255, 0.12) !important;
+
+}
+
+
+body.dark-mode .glass-input option {
+
+    background: #222;
+
+    color: #fff;
+
+}
+
+
+body.dark-mode .glass-modal-footer {
+
+    background:
+        rgba(255, 255, 255, 0.03);
+
+    border-color:
+        rgba(255, 255, 255, 0.10);
+
+}
+
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 576px) {
+
+    .glass-edit-modal {
+
+        margin: 10px;
+
+        border-radius: 18px;
+
+    }
+
+    .glass-modal-header {
+
+        padding: 18px;
+
+    }
+
+    .glass-modal-body {
+
+        padding: 18px;
+
+    }
+
+    .glass-modal-footer {
+
+        padding: 15px 18px;
+
+        display: flex;
+
+        flex-direction: column;
+
+        gap: 8px;
+
+    }
+
+    .glass-modal-footer .btn {
+
+        width: 100%;
+
+        margin: 0;
+
+    }
+
+}

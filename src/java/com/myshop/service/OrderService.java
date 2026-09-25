@@ -29,7 +29,7 @@ public interface OrderService {
     
     public int assignId();
     
-    List<AssignOrder> getAssignedOrdersByStaff(String staffEmail);
+    List<AssignOrder> getAssignedOrdersByStaff(String staffId);
     
     public String markOrderAsDelivered(int assignId, String staffId);
     
@@ -39,4 +39,5 @@ public interface OrderService {
     
     String getOrderId(String userId);
     
+    String getOtpByAssignId(int assignId);
 }

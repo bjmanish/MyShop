@@ -1,0 +1,2271 @@
+/* =========================================================
+   1. THEME VARIABLES
+   ========================================================= */
+
+:root,
+html[data-theme="light"],
+html[data-activity-theme="light"] {
+
+    --ua-bg: #f3f6fb;
+
+    --ua-panel: #ffffff;
+
+    --ua-panel-2: #f8fafc;
+
+    --ua-text: #172033;
+
+    --ua-muted: #64748b;
+
+    --ua-border: #e2e8f0;
+
+    --ua-border-light: #eef2f7;
+
+    --ua-primary: #3457cf;
+
+    --ua-primary-soft: rgba(52, 87, 207, 0.12);
+
+    --ua-red: #dc2626;
+
+    --ua-red-dark: #b91c1c;
+
+    --ua-red-soft: #fef2f2;
+
+    --ua-green: #15803d;
+
+    --ua-green-soft: rgba(34, 197, 94, 0.12);
+
+    --ua-yellow: #a16207;
+
+    --ua-yellow-soft: #fef9c3;
+
+    --ua-cyan: #0891b2;
+
+    --ua-shadow:
+        0 10px 30px rgba(15, 23, 42, 0.06);
+
+    --ua-shadow-hover:
+        0 18px 45px rgba(15, 23, 42, 0.12);
+}
+
+
+/* =========================================================
+   DARK THEME
+   ========================================================= */
+
+html[data-theme="dark"],
+html[data-activity-theme="dark"],
+html.dark-mode,
+body.dark-mode {
+
+    --ua-bg: #0f1726;
+
+    --ua-panel: #182235;
+
+    --ua-panel-2: #222e43;
+
+    --ua-text: #f1f5f9;
+
+    --ua-muted: #b5c2d3;
+
+    --ua-border: #344256;
+
+    --ua-border-light: rgba(255, 255, 255, 0.07);
+
+    --ua-primary: #a9bcff;
+
+    --ua-primary-soft: rgba(169, 188, 255, 0.13);
+
+    --ua-red: #f87171;
+
+    --ua-red-dark: #ef4444;
+
+    --ua-red-soft: rgba(248, 113, 113, 0.14);
+
+    --ua-green: #4ade80;
+
+    --ua-green-soft: rgba(74, 222, 128, 0.13);
+
+    --ua-yellow: #fcd34d;
+
+    --ua-yellow-soft: rgba(245, 158, 11, 0.16);
+
+    --ua-cyan: #22d3ee;
+
+    --ua-shadow:
+        0 14px 40px rgba(0, 0, 0, 0.28);
+
+    --ua-shadow-hover:
+        0 20px 55px rgba(0, 0, 0, 0.42);
+}
+
+
+/* =========================================================
+   2. GLOBAL
+   ========================================================= */
+
+* {
+    box-sizing: border-box;
+}
+
+
+html {
+    min-height: 100%;
+}
+
+
+body {
+    margin: 0;
+
+    background: var(--ua-bg);
+
+    color: var(--ua-text);
+
+    font-family:
+        "Inter",
+        "Segoe UI",
+        Arial,
+        sans-serif;
+
+    transition:
+        background 0.25s ease,
+        color 0.25s ease;
+}
+
+
+button,
+input,
+select,
+textarea {
+    font-family: inherit;
+}
+
+
+a {
+    text-decoration: none;
+}
+
+
+::selection {
+    background: var(--ua-primary);
+
+    color: #ffffff;
+}
+
+
+/* =========================================================
+   3. PAGE WRAPPER
+   ========================================================= */
+
+.page-wrapper {
+
+    width: 100%;
+
+    max-width: 1500px;
+
+    margin: 50px 0px;
+
+    padding: 25px;
+}
+
+
+/* =========================================================
+   4. BREADCRUMB
+   ========================================================= */
+
+.modern-breadcrumb {
+
+    display: flex;
+
+    align-items: center;
+
+    flex-wrap: wrap;
+
+    gap: 9px;
+
+    margin-bottom: 20px;
+
+    color: #64748b;
+
+    font-size: 13px;
+    text-decoration: none;
+}
+
+
+.modern-breadcrumb a {
+
+    color: var(--ua-primary);
+
+    font-weight: 700;
+
+    transition: 0.2s ease;
+    
+    text-decoration: none;
+}
+
+
+.modern-breadcrumb a:hover {
+
+    opacity: 0.75;
+    text-decoration: none;
+}
+
+
+.modern-breadcrumb i {
+
+    font-size: 10px;
+
+    color: var(--ua-muted);
+}
+
+
+.modern-breadcrumb span {
+
+    color: var(--ua-muted);
+
+    font-weight: 600;
+}
+
+
+/* =========================================================
+   5. PAGE HEADER
+   ========================================================= */
+
+.page-header {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 18px;
+
+    padding: 23px;
+
+    margin-bottom: 22px;
+
+    border:
+        1px solid var(--ua-border);
+
+    border-radius: 17px;
+
+    background: var(--ua-panel);
+
+    box-shadow: var(--ua-shadow);
+
+    transition: 0.25s ease;
+}
+
+
+.page-header:hover {
+
+    box-shadow: var(--ua-shadow-hover);
+}
+
+
+.page-title {
+
+    min-width: 0;
+}
+
+
+.page-title h2 {
+
+    margin: 0 0 6px;
+
+    color: var(--ua-text);
+
+    font-size: 24px;
+
+    font-weight: 800;
+
+    letter-spacing: -0.4px;
+}
+
+
+.page-title h2 i {
+
+    margin-right: 8px;
+
+    color: var(--ua-primary);
+}
+
+
+.page-title p {
+
+    margin: 0;
+
+    color: var(--ua-muted);
+
+    font-size: 13px;
+
+    line-height: 1.6;
+}
+
+
+/* =========================================================
+   6. HEADER ACTIONS
+   ========================================================= */
+
+.header-actions {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: flex-end;
+
+    flex-wrap: wrap;
+
+    gap: 10px;
+}
+
+
+.live-status,
+.admin-badge,
+.back-btn {
+
+    display: inline-flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 8px;
+
+    min-height: 38px;
+
+    padding: 9px 13px;
+
+    border-radius: 10px;
+
+    font-size: 12px;
+
+    font-weight: 700;
+
+    white-space: nowrap;
+    text-decoration: none;
+}
+
+
+.live-status {
+
+    color: var(--ua-green);
+
+    background: var(--ua-green-soft);
+}
+
+
+.live-dot {
+
+    width: 8px;
+
+    height: 8px;
+
+    border-radius: 50%;
+
+    background: currentColor;
+
+    box-shadow:
+        0 0 0 4px rgba(34, 197, 94, 0.12);
+
+    animation: livePulse 1.8s infinite;
+}
+
+
+@keyframes livePulse {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.45;
+    }
+}
+
+
+.admin-badge,
+.back-btn {
+
+    color: var(--ua-text);
+
+    background: var(--ua-panel-2);
+
+    border:
+        1px solid var(--ua-border);
+}
+
+
+.back-btn:hover {
+
+    color: var(--ua-primary);
+
+    border-color: var(--ua-primary);
+}
+
+
+/* =========================================================
+   7. STATISTICS
+   ========================================================= */
+
+.stats-grid {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(4, minmax(0, 1fr));
+
+    gap: 16px;
+
+    margin-bottom: 22px;
+}
+
+
+.stat-card {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 15px;
+
+    min-width: 0;
+
+    padding: 20px;
+
+    border:
+        1px solid var(--ua-border);
+
+    border-radius: 17px;
+
+    background: var(--ua-panel);
+
+    box-shadow: var(--ua-shadow);
+
+    transition: 0.25s ease;
+}
+
+
+.stat-card:hover {
+
+    transform: translateY(-2px);
+
+    box-shadow: var(--ua-shadow-hover);
+}
+
+
+.stat-icon {
+
+    width: 48px;
+
+    height: 48px;
+
+    flex: 0 0 48px;
+
+    display: grid;
+
+    place-items: center;
+
+    border-radius: 13px;
+
+    background: var(--ua-primary-soft);
+
+    color: var(--ua-primary);
+
+    font-size: 20px;
+}
+
+
+.stat-info {
+
+    min-width: 0;
+}
+
+
+.stat-info small {
+
+    display: block;
+
+    color: var(--ua-muted);
+
+    font-size: 12px;
+}
+
+
+.stat-info h3 {
+
+    margin: 5px 0 0;
+
+    color: var(--ua-text);
+
+    font-size: 26px;
+
+    font-weight: 800;
+}
+
+
+/* =========================================================
+   8. FILTER PANEL
+   ========================================================= */
+
+.filter-panel {
+
+    padding: 20px;
+
+    margin-bottom: 22px;
+
+    border:
+        1px solid var(--ua-border);
+
+    border-radius: 17px;
+
+    background: var(--ua-panel);
+
+    box-shadow: var(--ua-shadow);
+}
+
+
+.filter-heading {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 12px;
+
+    margin-bottom: 17px;
+}
+
+
+.filter-title {
+
+    color: var(--ua-text);
+
+    font-size: 16px;
+
+    font-weight: 800;
+}
+
+
+.filter-title i {
+
+    margin-right: 8px;
+
+    color: var(--ua-primary);
+}
+
+
+.filter-hint {
+
+    color: var(--ua-muted);
+
+    font-size: 12px;
+}
+
+
+.filter-grid {
+
+    display: grid;
+
+    grid-template-columns:
+        minmax(210px, 1.5fr)
+        repeat(2, minmax(135px, 0.8fr))
+        auto;
+
+    gap: 14px;
+
+    align-items: end;
+}
+
+
+.filter-group {
+
+    min-width: 0;
+}
+
+
+.filter-group label {
+
+    display: block;
+
+    margin-bottom: 7px;
+
+    color: var(--ua-muted);
+
+    font-size: 11px;
+
+    font-weight: 800;
+}
+
+
+.filter-control {
+
+    display: block;
+
+    width: 100%;
+
+    height: 42px;
+
+    padding: 8px 12px;
+
+    border:
+        1px solid var(--ua-border);
+
+    border-radius: 10px;
+
+    outline: none;
+
+    background: var(--ua-panel-2);
+
+    color: var(--ua-text);
+
+    font-size: 13px;
+
+    transition: 0.2s ease;
+}
+
+
+.filter-control:focus {
+
+    border-color: var(--ua-primary);
+
+    box-shadow:
+        0 0 0 3px var(--ua-primary-soft);
+}
+
+
+.filter-control::placeholder {
+
+    color: var(--ua-muted);
+}
+
+
+.clear-btn {
+
+    height: 42px;
+
+    padding: 0 17px;
+
+    border:
+        1px solid var(--ua-border);
+
+    border-radius: 10px;
+
+    background: var(--ua-panel-2);
+
+    color: var(--ua-text);
+
+    font-size: 12px;
+
+    font-weight: 700;
+
+    cursor: pointer;
+
+    transition: 0.2s ease;
+}
+
+
+.clear-btn:hover {
+
+    color: var(--ua-red);
+
+    border-color: var(--ua-red);
+
+    background: var(--ua-red-soft);
+}
+
+
+/* =========================================================
+   9. TABLE PANEL
+   ========================================================= */
+
+.table-panel {
+
+    overflow: hidden;
+
+    border:
+        1px solid var(--ua-border);
+
+    border-radius: 17px;
+
+    background: var(--ua-panel);
+
+    box-shadow: var(--ua-shadow);
+}
+
+
+.table-header {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 12px;
+
+    padding: 19px 20px;
+
+    border-bottom:
+        1px solid var(--ua-border);
+
+    background: var(--ua-panel);
+}
+
+
+.table-heading {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 12px;
+}
+
+
+.table-heading-icon {
+
+    width: 40px;
+
+    height: 40px;
+
+    display: grid;
+
+    place-items: center;
+
+    border-radius: 11px;
+
+    background: var(--ua-primary-soft);
+
+    color: var(--ua-primary);
+}
+
+
+.table-heading h5 {
+
+    margin: 0 0 3px;
+
+    color: var(--ua-text);
+
+    font-size: 16px;
+
+    font-weight: 800;
+}
+
+
+.record-count,
+.latest-badge {
+
+    color: var(--ua-muted);
+
+    font-size: 12px;
+}
+
+
+.latest-badge {
+
+    white-space: nowrap;
+}
+
+
+/* =========================================================
+   10. TABLE
+   ========================================================= */
+
+.table-wrapper {
+
+    width: 100%;
+
+    overflow-x: auto;
+
+    overflow-y: hidden;
+
+    -webkit-overflow-scrolling: touch;
+}
+
+
+.activity-table {
+
+    width: 100%;
+
+    min-width: 1270px;
+
+    margin: 0;
+
+    border-collapse: collapse;
+
+    color: var(--ua-text);
+}
+
+
+.activity-table thead th {
+
+    padding: 15px 12px;
+
+    border-bottom:
+        1px solid var(--ua-border);
+
+    background: var(--ua-panel-2) !important;
+
+    color: var(--ua-muted) !important;
+
+    font-size: 11px;
+
+    font-weight: 800;
+
+    letter-spacing: 0.04em;
+
+    text-transform: uppercase;
+
+    white-space: nowrap;
+}
+
+
+.activity-table tbody td {
+
+    padding: 17px 12px;
+
+    border-bottom:
+        1px solid var(--ua-border);
+
+    background: var(--ua-panel) !important;
+
+    color: var(--ua-text) !important;
+
+    font-size: 12px;
+
+    vertical-align: middle;
+}
+
+
+.activity-table tbody tr:hover td {
+
+    background: var(--ua-panel-2) !important;
+}
+
+
+.activity-table th:last-child,
+.activity-table td:last-child {
+
+    min-width: 155px;
+
+    text-align: center;
+}
+
+
+/* =========================================================
+   11. USER
+   ========================================================= */
+
+.user-cell {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 12px;
+
+    min-width: 140px;
+}
+
+
+.user-avatar {
+
+    width: 45px;
+
+    height: 45px;
+
+    flex: 0 0 45px;
+
+    display: grid;
+
+    place-items: center;
+
+    border-radius: 14px;
+
+    background: var(--ua-panel-2);
+
+    color: var(--ua-primary);
+
+    font-weight: 800;
+}
+
+
+.user-details strong {
+
+    display: block;
+
+    color: var(--ua-text);
+
+    font-size: 13px;
+}
+
+
+.user-details small {
+
+    display: block;
+
+    margin-top: 4px;
+
+    color: var(--ua-muted);
+}
+
+
+/* =========================================================
+   12. ROLE
+   ========================================================= */
+
+.role-badge {
+
+    display: inline-flex;
+
+    align-items: center;
+
+    padding: 7px 12px;
+
+    border-radius: 20px;
+
+    background: var(--ua-primary-soft);
+
+    color: var(--ua-primary);
+
+    font-size: 11px;
+
+    font-weight: 800;
+}
+
+
+/* =========================================================
+   13. IP
+   ========================================================= */
+
+.ip-address {
+
+    display: inline-block;
+
+    padding: 6px 9px;
+
+    border-radius: 8px;
+
+    background: var(--ua-panel-2);
+
+    color: var(--ua-text);
+
+    font-family: monospace;
+
+    white-space: nowrap;
+}
+
+
+/* =========================================================
+   14. BROWSER
+   ========================================================= */
+
+.browser-cell {
+
+    max-width: 280px;
+
+    overflow: hidden;
+
+    text-overflow: ellipsis;
+
+    white-space: nowrap;
+
+    color: var(--ua-muted);
+}
+
+
+.active-time-text {
+
+    color: var(--ua-green);
+
+    font-weight: 700;
+}
+
+
+/* =========================================================
+   15. STATUS
+   ========================================================= */
+
+.status-badge {
+
+    display: inline-flex;
+
+    align-items: center;
+
+    gap: 7px;
+
+    padding: 8px 11px;
+
+    border-radius: 22px;
+
+    font-size: 11px;
+
+    font-weight: 800;
+
+    white-space: nowrap;
+}
+
+
+.status-dot {
+
+    width: 9px;
+
+    height: 9px;
+
+    border-radius: 50%;
+
+    background: currentColor;
+}
+
+
+.status-active {
+
+    color: #166534;
+
+    background: #dcfce7;
+}
+
+
+.status-logout {
+
+    color: var(--ua-muted);
+
+    background: var(--ua-panel-2);
+}
+
+
+.status-expired {
+
+    color: #a16207;
+
+    background: #fef9c3;
+}
+
+
+.status-force {
+
+    color: #b91c1c;
+
+    background: #fee2e2;
+}
+
+
+/* Dark status */
+
+html[data-theme="dark"] .status-active,
+html[data-activity-theme="dark"] .status-active,
+body.dark-mode .status-active {
+
+    color: #86efac;
+
+    background:
+        rgba(34, 197, 94, 0.17);
+}
+
+
+html[data-theme="dark"] .status-expired,
+html[data-activity-theme="dark"] .status-expired,
+body.dark-mode .status-expired {
+
+    color: #fcd34d;
+
+    background:
+        rgba(245, 158, 11, 0.16);
+}
+
+
+html[data-theme="dark"] .status-force,
+html[data-activity-theme="dark"] .status-force,
+body.dark-mode .status-force {
+
+    color: #fca5a5;
+
+    background:
+        rgba(239, 68, 68, 0.17);
+}
+
+
+/* =========================================================
+   16. FORCE LOGOUT BUTTON
+   ========================================================= */
+
+.activity-table button.force-logout-btn {
+
+    display: inline-flex !important;
+
+    align-items: center !important;
+
+    justify-content: center !important;
+
+    gap: 8px !important;
+
+    width: 132px !important;
+
+    min-width: 132px !important;
+
+    height: 40px !important;
+
+    padding: 9px 12px !important;
+
+    margin: 0 !important;
+
+    border:
+        1px solid var(--ua-red) !important;
+
+    border-radius: 10px !important;
+
+    outline: none !important;
+
+    background:
+        var(--ua-red-soft) !important;
+
+    color:
+        var(--ua-red) !important;
+
+    font-family:
+        "Inter",
+        "Segoe UI",
+        Arial,
+        sans-serif !important;
+
+    font-size: 12px !important;
+
+    font-weight: 700 !important;
+
+    line-height: 1.2 !important;
+
+    white-space: nowrap !important;
+
+    appearance: none !important;
+
+    -webkit-appearance: none !important;
+
+    cursor: pointer !important;
+
+    box-shadow: none !important;
+
+    transition:
+        background 0.2s ease,
+        border-color 0.2s ease,
+        color 0.2s ease,
+        transform 0.2s ease,
+        box-shadow 0.2s ease !important;
+}
+
+
+.activity-table button.force-logout-btn i {
+
+    margin: 0 !important;
+
+    color: inherit !important;
+
+    font-size: 13px !important;
+}
+
+
+.activity-table button.force-logout-btn:hover {
+
+    background:
+        var(--ua-red) !important;
+
+    border-color:
+        var(--ua-red) !important;
+
+    color: #ffffff !important;
+
+    transform:
+        translateY(-1px) !important;
+
+    box-shadow:
+        0 7px 18px
+        rgba(239, 68, 68, 0.22) !important;
+}
+
+
+.activity-table button.force-logout-btn:active {
+
+    transform:
+        scale(0.97) !important;
+}
+
+
+.activity-table button.force-logout-btn:focus-visible {
+
+    outline:
+        3px solid
+        rgba(239, 68, 68, 0.25) !important;
+
+    outline-offset: 2px !important;
+}
+
+
+.activity-table button.force-logout-btn:disabled {
+
+    opacity: 0.65 !important;
+
+    cursor: not-allowed !important;
+
+    transform: none !important;
+}
+
+
+.force-logout-success {
+
+    color:
+        var(--ua-green) !important;
+
+    background:
+        var(--ua-green-soft) !important;
+
+    border-color:
+        var(--ua-green) !important;
+}
+
+
+/* =========================================================
+   17. COMPLETED ACTION
+   ========================================================= */
+
+.no-action {
+
+    display: inline-flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 6px;
+
+    color: var(--ua-muted);
+
+    font-size: 12px;
+
+    white-space: nowrap;
+}
+
+
+/* =========================================================
+   18. EMPTY STATE
+   ========================================================= */
+
+.empty-state {
+
+    padding: 48px 16px !important;
+
+    text-align: center !important;
+
+    color: var(--ua-muted) !important;
+}
+
+
+.empty-state i {
+
+    display: block;
+
+    margin-bottom: 12px;
+
+    color: var(--ua-muted);
+
+    font-size: 30px;
+}
+
+
+/* =========================================================
+   19. FORCE LOGOUT CUSTOM MODAL
+   ========================================================= */
+
+/*
+   IMPORTANT:
+   This modal does NOT depend on Bootstrap's modal JS.
+
+   JavaScript adds:
+       .show
+
+   to #forceLogoutModal.
+*/
+
+
+#forceLogoutModal {
+
+    position: fixed !important;
+
+    top: 0 !important;
+
+    left: 0 !important;
+
+    width: 100vw !important;
+
+    height: 100vh !important;
+
+    z-index: 99999 !important;
+
+    display: none !important;
+
+    align-items: center !important;
+
+    justify-content: center !important;
+
+    padding: 20px !important;
+
+    background:
+        rgba(0, 0, 0, 0.68) !important;
+
+    overflow-x: hidden !important;
+
+    overflow-y: auto !important;
+
+    opacity: 0 !important;
+
+    visibility: hidden !important;
+
+    pointer-events: none !important;
+
+    transition:
+        opacity 0.25s ease,
+        visibility 0.25s ease !important;
+}
+
+
+/* OPEN */
+
+#forceLogoutModal.show {
+
+    display: flex !important;
+
+    opacity: 1 !important;
+
+    visibility: visible !important;
+
+    pointer-events: auto !important;
+}
+
+
+/* =========================================================
+   20. MODAL DIALOG
+   ========================================================= */
+
+#forceLogoutModal .modal-dialog {
+
+    position: relative !important;
+
+    width: 100% !important;
+
+    max-width: 475px !important;
+
+    margin: auto !important;
+
+    z-index: 100000 !important;
+
+    pointer-events: auto !important;
+
+    transform:
+        translateY(-15px)
+        scale(0.97) !important;
+
+    transition:
+        transform 0.25s ease !important;
+}
+
+
+#forceLogoutModal.show .modal-dialog {
+
+    transform:
+        translateY(0)
+        scale(1) !important;
+}
+
+
+/* =========================================================
+   21. MODAL CONTENT
+   ========================================================= */
+
+#forceLogoutModal .modal-content {
+
+    position: relative !important;
+
+    width: 100% !important;
+
+    overflow: hidden !important;
+
+    border:
+        1px solid var(--ua-border) !important;
+
+    border-radius: 20px !important;
+
+    background:
+        var(--ua-panel) !important;
+
+    color:
+        var(--ua-text) !important;
+
+    box-shadow:
+        0 30px 90px
+        rgba(0, 0, 0, 0.42) !important;
+
+    backdrop-filter:
+        blur(25px) !important;
+
+    -webkit-backdrop-filter:
+        blur(25px) !important;
+}
+
+
+/* =========================================================
+   22. MODAL HEADER
+   ========================================================= */
+
+#forceLogoutModal .modal-header {
+
+    display: flex !important;
+
+    align-items: center !important;
+
+    justify-content: space-between !important;
+
+    padding: 20px 23px !important;
+
+    border-bottom:
+        1px solid var(--ua-border) !important;
+
+    background:
+        var(--ua-panel) !important;
+}
+
+
+.modal-title-wrapper {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 12px;
+}
+
+
+.modal-danger-icon {
+
+    width: 43px;
+
+    height: 43px;
+
+    flex: 0 0 43px;
+
+    display: grid;
+
+    place-items: center;
+
+    border-radius: 12px;
+
+    background:
+        var(--ua-red-soft);
+
+    color:
+        var(--ua-red);
+
+    font-size: 19px;
+}
+
+
+#forceLogoutModal .modal-title {
+
+    margin: 0 0 3px !important;
+
+    color:
+        var(--ua-text) !important;
+
+    font-size: 18px !important;
+
+    font-weight: 800 !important;
+}
+
+
+.modal-title-wrapper small {
+
+    color:
+        var(--ua-muted);
+
+    font-size: 12px;
+}
+
+
+/* =========================================================
+   23. CLOSE
+   ========================================================= */
+
+#forceLogoutModal .btn-close {
+
+    width: 32px !important;
+
+    height: 32px !important;
+
+    padding: 0 !important;
+
+    margin: 0 !important;
+
+    border: 0 !important;
+
+    border-radius: 8px !important;
+
+    background-color:
+        var(--ua-panel-2) !important;
+
+    opacity: 1 !important;
+
+    cursor: pointer !important;
+
+    transition:
+        0.2s ease !important;
+}
+
+
+#forceLogoutModal .btn-close:hover {
+
+    background:
+        var(--ua-red-soft) !important;
+
+    opacity: 1 !important;
+}
+
+
+/* =========================================================
+   24. MODAL BODY
+   ========================================================= */
+
+#forceLogoutModal .modal-body {
+
+    padding: 23px !important;
+
+    background:
+        var(--ua-panel) !important;
+
+    color:
+        var(--ua-text) !important;
+}
+
+
+/* =========================================================
+   25. WARNING
+   ========================================================= */
+
+.force-warning-box {
+
+    display: flex;
+
+    align-items: flex-start;
+
+    gap: 13px;
+
+    padding: 17px;
+
+    margin-bottom: 17px;
+
+    border:
+        1px solid
+        rgba(239, 68, 68, 0.25);
+
+    border-radius: 13px;
+
+    background:
+        var(--ua-red-soft);
+}
+
+
+.force-warning-box > i {
+
+    flex: 0 0 auto;
+
+    margin-top: 2px;
+
+    color:
+        var(--ua-red);
+
+    font-size: 20px;
+}
+
+
+.force-warning-box strong {
+
+    display: block;
+
+    margin-bottom: 7px;
+
+    color:
+        var(--ua-text);
+
+    font-size: 14px;
+}
+
+
+.force-warning-box p {
+
+    margin:
+        0 0 6px;
+
+    color:
+        var(--ua-muted);
+
+    font-size: 13px;
+
+    line-height: 1.6;
+}
+
+
+.force-user-name {
+
+    display: inline-block;
+
+    max-width: 100%;
+
+    overflow-wrap: anywhere;
+
+    color:
+        var(--ua-red);
+
+    font-size: 14px;
+
+    font-weight: 800;
+}
+
+
+.force-info-text {
+
+    margin: 0;
+
+    color:
+        var(--ua-muted);
+
+    font-size: 13px;
+
+    line-height: 1.6;
+}
+
+
+.force-info-text strong {
+
+    color:
+        var(--ua-text);
+}
+
+
+/* =========================================================
+   26. MODAL FOOTER
+   ========================================================= */
+
+#forceLogoutModal .modal-footer {
+
+    display: flex !important;
+
+    align-items: center !important;
+
+    justify-content: flex-end !important;
+
+    gap: 10px !important;
+
+    padding: 17px 23px 22px !important;
+
+    border-top:
+        1px solid var(--ua-border) !important;
+
+    background:
+        var(--ua-panel) !important;
+}
+
+
+/* =========================================================
+   27. CANCEL
+   ========================================================= */
+
+#forceLogoutModal .modal-cancel-btn {
+
+    display: inline-flex !important;
+
+    align-items: center !important;
+
+    justify-content: center !important;
+
+    min-width: 100px !important;
+
+    min-height: 41px !important;
+
+    padding: 9px 16px !important;
+
+    border:
+        1px solid var(--ua-border) !important;
+
+    border-radius: 10px !important;
+
+    background:
+        var(--ua-panel-2) !important;
+
+    color:
+        var(--ua-text) !important;
+
+    font-size: 13px !important;
+
+    font-weight: 800 !important;
+
+    cursor: pointer !important;
+
+    transition:
+        0.2s ease !important;
+}
+
+
+#forceLogoutModal .modal-cancel-btn:hover {
+
+    border-color:
+        var(--ua-primary) !important;
+
+    color:
+        var(--ua-primary) !important;
+}
+
+
+/* =========================================================
+   28. FORCE BUTTON INSIDE MODAL
+   ========================================================= */
+
+#forceLogoutModal .modal-force-btn {
+
+    display: inline-flex !important;
+
+    align-items: center !important;
+
+    justify-content: center !important;
+
+    gap: 8px !important;
+
+    min-width: 135px !important;
+
+    min-height: 41px !important;
+
+    padding: 9px 16px !important;
+
+    border:
+        1px solid var(--ua-red-dark) !important;
+
+    border-radius: 10px !important;
+
+    background:
+        var(--ua-red-dark) !important;
+
+    color: #ffffff !important;
+
+    font-size: 13px !important;
+
+    font-weight: 800 !important;
+
+    cursor: pointer !important;
+
+    transition:
+        0.2s ease !important;
+}
+
+
+#forceLogoutModal .modal-force-btn:hover {
+
+    background:
+        #991b1b !important;
+
+    border-color:
+        #991b1b !important;
+
+    transform:
+        translateY(-1px) !important;
+}
+
+
+#forceLogoutModal .modal-force-btn:disabled {
+
+    opacity: 0.65 !important;
+
+    cursor: wait !important;
+
+    transform: none !important;
+}
+
+
+/* =========================================================
+   29. NOTIFICATION
+   ========================================================= */
+
+.activity-notification {
+
+    position: fixed !important;
+
+    top: 20px !important;
+
+    right: 20px !important;
+
+    z-index: 110000 !important;
+
+    width:
+        min(390px, calc(100vw - 40px)) !important;
+
+    display: flex !important;
+
+    align-items: flex-start !important;
+
+    gap: 12px !important;
+
+    padding: 15px 17px !important;
+
+    border:
+        1px solid var(--ua-border) !important;
+
+    border-radius: 14px !important;
+
+    background:
+        var(--ua-panel) !important;
+
+    color:
+        var(--ua-text) !important;
+
+    box-shadow:
+        0 15px 45px
+        rgba(0, 0, 0, 0.22) !important;
+
+    opacity: 0 !important;
+
+    visibility: hidden !important;
+
+    transform:
+        translateX(120%) !important;
+
+    pointer-events: none !important;
+
+    transition:
+        opacity 0.3s ease,
+        visibility 0.3s ease,
+        transform 0.3s ease !important;
+}
+
+
+.activity-notification.show {
+
+    opacity: 1 !important;
+
+    visibility: visible !important;
+
+    transform:
+        translateX(0) !important;
+
+    pointer-events: auto !important;
+}
+
+
+.activity-notification.notification-success {
+
+    border-left:
+        4px solid var(--ua-green) !important;
+}
+
+
+.activity-notification.notification-error {
+
+    border-left:
+        4px solid var(--ua-red) !important;
+}
+
+
+.notification-icon {
+
+    width: 34px;
+
+    height: 34px;
+
+    flex: 0 0 34px;
+
+    display: grid;
+
+    place-items: center;
+
+    border-radius: 50%;
+
+    background:
+        var(--ua-green-soft);
+
+    color:
+        var(--ua-green);
+}
+
+
+.notification-error .notification-icon {
+
+    background:
+        var(--ua-red-soft);
+
+    color:
+        var(--ua-red);
+}
+
+
+.notification-content {
+
+    flex: 1;
+
+    min-width: 0;
+}
+
+
+.notification-content strong {
+
+    display: block;
+
+    margin-bottom: 3px;
+
+    color:
+        var(--ua-text);
+
+    font-size: 13px;
+}
+
+
+.notification-content span {
+
+    display: block;
+
+    color:
+        var(--ua-muted);
+
+    font-size: 12px;
+
+    line-height: 1.5;
+}
+
+
+.notification-close {
+
+    flex: 0 0 auto;
+
+    padding: 2px;
+
+    border: 0;
+
+    background: transparent;
+
+    color:
+        var(--ua-muted);
+
+    font-size: 16px;
+
+    cursor: pointer;
+}
+
+
+.notification-close:hover {
+
+    color:
+        var(--ua-red);
+}
+
+
+/* =========================================================
+   30. RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 1200px) {
+
+    .stats-grid {
+
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+    }
+
+
+    .filter-grid {
+
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+    }
+
+
+    .page-header {
+
+        align-items: flex-start;
+
+        flex-direction: column;
+    }
+
+
+    .header-actions {
+
+        width: 100%;
+
+        justify-content: flex-start;
+    }
+}
+
+
+@media (max-width: 768px) {
+
+    .page-wrapper {
+
+        padding:
+            20px 16px 40px;
+    }
+
+
+    .page-header {
+
+        padding: 19px;
+    }
+
+
+    .page-title h2 {
+
+        font-size: 21px;
+    }
+
+
+    .header-actions {
+
+        display: grid;
+
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+
+        width: 100%;
+    }
+
+
+    .live-status,
+    .admin-badge,
+    .back-btn {
+
+        width: 100%;
+
+        justify-content: center;
+        text-decoration: none;
+    }
+
+
+    .filter-grid {
+
+        grid-template-columns: 1fr;
+    }
+
+
+    .clear-btn {
+
+        width: 100%;
+    }
+}
+
+
+@media (max-width: 576px) {
+
+    .page-wrapper {
+
+        padding:
+            15px 10px 30px;
+    }
+
+
+    .page-header {
+
+        padding: 16px;
+
+        border-radius: 14px;
+    }
+
+
+    .page-title h2 {
+
+        font-size: 19px;
+    }
+
+
+    .page-title p {
+
+        font-size: 11px;
+    }
+
+
+    .header-actions {
+
+        grid-template-columns: 1fr;
+    }
+
+
+    .stats-grid {
+
+        grid-template-columns: 1fr;
+
+        gap: 10px;
+    }
+
+
+    .stat-card {
+
+        padding: 16px;
+    }
+
+
+    .filter-panel {
+
+        padding: 15px;
+
+        border-radius: 14px;
+    }
+
+
+    .table-panel {
+
+        border-radius: 14px;
+    }
+
+
+    .table-header {
+
+        align-items: flex-start;
+
+        flex-direction: column;
+
+        padding: 15px;
+    }
+
+
+    .activity-table button.force-logout-btn {
+
+        width: 120px !important;
+
+        min-width: 120px !important;
+
+        height: 37px !important;
+
+        padding: 8px 9px !important;
+
+        font-size: 11px !important;
+    }
+
+
+    #forceLogoutModal {
+
+        padding: 12px !important;
+    }
+
+
+    #forceLogoutModal .modal-dialog {
+
+        width:
+            100% !important;
+
+        max-width:
+            100% !important;
+    }
+
+
+    #forceLogoutModal .modal-content {
+
+        border-radius: 17px !important;
+    }
+
+
+    #forceLogoutModal .modal-header {
+
+        padding: 17px !important;
+    }
+
+
+    #forceLogoutModal .modal-body {
+
+        padding: 17px !important;
+    }
+
+
+    #forceLogoutModal .modal-footer {
+
+        padding:
+            15px 17px 17px !important;
+    }
+
+
+    .activity-notification {
+
+        top: 12px !important;
+
+        right: 12px !important;
+
+        width:
+            calc(100vw - 24px) !important;
+    }
+}
+
+
+@media (max-width: 420px) {
+
+    #forceLogoutModal .modal-footer {
+
+        flex-direction: column !important;
+    }
+
+
+    #forceLogoutModal .modal-cancel-btn,
+    #forceLogoutModal .modal-force-btn {
+
+        width: 100% !important;
+
+        min-width: 100% !important;
+    }
+}
+
+
+/* =========================================================
+   31. TABLE SCROLLBAR
+   ========================================================= */
+
+.table-wrapper::-webkit-scrollbar {
+
+    height: 7px;
+}
+
+
+.table-wrapper::-webkit-scrollbar-track {
+
+    background:
+        var(--ua-panel-2);
+}
+
+
+.table-wrapper::-webkit-scrollbar-thumb {
+
+    border-radius: 20px;
+
+    background:
+        var(--ua-muted);
+}
+
+
+.table-wrapper::-webkit-scrollbar-thumb:hover {
+
+    background:
+        var(--ua-primary);
+}
+
+
+/* =========================================================
+   32. REDUCED MOTION
+   ========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+
+    *,
+    *::before,
+    *::after {
+
+        animation-duration:
+            0.01ms !important;
+
+        animation-iteration-count:
+            1 !important;
+
+        transition-duration:
+            0.01ms !important;
+    }
+}

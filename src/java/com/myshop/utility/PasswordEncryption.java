@@ -1,6 +1,6 @@
 package com.myshop.utility;
 
-import com.myshop.service.impl.UserServiceImpl;
+//import com.myshop.service.impl.UserServiceImpl;
 import java.util.Base64;
 
 public class PasswordEncryption {
@@ -17,8 +17,8 @@ public class PasswordEncryption {
     }
    
     public static void main(String[] args) throws Exception {
-//        System.out.println("Decrypted password :"+getDecryptedPassword("YWRtaW5AMTIz"));
-//        System.out.println("Encrypted Password :"+getEncryptedPassword("admin@123"));
+//        System.out.println("Decrypted password : "+getDecryptedPassword("ZGVsaXZlcnkxMjM="));
+//        System.out.println("Encrypted Password :"+getEncryptedPassword("delivery123"));
 
 //        System.out.println("USER ID: "+new UserServiceImpl().generateUserId());
     }

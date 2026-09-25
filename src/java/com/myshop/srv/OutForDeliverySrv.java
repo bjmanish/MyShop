@@ -7,12 +7,14 @@ import com.myshop.service.impl.StaffServiceImpl;
 import com.myshop.utility.idUtil;
 import java.io.IOException;
 import java.net.URLEncoder;
+import static java.sql.Types.INTEGER;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Random;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.*;
+import java.util.*;
 
 @WebServlet(name = "OutForDeliverySrv", urlPatterns = {"/OutForDeliverySrv"})
 public class OutForDeliverySrv extends HttpServlet {
@@ -25,6 +27,7 @@ public class OutForDeliverySrv extends HttpServlet {
         HttpSession session = request.getSession();
         String userName = (String) session.getAttribute("user_id");
         String password = (String) session.getAttribute("sessionId");
+        String roleName = (String) session.getAttribute("roleName");
 
         // ✅ Session validation
         if (userName == null || password == null) {
@@ -35,7 +38,19 @@ public class OutForDeliverySrv extends HttpServlet {
         String userId = request.getParameter("userid");
         String prodId = request.getParameter("prodid");
         String orderId = request.getParameter("orderid");
+        String aId = request.getParameter("aId");
+        int assignId = 0;
 
+        try {
+
+            assignId = Integer.parseInt(aId);
+
+        } catch (Exception e) {
+
+            e.printStackTrace();
+        }
+        
+        System.out.println("Assign Id : "+assignId);
         // ✅ Always set status from backend (not from request)
         String status = "OUT_FOR_DELIVERY";
 
@@ -57,20 +72,20 @@ public class OutForDeliverySrv extends HttpServlet {
             // fallback (important)
             staffId = "STF-101";
         }
-        String asignId = idUtil.generateAssignId();
+//        String asignId = idUtil.generateAssignId();
         // ✅ Create AssignOrder object
-        AssignOrder assignOrder = new AssignOrder(asignId, orderId, staffId);
+        AssignOrder assignOrder = new AssignOrder(assignId, orderId, staffId);
 
         // ✅ Update order + assign
         OrderServiceImpl orderService = new OrderServiceImpl();
         boolean success = orderService.outForDelivery(userId, orderId, prodId, assignOrder);
 
         // ✅ Redirect response
-        if (success) {
-            response.sendRedirect("admin/shippedItems.jsp?message=" +
-                    URLEncoder.encode("Order is Out for Delivery 🚚 | OTP: " + otp, "UTF-8"));
+        if (success & "STAFF".equalsIgnoreCase(orderId)) {
+            response.sendRedirect("staff/assignOrder.jsp?message=" +
+                    URLEncoder.encode("Order is Out for Delivery", "UTF-8"));
         } else {
-            response.sendRedirect("admin/shippedItems.jsp?message=" +
+            response.sendRedirect("staff/assignOrder.jsp?message=" +
                     URLEncoder.encode("Failed to move order to Out for Delivery!", "UTF-8"));
         }
     }

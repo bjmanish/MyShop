@@ -10,13 +10,14 @@ public class AssignOrder {
     private String DeliveryStatus;
     private String otp;
     private LocalDateTime otpGeneratedAt;
-    private String assignId;
+    private int assignId;
     private String staffName;
+    
     public AssignOrder() {
         super();
     }
     
-    public AssignOrder(String assignId, String orderId, String staffId) {
+    public AssignOrder(int assignId, String orderId, String staffId) {
         this.orderId = orderId;
         this.assignId = assignId;
         this.staffId = staffId;
@@ -32,11 +33,11 @@ public class AssignOrder {
 
     
     
-    public String getAssignId() {
+    public int getAssignId() {
         return assignId;
     }
 
-    public void setAssignId(String assignId) {
+    public void setAssignId(int assignId) {
         this.assignId = assignId;
     }
 

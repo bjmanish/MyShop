@@ -5,6 +5,11 @@
 <meta charset="UTF-8">
 <title>MYSHOP - Admin Dashboard</title>
 
+<link
+        rel="shortcut icon"
+        type="image/x-icon"
+        href="<%=request.getContextPath()%>/favicon.ico">
+
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
 
@@ -102,6 +107,29 @@
 }
 
 </style>
+
+<script>
+    function loadNetworkInfo() {
+    try {
+        const response = await fetch('<%=request.getContextPath()%>/networkInfo');
+        const data = await response.json();
+
+        document.getElementById("networkInfo").innerHTML = `
+            <h3>Network Info</h3>
+            <p><b>IP Address:</b> ${data.ip}</p>
+            <p><b>Host:</b> ${data.host}</p>
+            <p><b>Browser:</b> ${data.userAgent}</p>
+        `;
+    } catch (error) {
+        console.error("Error fetching network info:", error);
+    }
+}
+console.log(loadNetworkInfo());
+window.onload() = loadNetworkInfo();
+
+
+</script>
+
 </head>
 
 <body>
@@ -147,8 +175,8 @@ if (userName == null || userType == null || !userType.equalsIgnoreCase("admin") 
 <!-- CONTENT -->
 <div class="content mt-5" id="mainContent">
 
-<h2 class="mb-2 text-white">Welcome, <%= userName %> 👋</h2>
-<p class="text-white">Manage your shop efficiently</p>
+<h2 class="mb-2">Welcome, <%= userName %> 👋</h2>
+<p>Manage your shop efficiently</p>
 
 <div class="row g-4 mt-3">
 
@@ -247,25 +275,6 @@ document.addEventListener("touchend", (e) => {
     if(diff > 70) openSidebar();     // swipe right
     if(diff < -70) closeSidebar();   // swipe left
 });
-
-function loadNetworkInfo() {
-    try {
-        const response = await fetch('<%=request.getContextPath()%>/networkInfo');
-        const data = await response.json();
-
-        document.getElementById("networkInfo").innerHTML = `
-            <h3>Network Info</h3>
-            <p><b>IP Address:</b> ${data.ip}</p>
-            <p><b>Host:</b> ${data.host}</p>
-            <p><b>Browser:</b> ${data.userAgent}</p>
-        `;
-    } catch (error) {
-        console.error("Error fetching network info:", error);
-    }
-}
-console.log(loadNetworkInfo());
-window.onload() = loadNetworkInfo();
-
 
 </script>
 

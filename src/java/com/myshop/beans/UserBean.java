@@ -17,7 +17,7 @@ public class UserBean implements Serializable {
     private int emailVerified = 1;   // default
     private int mobileVerified = 0;  // default
     
-    private String roleId;
+    private int roleId;
     private String roleName;
     
     private String cartId;
@@ -119,11 +119,11 @@ public class UserBean implements Serializable {
         this.mobileVerified = mobileVerified;
     }
 
-    public String getRoleId() {
+    public int getRoleId() {
         return roleId;
     }
 
-    public void setRoleId(String roleId) {
+    public void setRoleId(int roleId) {
         this.roleId = roleId;
     }
 

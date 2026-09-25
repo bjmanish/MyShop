@@ -1,11 +1,18 @@
 package com.myshop.srv;
 
+import com.myshop.beans.OrderBean;
 import com.myshop.service.PaymentDAO;
+import com.myshop.service.impl.OrderServiceImpl;
 import com.myshop.service.impl.ProductServiceImpl;
+import com.myshop.service.impl.TransactionServiceImpl;
+import com.myshop.utility.dbUtil;
 import com.myshop.utility.idUtil;
 
 import java.io.IOException;
 import java.security.MessageDigest;
+import java.sql.Connection;
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -23,6 +30,12 @@ public class PaymentServlet extends HttpServlet {
             throws ServletException, IOException {
 
         HttpSession session = request.getSession();
+        
+        String urlContext = "http://localhost:2025/MyShop";
+        
+        SimpleDateFormat sdf = new SimpleDateFormat("YYYY:MM:DD hh:mm:ss");
+        Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+        sdf.format(timestamp);
 
         try {
             // =============================
@@ -46,10 +59,10 @@ public class PaymentServlet extends HttpServlet {
 
             String product = new ProductServiceImpl().getProdInfo(pid);
 
-            String surl = "http://localhost:8084/MyShop/PaymentSuccessServlet";
-            String furl = "http://localhost:8084/MyShop/PaymentFailureServlet";
+            String surl = urlContext+"/PaymentSuccessServlet";
+            String furl = urlContext+"/PaymentFailureServlet";
 
-            System.out.println("User: " + userId + " | Product: " + product + " | Amount: " + amount);
+            System.out.println("User: " + userId +"| Product: " + product + " | Amount: " + amount);
 
             // =============================
             // 2. VALIDATION
@@ -78,12 +91,25 @@ public class PaymentServlet extends HttpServlet {
             String hash = generateHash(hashString);
 
             System.out.println("Generated Hash: " + hash);
+            
+            OrderBean order = new OrderBean();
+            order.setUserId(userId);
+            order.setProdId(pid);
+            order.setTransId(txnid);
+            order.setShipped(0);
+            order.setStatus("PENDING");
+//            order.setQuantity(0);
+            order.setAmount(amountDouble);
+            order.setOrderDate(timestamp);
+            
 
             // =============================
             // 4. SAVE PAYMENT (PENDING)
             // =============================
-            PaymentDAO.savePayment(orderId, userId, txnid, amountDouble, "PENDING", hash);
-
+            PaymentDAO.savePayment(orderId, userId, txnid, amountDouble, "PENDING", hash);            
+//            new OrderServiceImpl().addOrder(order);
+            new OrderServiceImpl().paymentSuccess(cartId, orderId, userId, cartId, amountDouble);
+            new TransactionServiceImpl().addTransaction(txnid, orderId, userId, amountDouble, "PENDING", timestamp);
             System.out.println("Payment saved in DB");
 
             // =============================
@@ -114,7 +140,7 @@ public class PaymentServlet extends HttpServlet {
             // =============================
             request.setAttribute("error", "Payment initialization failed");
 
-            request.getRequestDispatcher("user/cart.jsp").forward(request, response);
+            request.getRequestDispatcher(request.getContextPath()+"/user/cart.jsp").forward(request, response);
         }
     }
 

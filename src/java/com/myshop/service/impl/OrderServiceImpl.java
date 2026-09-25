@@ -29,7 +29,7 @@ public class OrderServiceImpl implements OrderService {
 
             // 🔥 1. INSERT ORDER
             PreparedStatement ps1 = conn.prepareStatement(
-                "INSERT INTO ORDERS(order_id, user_id, total_amount, status, order_date) VALUES(?,?,?,?,?)"
+                "INSERT INTO ORDERS(orderid, userid, amount, status, order_date) VALUES(?,?,?,?,?)"
             );
 
             SimpleDateFormat sdf = new SimpleDateFormat("YYYY:MM:DD hh:mm:ss");
@@ -151,12 +151,14 @@ public class OrderServiceImpl implements OrderService {
 
         try {
             Connection conn = dbUtil.provideConnection();
-
-            PreparedStatement ps = conn.prepareStatement(
-                "SELECT o.order_id, o.user_id, o.total_amount, o.status, o.order_date, " +
+            
+            String query = "SELECT o.order_id, o.user_id, o.total_amount, o.status, o.order_date, " +
                 "oi.product_id, oi.quantity " +
-                "FROM ORDERS o JOIN ORDER_ITEMS oi ON o.order_id = oi.order_id"
-            );
+                "FROM ORDERS o JOIN CART_ITEMS oi ON o.order_id = oi.order_id";
+            
+            String query2 = "SELECT * FROM ORDERS";
+
+            PreparedStatement ps = conn.prepareStatement(query2);
 
             ResultSet rs = ps.executeQuery();
             
@@ -164,18 +166,18 @@ public class OrderServiceImpl implements OrderService {
             OrderItem item = null;
             while (rs.next()) {
                 item = new OrderItem();
-                    item.setProductId(rs.getString("product_id"));
+                    item.setProductId(rs.getString("prodid"));
                     item.setQuantity(rs.getInt("quantity"));
-                    item.setProductName(rs.getString("order_id"));
+                    item.setProductName(rs.getString("orderid"));
                     items.add(item);
                 OrderDetails order = new OrderDetails();
                 
-                order.setOrderId(rs.getString("order_id"));
-                order.setUserId(rs.getString("user_id"));
-                order.setAmount(rs.getDouble("total_amount"));
+                order.setOrderId(rs.getString("orderid"));
+                order.setUserId(rs.getString("userId"));
+                order.setAmount(rs.getDouble("amount"));
                 order.setStatus(rs.getString("status"));
                 order.setDatetime(rs.getTimestamp("order_date"));
-                order.setProdId(rs.getString("product_id"));
+                order.setProdId(rs.getString("prodid"));
                 order.setQnty(rs.getInt("quantity"));
                 order.setItems(items);
 
@@ -198,7 +200,7 @@ public class OrderServiceImpl implements OrderService {
             Connection conn = dbUtil.provideConnection();
 
             PreparedStatement ps = conn.prepareStatement(
-                "UPDATE ORDERS SET status=? WHERE order_id=?"
+                "UPDATE ORDERS SET status=? WHERE orderid=?"
             );
 
             ps.setString(1, status);
@@ -241,7 +243,7 @@ public List<OrderDetails> getAllOrderDetails(String userId) {
 
     try (Connection conn = dbUtil.provideConnection()) {
 
-        String query = "SELECT o.order_id, o.user_id, o.total_amount, o.status, o.order_date, o.order_date+7 as delivery_date, " +
+        String query = "SELECT o.orderid, o.userid, o.amount AS total_amount, o.status, o.order_date, o.order_date+7 as delivery_date, " +
                        "oi.product_id, oi.quantity, " +
                        "p.name " +
                        "FROM ORDERS o " +
@@ -250,7 +252,24 @@ public List<OrderDetails> getAllOrderDetails(String userId) {
                        "WHERE o.user_id = ? " +
                        "ORDER BY o.order_date DESC";
 
-        PreparedStatement ps = conn.prepareStatement(query);
+        String query1 =
+        "SELECT " +
+        "o.orderId, " +
+        "p.pId, " +
+        "o.amount, " +
+        "o.shipped, " +
+        "o.status, " +
+        "o.order_date, " +
+        "o.delivery_date, " +
+        "o.prodId AS product_id, " +
+        "o.quantity, " +
+        "p.pName " +
+        "FROM ORDERS o " +
+        "JOIN PRODUCTS p ON o.prodId = p.pId " +
+        "WHERE o.userid = ? " +
+        "ORDER BY o.order_date DESC";
+
+        PreparedStatement ps = conn.prepareStatement(query1);
         ps.setString(1, userId);
 
         ResultSet rs = ps.executeQuery();
@@ -259,15 +278,15 @@ public List<OrderDetails> getAllOrderDetails(String userId) {
 
             OrderDetails order = new OrderDetails();
 
-            order.setOrderId(rs.getString("order_id"));
-            order.setUserId(rs.getString("user_id"));
-            order.setAmount(rs.getDouble("total_amount"));
+            order.setOrderId(rs.getString("orderid"));
+            order.setUserId(userId);
+            order.setAmount(rs.getDouble("amount"));
             order.setStatus(rs.getString("status"));
             order.setDatetime(rs.getTimestamp("order_date"));
             order.setDeliveryDate(rs.getTimestamp("delivery_date"));
 
             order.setProdId(rs.getString("product_id"));
-            order.setProdName(rs.getString("name"));
+            order.setProdName(rs.getString("pname"));
             order.setQnty(rs.getInt("quantity"));
 
             list.add(order);
@@ -281,7 +300,7 @@ public List<OrderDetails> getAllOrderDetails(String userId) {
 }
 
     @Override
-public boolean outForDelivery(String userId, String orderId, String prodId, AssignOrder assignOrder) {
+    public boolean outForDelivery(String userId, String orderId, String prodId, AssignOrder assignOrder) {
 
     boolean flag = false;
 
@@ -294,26 +313,29 @@ public boolean outForDelivery(String userId, String orderId, String prodId, Assi
         con.setAutoCommit(false); // ✅ transaction start
 
         // ✅ 1. Update order status
-        String updateQuery = "UPDATE ORDERS SET status=? WHERE user_id=? AND order_id=?";
-        psUpdate = con.prepareStatement(updateQuery);
-        psUpdate.setString(1, "OUT_FOR_DELIVERY");
-        psUpdate.setString(2, userId);
-        psUpdate.setString(3, orderId);
-//        psUpdate.setString(4, prodId);
-
-        int updated = psUpdate.executeUpdate();
+//        String updateQuery = "UPDATE ORDERS SET status=? WHERE userid=? AND orderid=?";
+//        psUpdate = con.prepareStatement(updateQuery);
+//        psUpdate.setString(1, "OUT_FOR_DELIVERY");
+//        psUpdate.setString(2, userId);
+//        psUpdate.setString(3, orderId);
+////        psUpdate.setString(4, prodId);
+//
+//        int updated = psUpdate.executeUpdate();
 
         // ✅ 2. Insert into ASSIGN_ORDER table
-        String insertQuery = "INSERT INTO DELIVERY_ASSIGNMENT(assign_id,order_id, staff_id) VALUES (?, ?, ?)";
+//        String insertQuery = "INSERT INTO ASSIGNORDERFORSTAFF(assignid,orderid, staffid) VALUES (?, ?, ?)";
+        String insertQuery = "UPDATE ASSIGNORDERFORSTAFF SET deliveryStatus = 'OUT_FOR_DELIVERY' WHERE assignId = ?";
         psInsert = con.prepareStatement(insertQuery);
-        psInsert.setString(1, assignOrder.getAssignId());
-        psInsert.setString(2, assignOrder.getOrderId());
-        psInsert.setString(3, assignOrder.getStaffId());
+        psInsert.setInt(1, assignOrder.getAssignId());
+//        psInsert.setString(2, assignOrder.getOrderId());
+//        psInsert.setString(3, assignOrder.getStaffId());
         
         int inserted = psInsert.executeUpdate();
 
         // ✅ Commit only if both succeed
-        if (updated > 0 && inserted > 0) {
+        if (
+//                updated > 0 && 
+                inserted > 0) {
             con.commit();
             flag = true;
         } else {
@@ -351,18 +373,211 @@ public boolean outForDelivery(String userId, String orderId, String prodId, Assi
     }
 
     @Override
-    public List<AssignOrder> getAssignedOrdersByStaff(String staffEmail) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public List<AssignOrder> getAssignedOrdersByStaff(String staffId) {
+
+    List<AssignOrder> assignedOrders = new ArrayList<>();
+
+    String sql =
+        "SELECT " +
+        "    assignId, " +
+        "    orderId, " +
+        "    staff_id, " +
+        "    staffName, " +
+        "    assignedDate, " +
+        "    deliveryStatus, " +
+        "    otp, " +
+        "    otpGeneratedAt " +
+        "FROM ASSIGNORDERFORSTAFF " +
+        "WHERE staff_id = ? " +
+        "ORDER BY assignedDate DESC";
+
+    try (
+        Connection con = dbUtil.provideConnection();
+        PreparedStatement ps = con.prepareStatement(sql)
+    ) {
+
+        ps.setString(1, staffId);
+
+        try (ResultSet rs = ps.executeQuery()) {
+
+            while (rs.next()) {
+
+                AssignOrder order = new AssignOrder();
+
+                order.setAssignId(
+                    rs.getInt("assignId")
+                );
+
+                order.setOrderId(
+                    rs.getString("orderId")
+                );
+
+                order.setStaffId(
+                    rs.getString("staff_id")
+                );
+
+                order.setStaffName(
+                    rs.getString("staffName")
+                );
+
+                order.setAssignDate(
+                    rs.getTimestamp("assignedDate")
+                );
+
+                order.setDeliveryStatus(
+                    rs.getString("deliveryStatus")
+                );
+
+                order.setOtp(
+                    rs.getString("otp")
+                );
+
+                Timestamp otpTimestamp =
+                    rs.getTimestamp("otpGeneratedAt");
+
+                if (otpTimestamp != null) {
+
+                    order.setOtpGeneratedAt(
+                        otpTimestamp.toLocalDateTime()
+                    );
+
+                }
+
+                assignedOrders.add(order);
+            }
+        }
+
+    } catch (Exception e) {
+
+        e.printStackTrace();
+
     }
 
+    return assignedOrders;
+}
+    
     @Override
     public String markOrderAsDelivered(int assignId, String staffId) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        String sql =
+        "UPDATE ASSIGNORDERFORSTAFF " +
+        "SET deliveryStatus = ?, " +
+        "    remarks = ? " +
+        "WHERE assignId = ? " +
+        "AND staff_id = ? " +
+        "AND deliveryStatus = ?";
+
+    try (
+        Connection con = dbUtil.provideConnection();
+        PreparedStatement ps = con.prepareStatement(sql)
+    ) {
+
+        ps.setString(1, "DELIVERED");
+
+        ps.setString(
+            2,
+            "Delivery completed successfully after OTP verification"
+        );
+
+        ps.setInt(3, assignId);
+
+        ps.setString(4, staffId);
+
+        ps.setString(5, "OUT_FOR_DELIVERY");
+
+
+        int rows =
+            ps.executeUpdate();
+
+
+        if (rows > 0) {
+
+            System.out.println(
+                "Delivery status updated successfully."
+            );
+
+            System.out.println(
+                "Assign ID: " + assignId
+            );
+
+            System.out.println(
+                "Staff ID: " + staffId
+            );
+
+            return "SUCCESS";
+        }
+
+
+        System.out.println(
+            "No delivery record was updated."
+        );
+
+        System.out.println(
+            "Assign ID: " + assignId
+        );
+
+        System.out.println(
+            "Staff ID: " + staffId
+        );
+
+        return "FAILED";
+
+
+    } catch (Exception e) {
+
+        e.printStackTrace();
+
+        return "FAILED";
+    } 
+    
     }
 
     @Override
     public boolean updateOTPAfterDelivery(int assignId) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+       String sql =
+        "UPDATE ASSIGNORDERFORSTAFF " +
+        "SET otp = NULL, " +
+        "otpGeneratedAt = NULL " +
+        "WHERE assignId = ?" +
+        "AND deliveryStatus = 'DELIVERED' ";
+
+    try (
+        Connection con = dbUtil.provideConnection();
+        PreparedStatement ps = con.prepareStatement(sql)
+    ) {
+
+        ps.setInt(1, assignId);
+
+
+        int rows =
+            ps.executeUpdate();
+
+
+        if (rows > 0) {
+
+            System.out.println(
+                "OTP cleared successfully for Assign ID: "
+                + assignId
+            );
+
+            return true;
+        }
+
+
+        System.out.println(
+            "OTP could not be cleared for Assign ID: "
+            + assignId
+        );
+
+        return false;
+
+
+    } catch (Exception e) {
+
+        e.printStackTrace();
+
+        return false;
+    } 
+    
     }
 
     @Override
@@ -388,5 +603,25 @@ public boolean outForDelivery(String userId, String orderId, String prodId, Assi
             ex.getMessage();
         }
         return orderId;
+    }
+
+    @Override
+    public String getOtpByAssignId(int assignId) {
+        String  otp = null;
+        
+        try(Connection conn = dbUtil.provideConnection();
+                PreparedStatement ps = conn.prepareStatement("SELECT otp from ASSIGNORDERFORSTAFF where assignId = ?");){
+            ps.setInt(1, assignId);
+            
+            ResultSet rs = ps.executeQuery();
+            
+            if(rs.next()){
+                otp = rs.getString("otp");
+            }
+            
+        } catch (SQLException ex) {
+            ex.getMessage();
+        }
+        return otp;
     }
 }

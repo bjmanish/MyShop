@@ -25,7 +25,7 @@ public class UpdateProductImageSrv extends HttpServlet {
             InputStream inputStream = filePart.getInputStream();
 
             PreparedStatement ps = conn.prepareStatement(
-                "UPDATE PRODUCTS SET image=? WHERE product_id=?");
+                "UPDATE PRODUCTS SET image=? WHERE pId=?");
 
             ps.setBinaryStream(1, inputStream, (int) filePart.getSize());
             ps.setString(2, pid);

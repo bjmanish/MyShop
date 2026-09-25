@@ -1,313 +1,1288 @@
 <%@page import="com.myshop.service.impl.CartServiceImpl"%>
-<%@ page language="java"%>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<link rel="icon" href="<%=request.getContextPath()%>/favicon.ico" type="image/png">
-<link rel="shortcut icon" href="<%=request.getContextPath()%>/favicon.ico">
-<link rel="apple-touch-icon" href="<%=request.getContextPath()%>/favicon.ico">
-
-<!-- BOOTSTRAP -->
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-
-    <script>
-        function loadCartCount(){
-            fetch("<%=request.getContextPath()%>/cartCount")
-            .then(res => res.text())
-            .then(count => {
-                document.getElementById("cartCount").innerText = count;
-            });
-        }
-        //load on page start
-//        loadCartCount();
-    </script>
-
-
-
-
-<style>
-
-/* BACKGROUND */
-body {
-    background: linear-gradient(135deg, #141e30, #243b55);
-    transition: 0.3s;
-}
-
-/* DARK MODE */
-.dark-mode {
-    background: #000 !important;
-    color: #fff !important;
-}
-
-/* NAVBAR */
-.modern-nav {
-    background: rgba(0,0,0,0.7);
-    backdrop-filter: blur(10px);
-    transition: 0.3s;
-    z-index: 10000;
-}
-
-/* SCROLL EFFECT */
-.nav-scrolled {
-    padding: 5px 0;
-    background: black !important;
-}
-
-/* LOGO */
-.logo {
-    font-weight: bold;
-    color: white !important;
-}
-
-/* SEARCH */
-.search-box input {
-    width: 280px;
-    border-radius: 20px;
-}
-
-/* NAV LINKS */
-.nav-link {
-    color: white !important;
-}
-
-/* NOTIFICATION */
-.notif-badge {
-    position: absolute;
-    top: 0;
-    right: -5px;
-    background: red;
-    color: white;
-    font-size: 10px;
-    padding: 2px 5px;
-    border-radius: 50%;
-}
-
-/* MOBILE MENU */
-#mobileMenu {
-    position: fixed;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: #111;
-    padding: 20px;
-    transition: 0.3s;
-    z-index: 2000;
-}
-
-#mobileMenu.active {
-    left: 0;
-}
-
-#mobileMenu a {
-    display: block;
-    padding: 15px;
-    color: white;
-    font-size: 18px;
-    text-decoration: none;
-}
-
-/* OVERLAY */
-#menuOverlay {
-    position: fixed;
-    width: 100%;
-    height: 100%;
-    background: rgba(0,0,0,0.5);
-    display: none;
-    z-index: -1500;
-}
-
-#menuOverlay.active {
-    display: block;
-}
-
-</style>
-
-</head>
-<body>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 
 <%
-String role = (String) session.getAttribute("role");
-String name = (String) session.getAttribute("name");
-String userId = (String)session.getAttribute("user_id");
-String cartId = (String)session.getAttribute("cartId");
-int cartCount = new CartServiceImpl().getCartCount(userId);
-//System.out.println("cart qnty :"+cartCount);
-String homePage = "index.jsp";
-String profile =  "";
-if ("customer".equalsIgnoreCase(role)){
-    homePage = "userHome.jsp";
-    profile = "userProfile.jsp";
-}
-else if ("admin".equalsIgnoreCase(role)){
-    homePage = "adminHome.jsp";
-    profile = "adminProfile.jsp";
-}
-else if ("staff".equalsIgnoreCase(role) || "delivery".equalsIgnoreCase(role)){
-    homePage = "staffHome.jsp";
-    profile = "staffProfile.jsp";
-}
+    String role = (String) session.getAttribute("role");
+    String name = (String) session.getAttribute("name");
+    String userId = (String) session.getAttribute("user_id");
+    String cartId = (String) session.getAttribute("cartId");
+
+    int cartCount = 0;
+
+    try {
+        if (userId != null && !userId.trim().isEmpty()) {
+            cartCount = new CartServiceImpl().getCartCount(userId);
+        }
+    } catch (Exception e) {
+        cartCount = 0;
+    }
+
+
+    /* =========================================================
+       ROLE BASED URLS
+       ========================================================= */
+
+    String homePage =
+        request.getContextPath() + "/index.jsp";
+
+    String profile = request.getContextPath()+"";
+
+
+    if ("customer".equalsIgnoreCase(role)) {
+
+        homePage =
+            request.getContextPath() + "/user/userHome.jsp";
+
+        profile =
+            request.getContextPath() + "/user/userProfile.jsp";
+
+
+    } else if ("admin".equalsIgnoreCase(role)) {
+
+        homePage =
+            request.getContextPath() + "/admin/adminHome.jsp";
+        
+//        profile = request.getContextPath() + "/admin/applicationStatus.jsp";
+        
+        profile = request.getContextPath() + "/admin/userActivity.jsp";
+
+
+    } else if ("staff".equalsIgnoreCase(role)
+            || "delivery".equalsIgnoreCase(role)
+            ) {
+
+        homePage =
+            request.getContextPath() + "/staff/staffHome.jsp";
+
+        profile =
+            request.getContextPath() + "/staff/staffProfile.jsp";
+    }
 %>
 
-<!-- NAVBAR -->
-<nav class="navbar navbar-expand-lg modern-nav fixed-top" id="navbar">
-<div class="container">
+<!DOCTYPE html>
+<html lang="en">
 
-<a class="navbar-brand logo" href="<%=homePage%>">
-<i class="bi bi-bag-heart-fill"></i> MYSHOP
-</a>
+<head>
 
-<!-- SEARCH -->
-<div class="search-box d-none d-lg-flex mx-3">
-<input type="text" class="form-control" placeholder="Search products...">
-</div>
+    <meta charset="UTF-8">
 
-<!-- TOGGLE -->
-<button class="navbar-toggler text-white" id="navToggleBtn">
-<i class="bi bi-list"></i>
-</button>
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1">
 
-<!-- MENU -->
-<div class="collapse navbar-collapse" id="menu">
-<ul class="navbar-nav ms-auto align-items-lg-center gap-lg-3">
+<!-- =========================================================
+     BOOTSTRAP CSS
+     ========================================================= -->
 
-<!-- ? -->
-<li class="nav-item position-relative">
-<a class="nav-link"><i class="bi bi-bell"></i><span class="notif-badge">3</span></a>
-</li>
+<link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+    rel="stylesheet">
 
-<!-- ? -->
-<li class="nav-item">
-<a class="nav-link" id="themeToggle"><i class="bi bi-moon"></i></a>
-</li>
+<!-- =========================================================
+     BOOTSTRAP ICONS
+     ========================================================= -->
 
-<% if (role == null) { %>
+<link
+    rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
-<li class="nav-item"><a class="nav-link" href="<%=request.getContextPath()%>/index.jsp">Home</a></li>
-<li class="nav-item position-relative" >
-    <a class="nav-link" onclick="handleCartClick()" > <i class="bi bi-cart3"></i> <span class="notif-badge" id="cartCount"><%= ( (cartCount != 0) ? cartCount : 0 )%></span></a>
-</li>
 
-<li class="nav-item"><a class="nav-link" id="loginLink" href="<%=request.getContextPath()%>/login.jsp">Login</a></li>
+    <link rel="stylesheet" href="<%=request.getContextPath()%>/css/header.css"/>
 
-<% } else { %>
+</head>
 
-<%--<li class="nav-item"><a class="nav-link" href="<%=homePage%>">Home</a></li>--%>
-    
-    <% if(role.equalsIgnoreCase("CUSTOMER")) { %>
-        <!-- ? CART (NEW - ADDED) -->
-        <li class="nav-item position-relative">
-            <a class="nav-link" href="cart.jsp?cartId=<%=cartId%>&uid=<%=userId%>" onclick="handleCartClick()" id="cart-Count">
-                <i class="bi bi-cart3" ></i><span class="notif-badge" id="cartCount"><%= ( (cartCount != 0) ? cartCount : 0 )%></span>
-            </a>
-        </li>
-        <li class="nav-item position-relative">
-            <a class="nav-link" href="orderDetails.jsp?userId=<%=userId%>&orderId=<%=session.getAttribute("orderId")%>">
-                <i class="bi bi-truck"></i>
-            </a>
-        </li>
-        <%}else if(role.equalsIgnoreCase("admin")){%>
-            <li class="nav-item"><a class="nav-link" href="shippedItems.jsp?uid=<%=userId%>">Orders</a></li>
-        <%}else{%>
-            <li class="nav-item"><a class="nav-link" href="assignOrder.jsp?uId=<%=userId%>">Assign Order</a></li>
-        <%}%>
-        <li class="nav-item"><a class="nav-link" href="<%=profile%>">Welcome <%=name%></a></li>
-        <li class="nav-item"><a class="nav-link" href="#" onclick="openLogoutModal()">Logout</a></li>
-    <% } %>
+<body>
 
-</ul>
-</div>
-</div>
+<!-- =========================================================
+     NAVBAR
+     ========================================================= -->
+
+<nav
+    class="navbar navbar-expand-lg modern-nav fixed-top"
+    id="navbar">
+
+    <div class="container">
+
+
+        <!-- =================================================
+             LOGO
+             ================================================= -->
+
+        <a
+            class="navbar-brand logo"
+            href="<%=homePage%>">
+
+            <i class="bi bi-bag-heart-fill"></i>
+
+            <span>MYSHOP</span>
+
+        </a>
+
+
+        <!-- =================================================
+             DESKTOP SEARCH
+             ================================================= -->
+
+        <form
+            class="search-box d-none d-lg-flex mx-3"
+            action="<%=request.getContextPath()%>/index.jsp"
+            method="get">
+
+            <input
+                type="search"
+                name="search"
+                class="form-control"
+                placeholder="Search products..."
+                value="<%=request.getParameter("search") != null
+                    ? request.getParameter("search")
+                    : ""%>">
+
+        </form>
+
+
+        <!-- =================================================
+             CONTROLS
+             ================================================= -->
+
+        <div
+            class="d-flex align-items-center gap-2">
+
+
+            <!-- THEME BUTTON -->
+
+            <button
+                type="button"
+                class="theme-btn"
+                id="themeToggle"
+                title="Change theme">
+
+                <i
+                    class="bi bi-moon-fill"
+                    id="themeIcon">
+                </i>
+
+            </button>
+
+
+            <!-- MOBILE MENU -->
+
+            <button
+                type="button"
+                class="navbar-toggler border-0"
+                id="navToggleBtn"
+                aria-label="Open menu">
+
+                <i
+                    class="bi bi-list"
+                    style="
+                        font-size:16px;
+                        color:var(--nav-text);
+                    ">
+                </i>
+
+            </button>
+
+        </div>
+
+
+        <!-- =================================================
+             DESKTOP MENU
+             ================================================= -->
+
+        <div
+            class="d-none d-lg-block"
+            id="menu">
+
+            <ul
+                class="navbar-nav
+                       ms-auto
+                       align-items-center
+                       flex-row">
+
+
+                <!-- =================================================
+                     NOTIFICATION
+                     ================================================= -->
+
+                <li
+                    class="nav-item position-relative">
+
+                    <a
+                        class="nav-link"
+                        href="#">
+
+                        <i class="bi bi-bell"></i>
+
+                        <span class="notif-badge">
+
+                            3
+
+                        </span>
+
+                    </a>
+
+                </li>
+
+
+                <% if (role == null) { %>
+
+
+                    <!-- =================================================
+                         GUEST HOME
+                         ================================================= -->
+
+                    <li class="nav-item">
+
+                        <a
+                            class="nav-link"
+                            href="<%=request.getContextPath()%>/index.jsp">
+
+                            <i class="bi bi-house"></i>
+
+                            <span>Home</span>
+
+                        </a>
+
+                    </li>
+
+
+                    <!-- =================================================
+                         GUEST CART
+                         ================================================= -->
+
+                    <li
+                        class="nav-item position-relative">
+
+                        <a
+                            class="nav-link"
+                            href="#"
+                            onclick="handleGuestCart(event)">
+
+                            <i class="bi bi-cart3"></i>
+
+                            <span>Cart</span>
+
+                            <span
+                                class="notif-badge"
+                                id="cartCount">
+
+                                <%=cartCount%>
+
+                            </span>
+
+                        </a>
+
+                    </li>
+
+
+                    <!-- =================================================
+                         LOGIN
+                         ================================================= -->
+
+                    <li class="nav-item">
+
+                        <a
+                            class="nav-link"
+                            href="<%=request.getContextPath()%>/login.jsp">
+
+                            <i
+                                class="bi bi-box-arrow-in-right">
+                            </i>
+
+                            <span>Login</span>
+
+                        </a>
+
+                    </li>
+
+
+                <% } else { %>
+
+
+                    <!-- =================================================
+                         CUSTOMER
+                         ================================================= -->
+
+                    <% if ("customer".equalsIgnoreCase(role)) { %>
+
+
+                        <!-- HOME -->
+
+                        <li class="nav-item">
+
+                            <a
+                                class="nav-link"
+                                href="<%=request.getContextPath()%>/user/userHome.jsp">
+
+                                <i class="bi bi-house"></i>
+
+                                <span>Home</span>
+
+                            </a>
+
+                        </li>
+
+
+                        <!-- CART -->
+
+                        <li
+                            class="nav-item position-relative">
+
+                            <a
+                                class="nav-link"
+                                href="<%=request.getContextPath()%>/user/cart.jsp?cartId=<%=cartId%>&uid=<%=userId%>">
+
+                                <i class="bi bi-cart3"></i>
+
+                                <span>Cart</span>
+
+                                <span
+                                    class="notif-badge"
+                                    id="cartCount">
+
+                                    <%=cartCount%>
+
+                                </span>
+
+                            </a>
+
+                        </li>
+
+
+                        <!-- ORDERS -->
+
+                        <li class="nav-item">
+
+                            <a
+                                class="nav-link"
+                                href="<%=request.getContextPath()%>/user/orderDetails.jsp?userId=<%=userId%>">
+
+                                <i class="bi bi-truck"></i>
+
+                                <span>Orders</span>
+
+                            </a>
+
+                        </li>
+
+
+                    <!-- =================================================
+                         ADMIN
+                         ================================================= -->
+
+                    <% } else if ("admin".equalsIgnoreCase(role)) { %>
+
+
+                        <!-- HOME -->
+
+                        <li class="nav-item">
+
+                            <a
+                                class="nav-link"
+                                href="<%=request.getContextPath()%>/admin/adminHome.jsp">
+
+                                <i class="bi bi-house"></i>
+
+                                <span>Home</span>
+
+                            </a>
+
+                        </li>
+
+
+                        <!-- ORDERS -->
+
+                        <li class="nav-item">
+
+                            <a
+                                class="nav-link"
+                                href="<%=request.getContextPath()%>/admin/shippedItems.jsp?uid=<%=userId%>">
+
+                                <i class="bi bi-box-seam"></i>
+
+                                <span>Orders</span>
+
+                            </a>
+
+                        </li>
+
+
+                    <!-- =================================================
+                         STAFF / DELIVERY
+                         ================================================= -->
+
+                    <% } else if ("staff".equalsIgnoreCase(role)
+                            || "delivery".equalsIgnoreCase(role)
+                            || "DELIVERY_STAFF".equalsIgnoreCase(role)
+                            ) { %>
+
+
+                        <!-- HOME -->
+
+                        <li class="nav-item">
+
+                            <a
+                                class="nav-link"
+                                href="<%=request.getContextPath()%>/staff/staffHome.jsp">
+
+                                <i class="bi bi-house"></i>
+
+                                <span>Home</span>
+
+                            </a>
+
+                        </li>
+
+
+                        <!-- ASSIGN ORDER -->
+
+                        <li class="nav-item">
+
+                            <a
+                                class="nav-link"
+                                href="<%=request.getContextPath()%>/staff/assignOrder.jsp?uId=<%=userId%>">
+
+                                <i class="bi bi-box-seam"></i>
+
+                                <span>Assign Order</span>
+
+                            </a>
+
+                        </li>
+
+
+                    <% } %>
+
+
+                    <!-- =================================================
+                         PROFILE
+                         ================================================= -->
+
+                    <li class="nav-item">
+
+                        <a
+                            class="nav-link"
+                            href="<%=profile%>">
+
+                            <i
+                                class="bi bi-person-circle">
+                            </i>
+
+                          <%-- <span>
+                                Welcome <%=name%>
+                            </span>  --%>
+
+                        </a>
+
+                    </li>
+
+
+                    <!-- =================================================
+                         LOGOUT
+                         ================================================= -->
+
+                    <li class="nav-item">
+
+                        <a
+                            class="nav-link"
+                            href="#"
+                            onclick="openLogoutModal(); return false;">
+
+                            <i
+                                class="bi bi-box-arrow-right">
+                            </i>
+
+                            <span>Logout</span>
+
+                        </a>
+
+                    </li>
+
+
+                <% } %>
+
+
+            </ul>
+
+        </div>
+
+    </div>
+
 </nav>
 
-<!-- MOBILE MENU -->
+
+<!-- =========================================================
+     MOBILE MENU
+     ========================================================= -->
+
 <div id="mobileMenu">
 
-<div class="d-flex justify-content-between">
-<h4>Menu</h4>
-<button id="closeMenu" class="btn btn-light btn-sm">X</button>
+
+    <!-- MOBILE HEADER -->
+
+    <div
+        class="d-flex
+               justify-content-between
+               align-items-center">
+
+        <h4 class="fw-bold m-0">
+
+            <i class="bi bi-bag-heart-fill"></i>
+
+            MYSHOP
+
+        </h4>
+
+
+        <button
+            type="button"
+            id="closeMenu"
+            class="mobile-close">
+
+            <i class="bi bi-x-lg"></i>
+
+        </button>
+
+    </div>
+
+
+    <!-- MOBILE SEARCH -->
+
+    <form
+        action="<%=request.getContextPath()%>/index.jsp"
+        method="get">
+
+        <input
+            type="search"
+            name="search"
+            class="form-control mobile-search my-4"
+            placeholder="Search products..."
+            value="<%=request.getParameter("search") != null
+                ? request.getParameter("search")
+                : ""%>">
+
+    </form>
+
+
+    <% if (role == null) { %>
+
+
+        <!-- GUEST -->
+
+        <a
+            href="<%=request.getContextPath()%>/index.jsp">
+
+            <i class="bi bi-house"></i>
+
+            <span>Home</span>
+
+        </a>
+
+
+        <a
+            href="#"
+            onclick="handleGuestCart(event)">
+
+            <i class="bi bi-cart3"></i>
+
+            <span>Cart</span>
+
+        </a>
+
+
+        <a
+            href="<%=request.getContextPath()%>/login.jsp">
+
+            <i
+                class="bi bi-box-arrow-in-right">
+            </i>
+
+            <span>Login</span>
+
+        </a>
+
+
+    <% } else { %>
+
+
+        <!-- =================================================
+             CUSTOMER MOBILE
+             ================================================= -->
+
+        <% if ("customer".equalsIgnoreCase(role)) { %>
+
+
+            <a
+                href="<%=request.getContextPath()%>/user/userHome.jsp">
+
+                <i class="bi bi-house"></i>
+
+                <span>Home</span>
+
+            </a>
+
+
+            <a
+                href="<%=request.getContextPath()%>/user/cart.jsp?cartId=<%=cartId%>&uid=<%=userId%>">
+
+                <i class="bi bi-cart3"></i>
+
+                <span>
+                    Cart (<%=cartCount%>)
+                </span>
+
+            </a>
+
+
+            <a
+                href="<%=request.getContextPath()%>/orderDetails.jsp?userId=<%=userId%>&orderId=<%=session.getAttribute("orderId")%>">
+
+                <i class="bi bi-truck"></i>
+
+                <span>Orders</span>
+
+            </a>
+
+
+        <!-- =================================================
+             ADMIN MOBILE
+             ================================================= -->
+
+        <% } else if ("admin".equalsIgnoreCase(role)) { %>
+
+
+            <a
+                href="<%=request.getContextPath()%>/admin/adminHome.jsp">
+
+                <i class="bi bi-house"></i>
+
+                <span>Home</span>
+
+            </a>
+
+
+            <a
+                href="<%=request.getContextPath()%>/admin/shippedItems.jsp?uid=<%=userId%>">
+
+                <i class="bi bi-box-seam"></i>
+
+                <span>Orders</span>
+
+            </a>
+
+
+        <!-- =================================================
+             STAFF MOBILE
+             ================================================= -->
+
+        <% } else if ("staff".equalsIgnoreCase(role)
+                || "delivery".equalsIgnoreCase(role)
+                || "DELIVERY_STAFF".equalsIgnoreCase(role)
+                ) { %>
+
+
+            <a
+                href="<%=request.getContextPath()%>/staff/staffHome.jsp">
+
+                <i class="bi bi-house"></i>
+
+                <span>Home</span>
+
+            </a>
+
+
+            <a
+                href="<%=request.getContextPath()%>/staff/assignOrder.jsp?uId=<%=userId%>">
+
+                <i class="bi bi-box-seam"></i>
+
+                <span>Assign Order</span>
+
+            </a>
+
+
+        <% } %>
+
+
+        <!-- PROFILE -->
+
+        <a href="<%=profile%>">
+
+            <i
+                class="bi bi-person-circle">
+            </i>
+
+            <span>Profile</span>
+
+        </a>
+
+
+        <!-- LOGOUT -->
+
+        <a
+            href="#"
+            onclick="openLogoutModal(); return false;">
+
+            <i
+                class="bi bi-box-arrow-right">
+            </i>
+
+            <span>Logout</span>
+
+        </a>
+
+
+    <% } %>
+
+
+    <!-- MOBILE THEME -->
+
+    <a
+        href="#"
+        onclick="toggleTheme(); return false;">
+
+        <i class="bi bi-circle-half"></i>
+
+        <span>Change Theme</span>
+
+    </a>
+
 </div>
 
-<input type="text" class="form-control my-3" placeholder="Search...">
 
-<a href="<%=homePage%>">Home</a>
-<a href="#">Orders</a>
-<a href="userProfile.jsp">Profile</a>
-<a href="#" onclick="openLogoutModal()">Logout</a>
+<!-- =========================================================
+     OVERLAY
+     ========================================================= -->
 
-</div>
-
-<!-- OVERLAY -->
 <div id="menuOverlay"></div>
 
-<!-- LOGOUT MODAL -->
-<div class="modal fade" id="logoutModal">
-<div class="modal-dialog modal-dialog-centered">
-<div class="modal-content text-center">
 
-<div class="modal-header">
-<h5>Confirm Logout</h5>
-<button class="btn-close" data-bs-dismiss="modal"></button>
+<!-- =========================================================
+     LOGOUT MODAL
+     ========================================================= -->
+
+<%
+    if (userId != null && !userId.trim().isEmpty()) {
+%>
+
+<div
+    class="modal fade"
+    id="logoutModal"
+    tabindex="-1"
+    aria-hidden="true">
+
+    <div
+        class="modal-dialog modal-dialog-centered">
+
+        <div
+            class="modal-content logout-modal-content">
+
+
+            <div class="modal-header">
+
+                <h5 class="modal-title">
+
+                    <i
+                        class="bi bi-box-arrow-right">
+                    </i>
+
+                    Confirm Logout
+
+                </h5>
+
+
+                <button
+                    type="button"
+                    class="btn-close"
+                    data-bs-dismiss="modal">
+                </button>
+
+            </div>
+
+
+            <div
+                class="modal-body text-center">
+
+                <i
+                    class="bi bi-question-circle"
+                    style="font-size:45px;">
+                </i>
+
+
+                <p class="mt-3 mb-0">
+
+                    Are you sure you want to logout?
+
+                </p>
+
+            </div>
+
+
+            <div
+                class="modal-footer
+                       justify-content-center">
+
+                <button
+                    type="button"
+                    class="btn btn-secondary"
+                    data-bs-dismiss="modal">
+
+                    Cancel
+
+                </button>
+
+
+                <button
+                    type="button"
+                    class="btn btn-danger"
+                    onclick="confirmLogout()">
+
+                    Logout
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
 </div>
 
-<div class="modal-body">
-<p>Are you sure you want to logout?</p>
-</div>
+<%
+    }
+%>
 
-<div class="modal-footer justify-content-center">
-<button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-<button class="btn btn-danger" onclick="confirmLogout()">Logout</button>
-</div>
 
-</div>
-</div>
-</div>
+<!-- =========================================================
+     BOOTSTRAP JS
+     ========================================================= -->
+
+<script
+    src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js">
+</script>
+
 
 <script>
 
-// MOBILE MENU
-const toggleBtn = document.getElementById("navToggleBtn");
-const mobileMenu = document.getElementById("mobileMenu");
-const overlay = document.getElementById("menuOverlay");
-const closeBtn = document.getElementById("closeMenu");
+/* =========================================================
+   THEME
+   ========================================================= */
 
-toggleBtn.onclick = () => {
-    mobileMenu.classList.add("active");
-    overlay.classList.add("active");
-};
+function applyTheme() {
 
-closeBtn.onclick = closeMenu;
-overlay.onclick = closeMenu;
+    const savedTheme =
+        localStorage.getItem("myshop-theme") || "light";
 
-function closeMenu(){
-    mobileMenu.classList.remove("active");
-    overlay.classList.remove("active");
+
+    if (savedTheme === "dark") {
+
+        document.body.classList.add(
+            "dark-mode"
+        );
+
+    } else {
+
+        document.body.classList.remove(
+            "dark-mode"
+        );
+    }
+
+
+    updateThemeIcon();
 }
 
-// DARK MODE
-document.getElementById("themeToggle").onclick = () => {
-    document.body.classList.toggle("dark-mode");
-};
 
-// SCROLL NAVBAR
-window.addEventListener("scroll", () => {
-    document.getElementById("navbar")
-    .classList.toggle("nav-scrolled", window.scrollY > 50);
-});
+/* =========================================================
+   UPDATE THEME ICON
+   ========================================================= */
 
-// LOGOUT
+function updateThemeIcon() {
+
+    const icon =
+        document.getElementById(
+            "themeIcon"
+        );
+
+
+    if (!icon) {
+        return;
+    }
+
+
+    if (
+        document.body.classList.contains(
+            "dark-mode"
+        )
+    ) {
+
+        icon.className =
+            "bi bi-sun-fill";
+
+        icon.title =
+            "Switch to light mode";
+
+    } else {
+
+        icon.className =
+            "bi bi-moon-fill";
+
+        icon.title =
+            "Switch to dark mode";
+    }
+}
+
+
+/* =========================================================
+   TOGGLE THEME
+   ========================================================= */
+
+function toggleTheme() {
+
+    const isDark =
+        document.body.classList.contains(
+            "dark-mode"
+        );
+
+
+    if (isDark) {
+
+        document.body.classList.remove(
+            "dark-mode"
+        );
+
+        localStorage.setItem(
+            "myshop-theme",
+            "light"
+        );
+
+    } else {
+
+        document.body.classList.add(
+            "dark-mode"
+        );
+
+        localStorage.setItem(
+            "myshop-theme",
+            "dark"
+        );
+    }
+
+
+    updateThemeIcon();
+}
+
+
+/* =========================================================
+   INITIALIZE
+   ========================================================= */
+
+document.addEventListener(
+    "DOMContentLoaded",
+    function () {
+
+        applyTheme();
+
+
+        const themeToggle =
+            document.getElementById(
+                "themeToggle"
+            );
+
+
+        if (themeToggle) {
+
+            themeToggle.addEventListener(
+                "click",
+                function () {
+
+                    toggleTheme();
+
+                }
+            );
+        }
+
+    }
+);
+
+
+/* =========================================================
+   MOBILE MENU
+   ========================================================= */
+
+document.addEventListener(
+    "DOMContentLoaded",
+    function () {
+
+        const toggleBtn =
+            document.getElementById(
+                "navToggleBtn"
+            );
+
+        const mobileMenu =
+            document.getElementById(
+                "mobileMenu"
+            );
+
+        const overlay =
+            document.getElementById(
+                "menuOverlay"
+            );
+
+        const closeBtn =
+            document.getElementById(
+                "closeMenu"
+            );
+
+
+        if (
+            toggleBtn &&
+            mobileMenu &&
+            overlay
+        ) {
+
+            toggleBtn.addEventListener(
+                "click",
+                function () {
+
+                    mobileMenu.classList.add(
+                        "active"
+                    );
+
+                    overlay.classList.add(
+                        "active"
+                    );
+
+                    document.body.style.overflow =
+                        "hidden";
+
+                }
+            );
+        }
+
+
+        if (closeBtn) {
+
+            closeBtn.addEventListener(
+                "click",
+                closeMenu
+            );
+        }
+
+
+        if (overlay) {
+
+            overlay.addEventListener(
+                "click",
+                closeMenu
+            );
+        }
+
+
+        function closeMenu() {
+
+            if (mobileMenu) {
+
+                mobileMenu.classList.remove(
+                    "active"
+                );
+            }
+
+
+            if (overlay) {
+
+                overlay.classList.remove(
+                    "active"
+                );
+            }
+
+
+            document.body.style.overflow =
+                "";
+        }
+
+    }
+);
+
+
+/* =========================================================
+   GUEST CART
+   ========================================================= */
+
+function handleGuestCart(event) {
+
+    if (event) {
+
+        event.preventDefault();
+
+    }
+
+
+    if (
+        typeof showLoginAlert ===
+        "function"
+    ) {
+
+        showLoginAlert();
+
+    } else {
+
+        window.location.href =
+            "<%=request.getContextPath()%>/login.jsp";
+    }
+}
+
+
+/* =========================================================
+   CART COUNT
+   ========================================================= */
+
+function loadCartCount() {
+
+    const badge =
+        document.getElementById(
+            "cartCount"
+        );
+
+
+    if (!badge) {
+        return;
+    }
+
+
+    fetch(
+        "<%=request.getContextPath()%>/cartCount"
+    )
+    .then(function(response) {
+
+        if (!response.ok) {
+
+            throw new Error(
+                "Cart count request failed"
+            );
+        }
+
+        return response.text();
+
+    })
+    .then(function(count) {
+
+        badge.innerText =
+            count;
+
+    })
+    .catch(function(error) {
+
+        console.log(
+            "Cart count:",
+            error
+        );
+
+    });
+}
+
+
+/* =========================================================
+   SCROLL NAVBAR
+   ========================================================= */
+
+window.addEventListener(
+    "scroll",
+    function () {
+
+        const navbar =
+            document.getElementById(
+                "navbar"
+            );
+
+
+        if (!navbar) {
+            return;
+        }
+
+
+        if (window.scrollY > 50) {
+
+            navbar.classList.add(
+                "nav-scrolled"
+            );
+
+        } else {
+
+            navbar.classList.remove(
+                "nav-scrolled"
+            );
+        }
+
+    }
+);
+
+
+/* =========================================================
+   LOGOUT MODAL
+   ========================================================= */
+
 function openLogoutModal() {
-    new bootstrap.Modal(document.getElementById('logoutModal')).show();
+
+    const modalElement =
+        document.getElementById(
+            "logoutModal"
+        );
+
+
+    if (!modalElement) {
+        return;
+    }
+
+
+    if (
+        typeof bootstrap !==
+        "undefined"
+    ) {
+
+        const modal =
+            bootstrap.Modal.getOrCreateInstance(
+                modalElement
+            );
+
+        modal.show();
+
+    } else {
+
+        confirmLogout();
+    }
 }
+
+
+/* =========================================================
+   CONFIRM LOGOUT
+   ========================================================= */
 
 function confirmLogout() {
-    window.location.href = "<%=request.getContextPath()%>/LogoutSrv";
+
+    window.location.href =
+        "<%=request.getContextPath()%>/LogoutSrv";
 }
+
+
+/* =========================================================
+   THEME SYNC BETWEEN TABS
+   ========================================================= */
+
+window.addEventListener(
+    "storage",
+    function(event) {
+
+        if (
+            event.key ===
+            "myshop-theme"
+        ) {
+
+            applyTheme();
+
+        }
+
+    }
+);
 
 </script>
 

@@ -25,7 +25,7 @@ public interface StaffService {
     
     public String isValidCredential(String emailId, String password);
     
-    public StaffBean getStaffDetails(String email, String password);
+    public StaffBean getStaffDetails(String email);
     
     public byte[] getProfileImg(String userId);
     

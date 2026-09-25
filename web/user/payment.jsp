@@ -9,8 +9,8 @@ if (userId == null) {
 }
 double amount = Double.parseDouble(request.getParameter("amount"));
 String pid = request.getParameter("pid");
-//String paymentId = idUtil.generateTransactionId();
-//String orderId = idUtil.generateUUIDOrderId();
+String paymentId = idUtil.generateTransactionId();
+String orderId = idUtil.generateUUIDOrderId();
 %>
 <!DOCTYPE html>
 <html lang="en">

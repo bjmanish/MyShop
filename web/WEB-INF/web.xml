@@ -25,16 +25,18 @@
         <servlet-name>Verify</servlet-name>
         <servlet-class>com.myshop.srv.Verify</servlet-class>
     </servlet>
-    
     <servlet>
         <servlet-name>SendOTPSrv</servlet-name>
         <servlet-class>com.myshop.srv.SendOTPSrv</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>MyShopSessionListener</servlet-name>
+        <servlet-class>com.myshop.listener.MyShopSessionListener</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>SendOTPSrv</servlet-name>
         <url-pattern>/SendOTPSrv</url-pattern>
     </servlet-mapping>
-    
     <servlet>
         <servlet-name>VerifyOTPServlet</servlet-name>
         <servlet-class>com.myshop.srv.VerifyOTPServlet</servlet-class>
@@ -43,7 +45,6 @@
         <servlet-name>VerifyOTPServlet</servlet-name>
         <url-pattern>/VerifyOTPServlet</url-pattern>
     </servlet-mapping>
-    
     <servlet-mapping>
         <servlet-name>ViewStaffSev</servlet-name>
         <url-pattern>/ViewStaffSev</url-pattern>
@@ -67,6 +68,10 @@
     <servlet-mapping>
         <servlet-name>Verify</servlet-name>
         <url-pattern>/Verify</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>MyShopSessionListener</servlet-name>
+        <url-pattern>/MyShopSessionListener</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>

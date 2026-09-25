@@ -10,7 +10,7 @@ public class PaymentDAO {
     public static void savePayment(String orderId, String userId, String txnId, Double amount, String status, String payu_hash) {
         try (Connection con = dbUtil.provideConnection()) {
 
-            String sql = "INSERT INTO PAYMENTS_PAYU(payment_id1, order_id, user_id, txn_id, amount, status, payu_hash) VALUES(?,?,?,?,?,?,?)";
+            String sql = "INSERT INTO dbo.PAYMENTS_PAYU(payment_id1, order_id, user_id, txn_id, amount, status, payu_hash) VALUES(?,?,?,?,?,?,?)";
             PreparedStatement ps = con.prepareStatement(sql);
             String payId = idUtil.generateTransactionId();
             ps.setString(1, payId);
