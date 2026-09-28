@@ -22,13 +22,13 @@ public class PaymentSuccessServlet extends HttpServlet {
 
         String txnId = request.getParameter("txnid");
         String paymentMode = request.getParameter("mode");
-
+        String pid = request.getParameter("pid");
         // Update DB
         PaymentDAO.updatePayment(txnId, "SUCCESS", paymentMode);
 
         // Update Order
 //        .updatePaymentStatus(txnId, "SUCCESS");
-        new OrderServiceImpl().paymentSuccess(paymentMode, txnId, txnId, txnId, 0);
+        new OrderServiceImpl().paymentSuccess(paymentMode, pid, txnId, txnId, txnId, 0);
 
         request.setAttribute("msg", "Payment Successful ✅");
         request.getRequestDispatcher("user/success.jsp").forward(request, response);

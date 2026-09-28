@@ -750,16 +750,18 @@
 
 
                 <form class="footer-newsletter"
-                      onsubmit="subscribeMyShop(event)">
+                      id ="subscriptionForm">
 
                     <input
                         type="email"
-                        class="footer-newsletter-input"
+                        id="subscriptionEmail"
+                        name="email"
+                        class="footer-newsletter-input form-control"
                         placeholder="Enter your email"
                         required
                     >
 
-                    <button type="submit" aria-label="Subscribe">
+                    <button type="submit" id="subscribeBtn" aria-label="Subscribe">
 
                         <i class="fa-solid fa-paper-plane"></i>
 
@@ -883,43 +885,84 @@
     /* =========================
        NEWSLETTER
        ========================= */
+    document.getElementById("subscriptionForm")
+    .addEventListener("submit", function (event) {
 
-    function subscribeMyShop(event) {
+    event.preventDefault();
 
-        event.preventDefault();
+    const emailInput =
+        document.getElementById("subscriptionEmail");
 
-        const email =
-            event.target.querySelector("input").value.trim();
+    const button =
+        document.getElementById("subscribeBtn");
 
-        if (!email) {
-            return;
+    const email = emailInput.value.trim();
+
+    if (!email) {
+        showToast("Please enter your email address.");
+        return;
+    }
+
+    const oldButtonHTML = button.innerHTML;
+
+    button.disabled = true;
+
+    button.innerHTML =
+        '<span class="spinner-border spinner-border-sm me-1"></span>' +
+        ' Subscribing...';
+
+    fetch(`/MyShop/SubscriptionServlet`, {
+        method: "POST",
+        headers: {
+            "Content-Type":
+                "application/x-www-form-urlencoded"
+        },
+        body:
+            "email=" + encodeURIComponent(email)
+    })
+
+    .then(response => {
+
+        if (!response.ok) {
+            throw new Error("Subscription request failed");
         }
+        return response.json();
+    })
 
-        /*
-         * Currently this is UI only.
-         * Connect this form to your servlet later
-         * if you want to store subscribers.
-         */
+    .then(data => {
 
-        if (typeof Swal !== "undefined") {
+        if (data.success) {
 
-            Swal.fire({
-                icon: "success",
-                title: "Subscribed!",
-                text: "Thank you for subscribing to MYSHOP.",
-                confirmButtonText: "OK",
-                confirmButtonColor: "#2563eb"
-            });
+            emailInput.value = "";
+
+            button.innerHTML =
+                '<i class="bi bi-check-circle me-1"></i>' +
+                ' Subscribed';
+
+            showToast(data.message);
 
         } else {
 
-            alert("Thank you for subscribing to MYSHOP.");
+            showToast(data.message);
 
+            button.innerHTML = oldButtonHTML;
+            button.disabled = false;
         }
+    })
 
-        event.target.reset();
-    }
+    .catch(error => {
 
+        console.error(error);
+
+        showToast(
+            "Something went wrong. Please try again."
+        );
+
+        button.innerHTML = oldButtonHTML;
+        button.disabled = false;
+    });
+
+});
 
     /* =========================
        THEME SUPPORT

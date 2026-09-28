@@ -5,6 +5,7 @@ import com.myshop.service.impl.CartServiceImpl;
 import com.myshop.service.impl.OrderServiceImpl;
 import com.myshop.service.impl.UserLoginActivityServiceImpl;
 import com.myshop.service.impl.UserServiceImpl;
+import com.myshop.utility.MailMessage;
 import com.myshop.utility.dbUtil;
 
 import java.io.BufferedReader;
@@ -210,7 +211,11 @@ public class GoogleLoginServlet extends HttpServlet {
                             name,
                             email
                     );
-
+            
+                    String ipAddress = getClientIpAddress(request);
+                    String device = getDeviceInfo(request);
+                    
+                    MailMessage.welcomeBack(user, ipAddress, device);
 
             // =================================================
             // VALIDATE APPLICATION USER
@@ -560,7 +565,7 @@ public class GoogleLoginServlet extends HttpServlet {
 
 
             if (rows > 0) {
-
+                
                 System.out.println(
                         "Login activity inserted successfully."
                 );
@@ -687,6 +692,39 @@ public class GoogleLoginServlet extends HttpServlet {
         return ipAddress;
     }
 
+    private String getDeviceInfo(HttpServletRequest request) { 
+        String userAgent = request.getHeader("User-Agent"); 
+        if (userAgent == null || userAgent.trim().isEmpty()) { 
+            return "Unknown Device"; 
+        } 
+        userAgent = userAgent.toLowerCase(); 
+        String device; 
+        if (userAgent.contains("mobile") || 
+                userAgent.contains("android") || 
+                userAgent.contains("iphone") || 
+                userAgent.contains("ipad")
+            ) { 
+            device = "Mobile"; 
+        } else { 
+            device = "Desktop"; 
+        } 
+        String browser = "Unknown Browser"; 
+        if (userAgent.contains("edg/")){
+            browser = "Microsoft Edge"; 
+        } else if (userAgent.contains("chrome") && 
+                !userAgent.contains("edg/")) { 
+            browser = "Google Chrome"; 
+        } else if (userAgent.contains("firefox")) { 
+            browser = "Mozilla Firefox"; 
+        } else if (userAgent.contains("safari") && 
+                !userAgent.contains("chrome")) { 
+            browser = "Safari"; 
+        } else if (userAgent.contains("opera") || 
+                userAgent.contains("opr/")) { 
+            browser = "Opera"; 
+        } 
+        return device + " • " + browser; 
+    }
 
     // =========================================================
     // VERIFY GOOGLE TOKEN

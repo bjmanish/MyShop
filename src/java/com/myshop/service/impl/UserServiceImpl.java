@@ -3,6 +3,7 @@ package com.myshop.service.impl;
 import com.myshop.beans.UserBean;
 import com.myshop.beans.UserDetails;
 import com.myshop.service.UserService;
+import com.myshop.utility.MailMessage;
 //import com.myshop.utility.MailMessage;
 import com.myshop.utility.dbUtil;
 import com.myshop.utility.PasswordEncryption;
@@ -329,7 +330,7 @@ public class UserServiceImpl implements UserService {
         ps.setString(1, email);
 //        ps.setString()
         ResultSet rs = ps.executeQuery();
-
+        
         if (rs.next()) {
                 user = new UserBean();
                 user.setName(rs.getString("name"));
@@ -346,6 +347,8 @@ public class UserServiceImpl implements UserService {
                 user.setRoleId(roleId);
                 user.setRoleName(roleName);
                 
+//                MailMessage.welcomeBack(user);
+                
             } else {
             // ✅ 2. Insert new user
             String insertQuery = "INSERT INTO [USER] (user_id, name, email, password, role_id) VALUES (?, ?, ?, ?, ?)";
@@ -358,8 +361,10 @@ public class UserServiceImpl implements UserService {
             insertPs.setString(4, "GOOGLE_AUTH"); // or NULL
             insertPs.setInt(5, 1); // default role
 
-            insertPs.executeUpdate();
-
+//            insertPs.executeUpdate();
+            if(insertPs.executeUpdate()>0){
+                MailMessage.registrationSuccess(email, name);
+            }
 //            roleName = "CUSTOMER";
         }
 

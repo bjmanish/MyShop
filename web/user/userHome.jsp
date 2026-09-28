@@ -15,10 +15,10 @@
     <meta
         name="viewport"
         content="width=device-width, initial-scale=1.0">
-    
+
     <link rel="shortcut icon"
-      type="image/x-icon"
-      href="<%=request.getContextPath()%>/favicon.ico">
+          type="image/x-icon"
+          href="<%=request.getContextPath()%>/favicon.ico">
 
     <!-- =====================================================
          BOOTSTRAP
@@ -75,7 +75,6 @@
          ===================================================== -->
 
     <style>
-
 
         /* =====================================================
            LIGHT THEME
@@ -163,7 +162,7 @@
 
         html,
         body {
-        
+
             margin-top: 80px;
 
             padding: 0;
@@ -449,11 +448,13 @@
                     25px;
             }
 
+
             .home-title {
 
                 font-size:
                     22px;
             }
+
 
             .product-card {
 
@@ -464,11 +465,13 @@
                     16px;
             }
 
+
             .product-img {
 
                 height:
                     150px;
             }
+
 
             .product-name {
 
@@ -476,17 +479,20 @@
                     14px;
             }
 
+
             .product-description {
 
                 font-size:
                     12px;
             }
 
+
             .price {
 
                 font-size:
                     16px;
             }
+
 
             .old-price {
 
@@ -538,6 +544,7 @@
 
 
     <%
+
         String userId =
             (String) session.getAttribute("user_id");
 
@@ -552,6 +559,124 @@
 
         List<ProductBean> products =
             prodDao.getAllProducts();
+
+
+        /*
+         * =====================================================
+         * CART PRODUCT CHECK
+         * =====================================================
+         *
+         * Store product IDs that already exist in the
+         * logged-in user's cart.
+         *
+         * Example:
+         *
+         * cartProductIds = [P001, P005, P009]
+         *
+         * Then when displaying P005:
+         *
+         * productInCart = true
+         *
+         */
+
+        Set<String> cartProductIds =
+            new HashSet<>();
+
+
+        String cartId =
+            (String) session.getAttribute("cartId");
+
+
+        if (isLoggedIn) {
+
+            try {
+
+                CartServiceImpl cartService =
+                    new CartServiceImpl();
+
+
+                /*
+                 * If cartId is not available in session,
+                 * get/create it for this user.
+                 */
+
+                if (cartId == null ||
+                    cartId.trim().isEmpty()) {
+
+                    cartId =
+                        cartService.getOrCreateCart(
+                            userId
+                        );
+
+                    session.setAttribute(
+                        "cartId",
+                        cartId
+                    );
+                }
+
+
+                /*
+                 * Get all cart items.
+                 */
+
+                if (cartId != null &&
+                    !cartId.trim().isEmpty()) {
+
+                    List<CartBean> cartItems =
+                        cartService.getAllCartItems(
+                            cartId
+                        );
+
+
+                    if (cartItems != null) {
+
+                        for (CartBean item :
+                             cartItems) {
+
+                            if (item != null &&
+                                item.getProdId() != null &&
+                                !item.getProdId()
+                                    .trim()
+                                    .isEmpty()) {
+
+
+                                /*
+                                 * Only consider the product
+                                 * as present when quantity > 0.
+                                 */
+
+                                if (item.getQuantity() > 0) {
+
+                                    cartProductIds.add(
+                                        item.getProdId()
+                                            .trim()
+                                    );
+                                }
+
+                            }
+
+                        }
+
+                    }
+
+                }
+
+            } catch (Exception e) {
+
+                /*
+                 * Do not break the home page if cart
+                 * lookup fails.
+                 */
+
+                System.err.println(
+                    "Unable to load cart products: "
+                    + e.getMessage()
+                );
+
+            }
+
+        }
+
     %>
 
 
@@ -573,6 +698,7 @@
 
 
             <%
+
                 if (products != null &&
                     !products.isEmpty()) {
 
@@ -603,13 +729,41 @@
 
                         double oldPrice =
                             price + 500;
+
+
+                        /*
+                         * =================================================
+                         * PRODUCT ID
+                         * =================================================
+                         */
+
+                        String productId =
+                            product.getProdId();
+
+
+                        /*
+                         * =================================================
+                         * CHECK IF PRODUCT EXISTS IN CART
+                         * =================================================
+                         */
+
+                        boolean productInCart =
+                            productId != null
+                            &&
+                            cartProductIds.contains(
+                                productId.trim()
+                            );
+
             %>
 
 
             <!-- =================================================
                  PRODUCT
                  ================================================= -->
-             <% for(int i=1; i<=10; i++){ %>
+
+            <% for (int i = 1; i <= 10; i++) { %>
+
+
             <div
                 class="col-xl-3
                        col-lg-3
@@ -673,13 +827,53 @@
                     </p>
 
 
-                    <!-- BUTTONS -->
+                    <!-- =================================================
+                         BUTTONS
+                         ================================================= -->
 
                     <div class="mt-auto">
 
 
                         <%
+
                             if (isLoggedIn) {
+
+                                /*
+                                 * =================================================
+                                 * PRODUCT ALREADY IN CART
+                                 * =================================================
+                                 */
+
+                                if (productInCart) {
+
+                        %>
+
+
+                        <button
+                            type="button"
+                            class="btn btn-primary
+                                   w-100
+                                   mb-2
+                                   btn-custom"
+                            onclick="goToCart()">
+
+                            <i class="bi bi-cart-check me-1"></i>
+
+                            Go to Cart
+
+                        </button>
+
+
+                        <%
+
+                                } else {
+
+                                    /*
+                                     * =================================================
+                                     * PRODUCT NOT IN CART
+                                     * =================================================
+                                     */
+
                         %>
 
 
@@ -694,10 +888,23 @@
                                 this
                             )">
 
+                            <i class="bi bi-cart-plus me-1"></i>
+
                             Add to Cart
 
                         </button>
 
+
+                        <%
+
+                                }
+
+                        %>
+
+
+                        <!-- =================================================
+                             BUY NOW
+                             ================================================= -->
 
                         <button
                             type="button"
@@ -709,15 +916,23 @@
                                 '<%=price%>'
                             )">
 
+                            <i class="bi bi-lightning-charge me-1"></i>
+
                             Buy Now
 
                         </button>
 
 
                         <%
+
                             } else {
+
                         %>
 
+
+                        <!-- =================================================
+                             NOT LOGGED IN
+                             ================================================= -->
 
                         <button
                             type="button"
@@ -726,6 +941,8 @@
                                    mb-2
                                    btn-custom"
                             onclick="showLoginAlert()">
+
+                            <i class="bi bi-cart-plus me-1"></i>
 
                             Add to Cart
 
@@ -739,13 +956,17 @@
                                    btn-custom"
                             onclick="showLoginAlert()">
 
+                            <i class="bi bi-lightning-charge me-1"></i>
+
                             Buy Now
 
                         </button>
 
 
                         <%
+
                             }
+
                         %>
 
 
@@ -758,9 +979,14 @@
 
 
             <%
-                }   }
 
-                } else {
+                    }
+
+                }
+
+
+            } else {
+
             %>
 
 
@@ -778,6 +1004,7 @@
 
                     </h5>
 
+
                     <p class="mb-0">
 
                         Please check again later.
@@ -790,7 +1017,9 @@
 
 
             <%
+
                 }
+
             %>
 
 
@@ -828,13 +1057,21 @@
 
         function addToCart(pid, btn) {
 
+
             if (!btn) {
+
                 return;
+
             }
 
 
             btn.disabled = true;
 
+
+            /*
+             * Save the current button text.
+             * This is only used if the request fails.
+             */
 
             const oldText =
                 btn.innerHTML;
@@ -847,40 +1084,88 @@
             fetch(
                 "<%=request.getContextPath()%>/AddtoCart",
                 {
+
                     method: "POST",
 
                     headers: {
+
                         "Content-Type":
                             "application/x-www-form-urlencoded"
+
                     },
 
                     body:
                         "pid=" +
                         encodeURIComponent(pid) +
                         "&pqty=1"
+
                 }
             )
+
+
             .then(function(response) {
+
 
                 if (!response.ok) {
 
                     throw new Error(
                         "Add to cart failed"
                     );
+
                 }
+
 
                 return response.text();
 
             })
+
+
             .then(function(response) {
+
 
                 console.log(
                     "AddtoCart:",
+                    response
+                );
+
+
+                /*
+                 * =================================================
+                 * SUCCESS
+                 * =================================================
+                 *
+                 * Do NOT restore Add to Cart.
+                 *
+                 * Change the button permanently to Go to Cart.
+                 */
+
+                btn.disabled = false;
+
+
+                btn.classList.remove(
+                    "btn-success"
+                );
+
+
+                btn.classList.add(
+                    "btn-primary"
                 );
 
 
                 btn.innerHTML =
-                    "Added ?";
+                    '<i class="bi bi-cart-check me-1"></i> Go to Cart';
+
+
+                /*
+                 * Replace the old Add to Cart action.
+                 */
+
+                btn.onclick =
+                    function () {
+
+                        goToCart();
+
+                    };
 
 
                 showToast(
@@ -888,33 +1173,39 @@
                 );
 
 
+                /*
+                 * Update header cart count if
+                 * loadCartCount() exists.
+                 */
+
                 if (
                     typeof loadCartCount ===
                     "function"
                 ) {
 
                     loadCartCount();
+
                 }
 
 
-                setTimeout(function() {
-
-                    btn.disabled = false;
-
-                    btn.innerHTML =
-                        oldText;
-
-                }, 1500);
-
             })
+
+
             .catch(function(error) {
+
 
                 console.error(
                     error
                 );
 
 
+                /*
+                 * Restore the original button
+                 * only when adding fails.
+                 */
+
                 btn.disabled = false;
+
 
                 btn.innerHTML =
                     oldText;
@@ -937,19 +1228,41 @@
 
 
         /* =================================================
+           GO TO CART
+           ================================================= */
+
+        function goToCart() {
+
+
+            /*
+             * Change this path if your actual
+             * cart JSP is somewhere else.
+             */
+
+            window.location.href =
+                "<%=request.getContextPath()%>/user/cart.jsp?cartId=<%=cartId%>&uid=<%=userId%>";
+
+        }
+
+
+        /* =================================================
            BUY NOW
            ================================================= */
 
         function buyNow(pid, price) {
 
+
             fetch(
                 "<%=request.getContextPath()%>/PaymentServlet",
                 {
+
                     method: "POST",
 
                     headers: {
+
                         "Content-Type":
                             "application/x-www-form-urlencoded"
+
                     },
 
                     body:
@@ -962,17 +1275,26 @@
                         encodeURIComponent(price) +
 
                         "&buyNow=true"
+
                 }
+
             )
+
+
             .then(function(response) {
+
 
                 console.log(
                     "Payment response:",
                     response.status
                 );
 
+
             })
+
+
             .catch(function(error) {
+
 
                 console.error(
                     "Buy Now:",
@@ -1001,6 +1323,7 @@
            ================================================= */
 
         function showToast(message) {
+
 
             const toast =
                 document.createElement("div");
@@ -1034,6 +1357,7 @@
 
         function showLoginAlert() {
 
+
             Swal.fire({
 
                 icon: "warning",
@@ -1046,7 +1370,11 @@
                 confirmButtonText:
                     "Login"
 
-            }).then(function() {
+            })
+
+
+            .then(function() {
+
 
                 window.location.href =
                     "<%=request.getContextPath()%>/login.jsp";
@@ -1054,6 +1382,7 @@
             });
 
         }
+
 
     </script>
 

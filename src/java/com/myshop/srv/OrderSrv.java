@@ -42,12 +42,12 @@ protected void doPost(HttpServletRequest request, HttpServletResponse response)
         double amount = Double.parseDouble(request.getParameter("amount"));
         String paymentId = request.getParameter("paymentId");
         String orderId = request.getParameter("orderId");
-        
+        String pid = request.getParameter("pid");
         // ================= STEP 1: CREATE ORDER =================
         OrderServiceImpl orderService = new OrderServiceImpl();
 
         String orderStatus = orderService.paymentSuccess(
-                paymentId, orderId, userId, cartId, amount
+                paymentId, pid, orderId, userId, cartId, amount
         );
 
         if (orderStatus == null) {

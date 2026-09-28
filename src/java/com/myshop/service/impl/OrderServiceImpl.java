@@ -16,7 +16,7 @@ public class OrderServiceImpl implements OrderService {
 
     // ================= PAYMENT SUCCESS =================
     @Override
-    public String paymentSuccess(String paymentId, String orderId, String userId,String cartId, double paidAmount) {
+    public String paymentSuccess(String paymentId, String prodId, String orderId, String userId, String cartId, double paidAmount) {
 
         String status = "FAILED";
         Connection conn = null;
@@ -29,7 +29,7 @@ public class OrderServiceImpl implements OrderService {
 
             // 🔥 1. INSERT ORDER
             PreparedStatement ps1 = conn.prepareStatement(
-                "INSERT INTO ORDERS(orderid, userid, amount, status, order_date) VALUES(?,?,?,?,?)"
+                "INSERT INTO ORDERS(orderid, prodId, userid, amount, status, order_date) VALUES(?,?,?,?,?)"
             );
 
             SimpleDateFormat sdf = new SimpleDateFormat("YYYY:MM:DD hh:mm:ss");
@@ -37,10 +37,11 @@ public class OrderServiceImpl implements OrderService {
             sdf.format(timestamp);
                     
             ps1.setString(1, orderId);
-            ps1.setString(2, userId);
-            ps1.setDouble(3, paidAmount);
-            ps1.setString(4, "PENDING");
-            ps1.setTimestamp(5, timestamp);
+            ps1.setString(2, prodId);
+            ps1.setString(3, userId);
+            ps1.setDouble(4, paidAmount);
+            ps1.setString(5, "PENDING");
+            ps1.setTimestamp(6, timestamp);
 
             ps1.executeUpdate();
 
@@ -590,13 +591,13 @@ public List<OrderDetails> getAllOrderDetails(String userId) {
         String  orderId = null;
         
         try(Connection conn = dbUtil.provideConnection();
-                PreparedStatement ps = conn.prepareStatement("SELECT order_id from orders where user_id = ?");){
+                PreparedStatement ps = conn.prepareStatement("SELECT orderid from orders where userid = ?");){
             ps.setString(1, userId);
             
             ResultSet rs = ps.executeQuery();
             
             if(rs.next()){
-                orderId = rs.getString("order_id");
+                orderId = rs.getString("orderid");
             }
             
         } catch (SQLException ex) {

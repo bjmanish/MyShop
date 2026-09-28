@@ -4,6 +4,7 @@
 
 <%
     String message = request.getParameter("message");
+
 %>
 
 <!DOCTYPE html>
@@ -323,39 +324,21 @@
                      ================================================= -->
 
                 <div class="google-container">
-
-
-                    <div
-                        id="g_id_onload"
-
+                        
+                    <div id="g_id_onload"
                         data-client_id="626330070401-adk186e3q4davc4re3bei10bgh95o3sc.apps.googleusercontent.com"
-
                         data-callback="handleCredentialResponse"
-
-                        data-auto_prompt="false"
-
-                        data-cancel_on_tap_outside="false">
-
+                        data-auto_prompt="true"
+                        data-cancel_on_tap_outside="true">
                     </div>
-
-
-                    <div
-                        class="g_id_signin"
-
+                    <div class="g_id_signin"
                         data-type="standard"
-
                         data-size="large"
-
                         data-theme="outline"
-
-                        data-text="signin_with"
-
-                        data-shape="pill"
-
-                        data-logo_alignment="left"
-
-                        data-width="320">
-
+                        data-text="sign_in_with"
+                        data-logo_alignment ="left"
+                        data-width ="320"
+                        data-shape="pill">                            
                     </div>
 
                 </div>

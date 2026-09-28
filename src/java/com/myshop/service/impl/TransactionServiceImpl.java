@@ -76,8 +76,7 @@ public class TransactionServiceImpl implements TransactionService {
         ps.setDouble(4, amount);
         ps.setString(5, orderId);
         ps.setString(6, "PENDING");
-        ps.setString(7, transType);
-        
+        ps.setString(7, transType);        
 
         flag = ps.executeUpdate() > 0;
 

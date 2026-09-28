@@ -108,7 +108,7 @@ public class PaymentServlet extends HttpServlet {
             // =============================
             PaymentDAO.savePayment(orderId, userId, txnid, amountDouble, "PENDING", hash);            
 //            new OrderServiceImpl().addOrder(order);
-            new OrderServiceImpl().paymentSuccess(cartId, orderId, userId, cartId, amountDouble);
+            new OrderServiceImpl().paymentSuccess(txnid, pid, orderId, userId, cartId, amountDouble);
             new TransactionServiceImpl().addTransaction(txnid, orderId, userId, amountDouble, "PENDING", timestamp);
             System.out.println("Payment saved in DB");
 

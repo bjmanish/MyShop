@@ -2,6 +2,7 @@ package com.myshop.srv;
 
 import com.myshop.beans.UserBean;
 import com.myshop.service.impl.UserServiceImpl;
+import com.myshop.utility.MailMessage;
 //import com.myshop.utility.PasswordEncryption;
 
 import java.io.IOException;
@@ -103,6 +104,7 @@ public class RegisterSrv extends HttpServlet {
             if ("SUCCESS".equalsIgnoreCase(status)) {
                 json.put("status", "success");
                 json.put("message", "Registration Successful!");
+                MailMessage.registrationSuccess(emailId, userName);
             } else {
                 json.put("status", "error");
                 json.put("message", status); // e.g. Email exists

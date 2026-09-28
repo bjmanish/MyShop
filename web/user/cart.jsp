@@ -12,12 +12,6 @@
 
 
 <%
-/* ============================================================
-   SESSION VALIDATION
-   IMPORTANT:
-   Keep this BEFORE header.jsp
-   ============================================================ */
-
 String userName =
         (String) session.getAttribute("username");
 

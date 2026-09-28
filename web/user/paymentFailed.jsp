@@ -1,40 +1,41 @@
+<%@page import="java.nio.charset.StandardCharsets"%>
+<%@page import="java.net.URLEncoder"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%
-    HttpSession debugSession = request.getSession(true);
+    String userName =
+            (String) session.getAttribute("username");
 
-    System.out.println("========== PAYMENT FAILURE SESSION ==========");
+    String password =
+            (String) session.getAttribute("sessionId");
 
-    if (debugSession == null) {
+    String userId =
+            (String) session.getAttribute("user_id");
 
-        System.out.println("SESSION = NULL");
 
-    } else {
+    /* =========================================================
+       SESSION CHECK
+       ========================================================= */
 
-        System.out.println(
-            "Session ID = " + debugSession.getId()
+    if (userName == null ||
+        password == null ||
+        userId == null) {
+
+        String sessionMessage =
+                java.net.URLEncoder.encode(
+                        "Your login session has expired. Please login again.",
+                        "UTF-8"
+                );
+
+        response.sendRedirect(
+                request.getContextPath()
+                + "/login.jsp?message="
+                + sessionMessage
         );
 
-        System.out.println(
-            "userId = " +
-            debugSession.getAttribute("userId")
-        );
-
-        System.out.println(
-            "user = " +
-            debugSession.getAttribute("user")
-        );
-
-        System.out.println(
-            "email = " +
-            debugSession.getAttribute("email")
-        );
-
-        System.out.println(
-            "role = " +
-            debugSession.getAttribute("role")
-        );
+        return;
     }
 %>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>

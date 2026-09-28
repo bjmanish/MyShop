@@ -11,7 +11,7 @@ public interface OrderService {
     
 //    public boolean addTransaction(TransactionBean order);
     
-    public String paymentSuccess(String payId, String ordId, String userId, String cartId, double paidAmount);
+    public String paymentSuccess(String payId, String prodId, String ordId, String userId, String cartId, double paidAmount);
     
     public int countSoldItem(String prodId);
     

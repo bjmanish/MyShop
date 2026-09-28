@@ -800,7 +800,7 @@ for (LocalDate date : visitDates) {
                                         ? user.getRoleName()
                                         : "USER" %>
 
-                                &nbsp; ? &nbsp;
+                                &nbsp; <%= user.getLoginId() %> &nbsp;
 
                                 <%= user.getIpAddress() != null
                                         ? user.getIpAddress()
